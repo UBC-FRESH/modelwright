@@ -55,7 +55,7 @@ Goal: generate readable Python from the controlled workbook IR without committin
 
 - [x] P3.1 Define generated-code prototype contract. Child issue: #15.
 - [x] P3.2 Build ignored generated-code experiment. Child issue: #16.
-- [ ] P3.3 Compare generated outputs against `formulas` results. Child issue: #17.
+- [x] P3.3 Compare generated outputs against `formulas` results. Child issue: #17.
 - [ ] P3.4 Summarize code-generation readiness. Child issue: #18.
 
 Status: active.
@@ -89,6 +89,6 @@ Status: planned.
 
 ## Current Next Steps
 
-1. Work P3.3 in child issue #17 on branch `feature/p3-code-generation-prototype`.
-2. Compare `tmp/generated_model.py` outputs against the `formulas` calculation for the same workbook.
-3. Keep comparison outputs under `tmp/` and commit only findings plus roadmap/changelog updates.
+1. Work P3.4 in child issue #18 on branch `feature/p3-code-generation-prototype`.
+2. Summarize Phase 3 generated-code readiness and define Phase 4 validation inputs.
+3. Close Phase 3 only after #18 is complete and the roadmap/changelog/issue state are synchronized.
