@@ -28,3 +28,4 @@ This file records completed project work in chronological order.
 - Opened Phase 4 PR #33 from `feature/p4-regression-validation` back to `main`.
 - Merged Phase 4 PR #33, closed parent issue #19, and activated Phase 5 on `feature/p5-package-api-cli-ci-decisions`.
 - Chose the initial package, dependency, and test stack in `planning/package-dependency-test-stack-decision.md`.
+- Defined initial Python API and deferred CLI boundaries in `planning/api-cli-boundary-decision.md`.
