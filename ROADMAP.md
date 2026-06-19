@@ -71,9 +71,9 @@ Goal: define and prototype the validation loop that compares generated Python be
 - [x] P4.1 Define validation scenario and oracle contract. Child issue: #20.
 - [x] P4.2 Build ignored validation prototype. Child issue: #21.
 - [x] P4.3 Define mismatch diagnostics and tolerance rules. Child issue: #22.
-- [ ] P4.4 Summarize validation architecture and package inputs. Child issue: #23.
+- [x] P4.4 Summarize validation architecture and package inputs. Child issue: #23.
 
-Status: active.
+Status: ready for PR.
 
 ## Phase 5: Package, API, CLI, And CI Decisions
 
@@ -91,6 +91,7 @@ Status: planned.
 
 ## Current Next Steps
 
-1. Work P4.4 in child issue #23 on branch `feature/p4-regression-validation`.
-2. Summarize validation architecture and Phase 5 package/API inputs.
-3. Close Phase 4 only after #23 is complete and the roadmap/changelog/issue state are synchronized.
+1. Open a PR from `feature/p4-regression-validation` back to `main` for Phase 4.
+2. Merge the Phase 4 PR after review.
+3. Close parent issue #19 only after the Phase 4 PR has merged.
+4. Activate Phase 5 issue #24 and branch only after Phase 4 is closed, unless the maintainer explicitly approves parallel work.
