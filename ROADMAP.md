@@ -64,10 +64,6 @@ Status: complete.
 
 GitHub parent issue: #19
 
-Active branch: `feature/p4-regression-validation`
-
-Open PR: #33
-
 Goal: define and prototype the validation loop that compares generated Python behavior against source workbook outputs.
 
 - [x] P4.1 Define validation scenario and oracle contract. Child issue: #20.
@@ -75,11 +71,15 @@ Goal: define and prototype the validation loop that compares generated Python be
 - [x] P4.3 Define mismatch diagnostics and tolerance rules. Child issue: #22.
 - [x] P4.4 Summarize validation architecture and package inputs. Child issue: #23.
 
-Status: PR open.
+Merged PR: #33
+
+Status: complete.
 
 ## Phase 5: Package, API, CLI, And CI Decisions
 
 GitHub parent issue: #24
+
+Active branch: `feature/p5-package-api-cli-ci-decisions`
 
 Goal: introduce durable project tooling only after extraction, code generation, and validation prototypes clarify the required shape.
 
@@ -89,10 +89,10 @@ Goal: introduce durable project tooling only after extraction, code generation, 
 - [ ] P5.4 Define CI and documentation verification. Child issue: #28.
 - [ ] P5.5 Summarize implementation bootstrap plan. Child issue: #29.
 
-Status: planned.
+Status: active.
 
 ## Current Next Steps
 
-1. Review and merge Phase 4 PR #33.
-2. Close parent issue #19 only after PR #33 has merged.
-3. Activate Phase 5 issue #24 and branch only after Phase 4 is closed, unless the maintainer explicitly approves parallel work.
+1. Work P5.1 in child issue #25 on branch `feature/p5-package-api-cli-ci-decisions`.
+2. Choose the package, dependency, and test stack from `planning/phase-4-closeout-phase-5-inputs.md`.
+3. Keep issue #25, this roadmap, and `CHANGE_LOG.md` synchronized before adding durable source/package structure.
