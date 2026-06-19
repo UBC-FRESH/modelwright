@@ -14,3 +14,9 @@ This file records completed project work in chronological order.
 - Built an ignored IR emitter prototype for the synthetic workbook, verified the emitted JSON against the IR contract, and recorded findings in `planning/ir-prototype-findings.md`.
 - Closed the Phase 2 extraction-contract planning loop by recording Phase 3 code-generation inputs in `planning/phase-2-closeout-phase-3-inputs.md`.
 - Opened Phase 2 PR #31 from `feature/p2-workbook-extraction-contracts` back to `main`.
+- Merged Phase 2 PR #31, closed parent issue #9, and activated Phase 3 on `feature/p3-code-generation-prototype`.
+- Defined the Phase 3 generated-code prototype contract in `planning/generated-code-prototype-contract.md`.
+- Built an ignored generated-code prototype from the IR, verified it computes `Summary!B2 = 70.2` and `Summary!B3 = "ok"`, and recorded findings in `planning/codegen-prototype-findings.md`.
+- Compared the ignored generated model against `formulas`, confirmed both controlled outputs match, and recorded findings in `planning/codegen-comparison-findings.md`.
+- Closed the Phase 3 generated-code planning loop by recording Phase 4 validation inputs in `planning/phase-3-closeout-phase-4-inputs.md`.
+- Opened Phase 3 PR #32 from `feature/p3-code-generation-prototype` back to `main`.
