@@ -51,6 +51,8 @@ GitHub parent issue: #14
 
 Active branch: `feature/p3-code-generation-prototype`
 
+Open PR: #32
+
 Goal: generate readable Python from the controlled workbook IR without committing to durable package structure too early.
 
 - [x] P3.1 Define generated-code prototype contract. Child issue: #15.
@@ -58,7 +60,7 @@ Goal: generate readable Python from the controlled workbook IR without committin
 - [x] P3.3 Compare generated outputs against `formulas` results. Child issue: #17.
 - [x] P3.4 Summarize code-generation readiness. Child issue: #18.
 
-Status: ready for PR.
+Status: PR open.
 
 ## Phase 4: Regression Validation Against Workbooks
 
@@ -89,7 +91,6 @@ Status: planned.
 
 ## Current Next Steps
 
-1. Open a PR from `feature/p3-code-generation-prototype` back to `main` for Phase 3.
-2. Merge the Phase 3 PR after review.
-3. Close parent issue #14 only after the Phase 3 PR has merged.
-4. Activate Phase 4 issue #19 and branch only after Phase 3 is closed, unless the maintainer explicitly approves parallel work.
+1. Review and merge Phase 3 PR #32.
+2. Close parent issue #14 only after PR #32 has merged.
+3. Activate Phase 4 issue #19 and branch only after Phase 3 is closed, unless the maintainer explicitly approves parallel work.
