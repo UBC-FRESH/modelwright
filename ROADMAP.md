@@ -56,9 +56,9 @@ Goal: generate readable Python from the controlled workbook IR without committin
 - [x] P3.1 Define generated-code prototype contract. Child issue: #15.
 - [x] P3.2 Build ignored generated-code experiment. Child issue: #16.
 - [x] P3.3 Compare generated outputs against `formulas` results. Child issue: #17.
-- [ ] P3.4 Summarize code-generation readiness. Child issue: #18.
+- [x] P3.4 Summarize code-generation readiness. Child issue: #18.
 
-Status: active.
+Status: ready for PR.
 
 ## Phase 4: Regression Validation Against Workbooks
 
@@ -89,6 +89,7 @@ Status: planned.
 
 ## Current Next Steps
 
-1. Work P3.4 in child issue #18 on branch `feature/p3-code-generation-prototype`.
-2. Summarize Phase 3 generated-code readiness and define Phase 4 validation inputs.
-3. Close Phase 3 only after #18 is complete and the roadmap/changelog/issue state are synchronized.
+1. Open a PR from `feature/p3-code-generation-prototype` back to `main` for Phase 3.
+2. Merge the Phase 3 PR after review.
+3. Close parent issue #14 only after the Phase 3 PR has merged.
+4. Activate Phase 4 issue #19 and branch only after Phase 3 is closed, unless the maintainer explicitly approves parallel work.
