@@ -41,9 +41,9 @@ Goal: define and test the minimum intermediate representation for workbook refer
   - [x] Emit diagnostics for missing cached formula values.
   - [x] Verify output against `planning/workbook-ir-contract.md` acceptance criteria.
 - [x] P2.3 Record IR prototype findings and refine contract. Child issue: #12.
-- [ ] P2.4 Close extraction-contract phase with Phase 3 inputs. Child issue: #13.
+- [x] P2.4 Close extraction-contract phase with Phase 3 inputs. Child issue: #13.
 
-Status: active.
+Status: ready for PR.
 
 ## Phase 3: Prototype Python Code Generation
 
@@ -87,6 +87,7 @@ Status: planned.
 
 ## Current Next Steps
 
-1. Work P2.4 in child issue #13 on branch `feature/p2-workbook-extraction-contracts`.
-2. Summarize the Phase 3 inputs from `planning/workbook-ir-contract.md` and `planning/ir-prototype-findings.md`.
-3. Close Phase 2 only after #13 is complete and the roadmap/changelog/issue state are synchronized.
+1. Open a PR from `feature/p2-workbook-extraction-contracts` back to `main` for Phase 2.
+2. Merge the Phase 2 PR after review.
+3. Close parent issue #9 only after the Phase 2 PR has merged.
+4. Activate Phase 3 issue #14 and branch only after Phase 2 is closed, unless the maintainer explicitly approves parallel work.
