@@ -68,7 +68,7 @@ Active branch: `feature/p4-regression-validation`
 
 Goal: define and prototype the validation loop that compares generated Python behavior against source workbook outputs.
 
-- [ ] P4.1 Define validation scenario and oracle contract. Child issue: #20.
+- [x] P4.1 Define validation scenario and oracle contract. Child issue: #20.
 - [ ] P4.2 Build ignored validation prototype. Child issue: #21.
 - [ ] P4.3 Define mismatch diagnostics and tolerance rules. Child issue: #22.
 - [ ] P4.4 Summarize validation architecture and package inputs. Child issue: #23.
@@ -91,6 +91,6 @@ Status: planned.
 
 ## Current Next Steps
 
-1. Work P4.1 in child issue #20 on branch `feature/p4-regression-validation`.
-2. Define the validation scenario and oracle contract from `planning/phase-3-closeout-phase-4-inputs.md`.
-3. Keep issue #20, this roadmap, and `CHANGE_LOG.md` synchronized before moving to the ignored validation prototype.
+1. Work P4.2 in child issue #21 on branch `feature/p4-regression-validation`.
+2. Build the ignored validation prototype from `planning/validation-scenario-oracle-contract.md`.
+3. Keep validation outputs under `tmp/` and commit only findings plus roadmap/changelog updates.
