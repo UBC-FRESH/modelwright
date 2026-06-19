@@ -6,9 +6,9 @@ The repository is intentionally lightweight at this stage. Do not add a package 
 
 ## Current Next Steps
 
-- Review `planning/spreadsheet-tooling-research.md` and use it to define the first hands-on prototype.
-- Identify one or two representative non-private workbooks or synthetic fixtures that can drive early prototypes.
-- Prototype workbook extraction with `openpyxl` before adding durable package structure.
+- Review `planning/first-prototype-findings.md` and define the minimum tracked intermediate representation for workbook references, formulas, named ranges, and dependencies.
+- Decide whether named ranges should remain first-class dependency nodes or normalize immediately to destination cells.
+- Use the synthetic prototype findings to plan the first generated-code experiment without adding durable package structure yet.
 
 ## Phase 0: Bootstrap Repo Contract
 
@@ -34,7 +34,7 @@ Topics:
 - `networkx` or similar graph tooling for dependency analysis.
 - Jinja or standard-library templating options for generated source once generation is justified.
 
-Deliverable: a planning note that records candidate libraries, capabilities, limitations, risks, and a recommended first prototype path.
+Deliverable: planning notes that record candidate libraries, capabilities, limitations, risks, and first prototype findings.
 
 Status: active.
 
