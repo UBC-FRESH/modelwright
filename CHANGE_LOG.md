@@ -30,3 +30,4 @@ This file records completed project work in chronological order.
 - Chose the initial package, dependency, and test stack in `planning/package-dependency-test-stack-decision.md`.
 - Defined initial Python API and deferred CLI boundaries in `planning/api-cli-boundary-decision.md`.
 - Defined the initial fixture and regression-test strategy in `planning/fixture-regression-test-strategy.md`.
+- Defined the first CI and documentation verification boundary in `planning/ci-docs-verification-decision.md`.
