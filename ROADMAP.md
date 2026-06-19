@@ -1,94 +1,92 @@
-# ROADMAP.md
+# Roadmap
 
-This roadmap is the current project plan and next-step tracker for `sheetforge`.
+This roadmap is the current project plan and issue tracker map for `sheetforge`.
 
 The repository is intentionally lightweight at this stage. Do not add a package layout, dependency manager, test framework, CLI, or CI contract until research and prototypes provide enough evidence for those choices.
 
-## Current Next Steps
+## Phase 0: Governance Bootstrap
 
-- Implement an ignored prototype that emits the minimum IR from `planning/workbook-ir-contract.md` for the synthetic workbook.
-- Confirm the IR includes semantic named-range edges and execution cell-dependency edges.
-- Use the IR prototype findings to decide whether to formalize extraction code or attempt a tiny generated-code experiment next.
+GitHub parent issue: #1
 
-## Phase 0: Bootstrap Repo Contract
-
-Goal: establish the project skeleton and working conventions.
-
-Tasks:
-
-- Add the project overview, agent contract, roadmap, changelog, planning folder, and ignore rules.
-- Keep private bootstrap notes and source workbooks out of tracked files.
-- Avoid choosing a Python stack before the first research phase.
+- [x] P0.1 Create project overview and agent operating contract. Child issue: #2.
+- [x] P0.2 Establish roadmap, changelog, planning area, and ignore rules. Child issue: #3.
+- [x] P0.3 Commit bootstrap skeleton and verify clean ignored scratch space. Child issue: #4.
+- [x] P0.4 Define strict issue, branch, and PR workflow. Child issue: #30.
 
 Status: complete.
 
 ## Phase 1: Research Spreadsheet Tooling
 
-Goal: evaluate existing libraries and decide what they can safely provide.
+GitHub parent issue: #5
 
-Topics:
-
-- `openpyxl` for workbook structure, formulas, worksheets, names, and metadata.
-- `formulas` and `pycel` for parsing, dependency graphs, and Python evaluation.
-- `xlwings` as a possible extraction or validation bridge to Excel, not as a runtime dependency for generated models.
-- `networkx` or similar graph tooling for dependency analysis.
-- Jinja or standard-library templating options for generated source once generation is justified.
-
-Deliverable: planning notes that record candidate libraries, capabilities, limitations, risks, and first prototype findings.
+- [x] P1.1 Compare candidate spreadsheet tooling. Child issue: #6.
+- [x] P1.2 Run first synthetic workbook prototype. Child issue: #7.
+- [x] P1.3 Record first prototype findings and architecture implications. Child issue: #8.
 
 Status: complete.
 
-## Phase 2: Define Workbook Extraction Contracts
+## Phase 2: Workbook Extraction Contracts
 
-Goal: define the minimum intermediate representation needed for workbook conversion.
+GitHub parent issue: #9
 
-Expected focus:
+Active branch: `feature/p2-workbook-extraction-contracts`
 
-- Workbook, worksheet, cell, formula, named range, dependency, input, output, and validation-example concepts.
-- Handling of cross-sheet references, external links, hidden sheets, circular references, volatile functions, array formulas, and unsupported Excel functions.
-- Provenance fields that trace generated behavior back to source workbook locations.
+Goal: define and test the minimum intermediate representation for workbook references, formulas, named ranges, dependencies, and diagnostics.
+
+- [x] P2.1 Define workbook IR prototype contract. Child issue: #10.
+- [ ] P2.2 Emit IR JSON from the synthetic workbook. Child issue: #11.
+  - [ ] Create ignored prototype IR emitter under `tmp/`.
+  - [ ] Emit semantic named-range/reference edges.
+  - [ ] Emit execution cell-dependency edges.
+  - [ ] Emit diagnostics for missing cached formula values.
+  - [ ] Verify output against `planning/workbook-ir-contract.md` acceptance criteria.
+- [ ] P2.3 Record IR prototype findings and refine contract. Child issue: #12.
+- [ ] P2.4 Close extraction-contract phase with Phase 3 inputs. Child issue: #13.
 
 Status: active.
 
 ## Phase 3: Prototype Python Code Generation
 
-Goal: generate readable Python from extracted workbook logic for a small controlled workbook.
+GitHub parent issue: #14
 
-Expected focus:
+Goal: generate readable Python from the controlled workbook IR without committing to durable package structure too early.
 
-- Generated module structure.
-- Naming and symbol mapping rules.
-- Formula translation strategy.
-- Separation between generated code and hand-written support code.
-- Reviewability and reproducibility of generated output.
+- [ ] P3.1 Define generated-code prototype contract. Child issue: #15.
+- [ ] P3.2 Build ignored generated-code experiment. Child issue: #16.
+- [ ] P3.3 Compare generated outputs against `formulas` results. Child issue: #17.
+- [ ] P3.4 Summarize code-generation readiness. Child issue: #18.
 
 Status: planned.
 
 ## Phase 4: Regression Validation Against Workbooks
 
-Goal: prove generated Python behavior matches source workbook outputs for representative scenarios.
+GitHub parent issue: #19
 
-Expected focus:
+Goal: define and prototype the validation loop that compares generated Python behavior against source workbook outputs.
 
-- Input scenario definition.
-- Workbook recalculation or oracle strategy.
-- Numeric tolerance and comparison rules.
-- Reporting mismatches with source-cell provenance.
+- [ ] P4.1 Define validation scenario and oracle contract. Child issue: #20.
+- [ ] P4.2 Build ignored validation prototype. Child issue: #21.
+- [ ] P4.3 Define mismatch diagnostics and tolerance rules. Child issue: #22.
+- [ ] P4.4 Summarize validation architecture and package inputs. Child issue: #23.
 
 Status: planned.
 
 ## Phase 5: Package, API, CLI, And CI Decisions
 
-Goal: introduce durable project tooling only after prototypes clarify the required shape.
+GitHub parent issue: #24
 
-Expected focus:
+Goal: introduce durable project tooling only after extraction, code generation, and validation prototypes clarify the required shape.
 
-- Python package layout.
-- Public API boundaries.
-- CLI commands.
-- Dependency manager.
-- Test framework and fixtures.
-- CI checks.
-- Documentation structure.
+- [ ] P5.1 Choose package, dependency, and test stack. Child issue: #25.
+- [ ] P5.2 Define public API and CLI boundaries. Child issue: #26.
+- [ ] P5.3 Define fixture and regression-test strategy. Child issue: #27.
+- [ ] P5.4 Define CI and documentation verification. Child issue: #28.
+- [ ] P5.5 Summarize implementation bootstrap plan. Child issue: #29.
 
 Status: planned.
+
+## Current Next Steps
+
+1. Work P2.2 in child issue #11 on branch `feature/p2-workbook-extraction-contracts`.
+2. Keep the P2.2 issue checklist, this roadmap, and `CHANGE_LOG.md` synchronized as the IR emitter prototype progresses.
+3. Close #11 only after the ignored prototype output is verified and the roadmap/changelog reflect the result.
