@@ -22,3 +22,4 @@ This file records completed project work in chronological order.
 - Opened Phase 3 PR #32 from `feature/p3-code-generation-prototype` back to `main`.
 - Merged Phase 3 PR #32, closed parent issue #14, and activated Phase 4 on `feature/p4-regression-validation`.
 - Defined the Phase 4 validation scenario and oracle contract in `planning/validation-scenario-oracle-contract.md`.
+- Built an ignored validation prototype, verified the baseline scenario passes with no mismatches, and recorded findings in `planning/validation-prototype-findings.md`.
