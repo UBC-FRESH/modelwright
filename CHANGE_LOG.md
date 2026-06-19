@@ -15,3 +15,4 @@ This file records completed project work in chronological order.
 - Closed the Phase 2 extraction-contract planning loop by recording Phase 3 code-generation inputs in `planning/phase-2-closeout-phase-3-inputs.md`.
 - Opened Phase 2 PR #31 from `feature/p2-workbook-extraction-contracts` back to `main`.
 - Merged Phase 2 PR #31, closed parent issue #9, and activated Phase 3 on `feature/p3-code-generation-prototype`.
+- Defined the Phase 3 generated-code prototype contract in `planning/generated-code-prototype-contract.md`.

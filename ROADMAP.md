@@ -53,7 +53,7 @@ Active branch: `feature/p3-code-generation-prototype`
 
 Goal: generate readable Python from the controlled workbook IR without committing to durable package structure too early.
 
-- [ ] P3.1 Define generated-code prototype contract. Child issue: #15.
+- [x] P3.1 Define generated-code prototype contract. Child issue: #15.
 - [ ] P3.2 Build ignored generated-code experiment. Child issue: #16.
 - [ ] P3.3 Compare generated outputs against `formulas` results. Child issue: #17.
 - [ ] P3.4 Summarize code-generation readiness. Child issue: #18.
@@ -89,6 +89,6 @@ Status: planned.
 
 ## Current Next Steps
 
-1. Work P3.1 in child issue #15 on branch `feature/p3-code-generation-prototype`.
-2. Define the generated-code prototype contract from `planning/phase-2-closeout-phase-3-inputs.md`.
-3. Keep issue #15, this roadmap, and `CHANGE_LOG.md` synchronized before moving to the ignored code-generation experiment.
+1. Work P3.2 in child issue #16 on branch `feature/p3-code-generation-prototype`.
+2. Build the ignored code-generation experiment from `planning/generated-code-prototype-contract.md`.
+3. Keep generated files under `tmp/` and commit only findings plus roadmap/changelog updates.
