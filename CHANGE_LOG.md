@@ -16,3 +16,4 @@ This file records completed project work in chronological order.
 - Opened Phase 2 PR #31 from `feature/p2-workbook-extraction-contracts` back to `main`.
 - Merged Phase 2 PR #31, closed parent issue #9, and activated Phase 3 on `feature/p3-code-generation-prototype`.
 - Defined the Phase 3 generated-code prototype contract in `planning/generated-code-prototype-contract.md`.
+- Built an ignored generated-code prototype from the IR, verified it computes `Summary!B2 = 70.2` and `Summary!B3 = "ok"`, and recorded findings in `planning/codegen-prototype-findings.md`.
