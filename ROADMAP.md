@@ -31,6 +31,8 @@ GitHub parent issue: #9
 
 Active branch: `feature/p2-workbook-extraction-contracts`
 
+Open PR: #31
+
 Goal: define and test the minimum intermediate representation for workbook references, formulas, named ranges, dependencies, and diagnostics.
 
 - [x] P2.1 Define workbook IR prototype contract. Child issue: #10.
@@ -43,7 +45,7 @@ Goal: define and test the minimum intermediate representation for workbook refer
 - [x] P2.3 Record IR prototype findings and refine contract. Child issue: #12.
 - [x] P2.4 Close extraction-contract phase with Phase 3 inputs. Child issue: #13.
 
-Status: ready for PR.
+Status: PR open.
 
 ## Phase 3: Prototype Python Code Generation
 
@@ -87,7 +89,6 @@ Status: planned.
 
 ## Current Next Steps
 
-1. Open a PR from `feature/p2-workbook-extraction-contracts` back to `main` for Phase 2.
-2. Merge the Phase 2 PR after review.
-3. Close parent issue #9 only after the Phase 2 PR has merged.
-4. Activate Phase 3 issue #14 and branch only after Phase 2 is closed, unless the maintainer explicitly approves parallel work.
+1. Review and merge Phase 2 PR #31.
+2. Close parent issue #9 only after PR #31 has merged.
+3. Activate Phase 3 issue #14 and branch only after Phase 2 is closed, unless the maintainer explicitly approves parallel work.
