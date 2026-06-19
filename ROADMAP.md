@@ -83,7 +83,7 @@ Active branch: `feature/p5-package-api-cli-ci-decisions`
 
 Goal: introduce durable project tooling only after extraction, code generation, and validation prototypes clarify the required shape.
 
-- [ ] P5.1 Choose package, dependency, and test stack. Child issue: #25.
+- [x] P5.1 Choose package, dependency, and test stack. Child issue: #25.
 - [ ] P5.2 Define public API and CLI boundaries. Child issue: #26.
 - [ ] P5.3 Define fixture and regression-test strategy. Child issue: #27.
 - [ ] P5.4 Define CI and documentation verification. Child issue: #28.
@@ -93,6 +93,6 @@ Status: active.
 
 ## Current Next Steps
 
-1. Work P5.1 in child issue #25 on branch `feature/p5-package-api-cli-ci-decisions`.
-2. Choose the package, dependency, and test stack from `planning/phase-4-closeout-phase-5-inputs.md`.
-3. Keep issue #25, this roadmap, and `CHANGE_LOG.md` synchronized before adding durable source/package structure.
+1. Work P5.2 in child issue #26 on branch `feature/p5-package-api-cli-ci-decisions`.
+2. Define public API and CLI boundaries using `planning/package-dependency-test-stack-decision.md`.
+3. Keep issue #26, this roadmap, and `CHANGE_LOG.md` synchronized before adding durable source/package structure.
