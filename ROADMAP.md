@@ -70,7 +70,7 @@ Goal: define and prototype the validation loop that compares generated Python be
 
 - [x] P4.1 Define validation scenario and oracle contract. Child issue: #20.
 - [x] P4.2 Build ignored validation prototype. Child issue: #21.
-- [ ] P4.3 Define mismatch diagnostics and tolerance rules. Child issue: #22.
+- [x] P4.3 Define mismatch diagnostics and tolerance rules. Child issue: #22.
 - [ ] P4.4 Summarize validation architecture and package inputs. Child issue: #23.
 
 Status: active.
@@ -91,6 +91,6 @@ Status: planned.
 
 ## Current Next Steps
 
-1. Work P4.3 in child issue #22 on branch `feature/p4-regression-validation`.
-2. Define mismatch diagnostics and tolerance rules using `planning/validation-prototype-findings.md`.
-3. Keep issue #22, this roadmap, and `CHANGE_LOG.md` synchronized before closing Phase 4.
+1. Work P4.4 in child issue #23 on branch `feature/p4-regression-validation`.
+2. Summarize validation architecture and Phase 5 package/API inputs.
+3. Close Phase 4 only after #23 is complete and the roadmap/changelog/issue state are synchronized.
