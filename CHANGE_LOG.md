@@ -27,6 +27,12 @@ This file records completed project work in chronological order.
 - Added dependency graph diagnostics coverage for ranges, external references, and simple circular dependencies.
 - Closed the Phase 9 dependency-graph planning loop by recording Phase 10 formula translation inputs in `planning/phase-9-closeout-phase-10-inputs.md`.
 - Opened Phase 9 PR #81 from `feature/p9-dependency-graph-core` back to `main`.
+- Merged Phase 9 PR #81, closed parent issue #49, and activated Phase 10 on `feature/p10-formula-translation-core`.
+- Added formula expression records for literals, references, binary arithmetic, comparisons, function calls, and translation diagnostics.
+- Added formula translation for the supported synthetic workbook subset, including references, named ranges, arithmetic, `ROUND`, `IF`, and `>`.
+- Added formula translation diagnostics coverage for unsupported functions and unsupported operators.
+- Closed the Phase 10 formula-translation planning loop by recording Phase 11 generated-model inputs in `planning/phase-10-closeout-phase-11-inputs.md`.
+- Opened Phase 10 PR #82 from `feature/p10-formula-translation-core` back to `main`.
 
 ## 2026-06-19
 

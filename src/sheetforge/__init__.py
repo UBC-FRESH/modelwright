@@ -9,6 +9,12 @@ from sheetforge.extraction import (
     WorkbookRecord,
     extract_workbook,
 )
+from sheetforge.formulas import (
+    FormulaExpression,
+    FormulaExpressionNode,
+    FormulaTranslationDiagnostic,
+    translate_formula_cell,
+)
 from sheetforge.graph import (
     DependencyEdge,
     DependencyGraph,
@@ -44,7 +50,10 @@ __all__ = [
     "DependencyGraph",
     "Diagnostic",
     "ExtractionDiagnostic",
+    "FormulaExpression",
+    "FormulaExpressionNode",
     "FormulaRecord",
+    "FormulaTranslationDiagnostic",
     "MISSING_VALUE",
     "NamedRangeRecord",
     "OracleConfig",
@@ -63,4 +72,5 @@ __all__ = [
     "load_validation_scenario",
     "normalize_cell_reference",
     "normalize_reference",
+    "translate_formula_cell",
 ]

@@ -144,9 +144,7 @@ Status: complete.
 
 GitHub parent issue: #49
 
-Active branch: `feature/p9-dependency-graph-core`
-
-Open PR: #81
+Merged PR: #81
 
 Goal: build normalized reference and dependency graph behavior on top of extracted workbook records.
 
@@ -154,21 +152,23 @@ Goal: build normalized reference and dependency graph behavior on top of extract
 - [x] P9.2 Resolve named ranges and dependency edges. Child issue: #62.
 - [x] P9.3 Add graph diagnostics and readiness note. Child issue: #60.
 
-Status: PR open.
+Status: complete.
 
 ## Phase 10: Formula Translation Core
 
 GitHub parent issue: #48
 
-Planned branch: `feature/p10-formula-translation-core`
+Active branch: `feature/p10-formula-translation-core`
+
+Open PR: #82
 
 Goal: translate the first supported Excel formula subset into internal operations ready for generated Python.
 
-- [ ] P10.1 Add formula expression model. Child issue: #61.
-- [ ] P10.2 Translate supported synthetic formula subset. Child issue: #59.
-- [ ] P10.3 Add unsupported formula diagnostics and closeout. Child issue: #66.
+- [x] P10.1 Add formula expression model. Child issue: #61.
+- [x] P10.2 Translate supported synthetic formula subset. Child issue: #59.
+- [x] P10.3 Add unsupported formula diagnostics and closeout. Child issue: #66.
 
-Status: planned backlog.
+Status: PR open.
 
 ## Phase 11: Generated Python Model Core
 
@@ -242,6 +242,6 @@ Status: planned backlog.
 
 ## Current Next Steps
 
-1. Merge Phase 9 PR #81 after checks pass.
-2. Close parent issue #49 after PR #81 merges.
-3. Activate Phase 10 on `feature/p10-formula-translation-core`.
+1. Merge Phase 10 PR #82 after checks pass.
+2. Close parent issue #48 after PR #82 merges.
+3. Activate Phase 11 on `feature/p11-generated-python-model-core`.
