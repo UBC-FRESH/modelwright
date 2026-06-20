@@ -10,15 +10,19 @@ The goal is not to preserve spreadsheets as the execution environment. The goal 
 
 ## Current Repo State
 
-This repository is currently a bootstrap skeleton. It contains:
+This repository is currently an early package skeleton. It contains:
 
 - `README.md`: concise project overview.
 - `ROADMAP.md`: lightweight project plan and current next-step tracker.
 - `CHANGE_LOG.md`: append-only project narrative.
 - `planning/`: focused planning notes and research records.
+- `pyproject.toml`: minimal package metadata and test dependency extra.
+- `src/sheetforge/`: importable package code.
+- `tests/`: package-backed tests and tracked synthetic fixture helpers.
+- `.github/workflows/test.yml`: first default CI workflow.
 - `tmp/`: ignored local working area that may contain private notes, source workbooks, scratch experiments, and generated outputs.
 
-There is no established application stack, package manager, test suite, workbook extraction framework, code generator, CLI, or CI contract yet. Do not invent one without clear need or user direction.
+There is no workbook extraction framework, code generator, CLI, public stability guarantee, release process, or broad CI/test matrix yet. Do not invent one without clear need or user direction.
 
 Private bootstrap notes may exist under `tmp/`. Treat those files as local context only. Do not copy raw transcripts, private references, unpublished details, or unrelated context into tracked files unless the user explicitly asks for a cleaned public version.
 
@@ -119,7 +123,12 @@ Use these phases as orientation, not as permission to add large systems prematur
 
 ## Tooling And Verification
 
-At the time this contract was written, there are no project-specific commands to run.
+Current default verification commands:
+
+```bash
+python -m pip install -e ".[test]"
+python -m pytest
+```
 
 When adding tooling:
 

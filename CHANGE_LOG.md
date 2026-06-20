@@ -9,6 +9,13 @@ This file records completed project work in chronological order.
 - Added baseline and intentional numeric mismatch regression tests using the synthetic fixture assets and validation report core.
 - Added the first default GitHub Actions workflow for editable install and `python -m pytest`.
 - Opened Phase 6 PR #41 from `feature/p6-initial-package-validation-core` back to `main`.
+- Merged Phase 6 PR #41, closed parent issue #34, and activated Phase 7 on `feature/p7-validation-scenario-comparison-core`.
+- Expanded the roadmap and GitHub issue backlog through Phase 15, with the long-term sequence recorded in `planning/long-term-roadmap.md`.
+- Added validation scenario objects and a JSON loader for fixture-backed validation scenario files.
+- Added scalar comparison helpers for numeric tolerance, exact text, missing outputs, and unsupported output diagnostics.
+- Added a validation report builder that compares scenario outputs from observed generated and oracle value mappings.
+- Closed the Phase 7 validation-core planning loop by recording Phase 8 extraction inputs in `planning/phase-7-closeout-phase-8-inputs.md`.
+- Opened Phase 7 PR #79 from `feature/p7-validation-scenario-comparison-core` back to `main`.
 
 ## 2026-06-19
 
