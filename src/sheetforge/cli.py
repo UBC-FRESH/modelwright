@@ -1,12 +1,14 @@
-"""Command-line wrappers for Sheetforge JSON workflows."""
+"""Typer-based command-line wrappers for Sheetforge JSON workflows."""
 
 from __future__ import annotations
 
-import argparse
 import json
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
+
+import typer
+from typer.main import get_command
 
 from sheetforge.extraction import extract_workbook
 from sheetforge.formulas import FormulaExpression
@@ -17,89 +19,289 @@ from sheetforge.validation import build_validation_report, load_validation_scena
 
 JsonValue = str | int | float | bool | None | list[Any] | dict[str, Any]
 
+app = typer.Typer(
+    add_completion=False,
+    no_args_is_help=True,
+    help="Inspect spreadsheet workbooks and assemble transparent Python-model workflow artifacts.",
+)
+workbook_app = typer.Typer(
+    add_completion=False,
+    no_args_is_help=True,
+    help="Extract workbook facts and dependency graphs.",
+)
+model_app = typer.Typer(
+    add_completion=False,
+    no_args_is_help=True,
+    help="Generate standalone Python model artifacts.",
+)
+validation_app = typer.Typer(
+    add_completion=False,
+    no_args_is_help=True,
+    help="Build validation reports from observed output values.",
+)
+
+app.add_typer(workbook_app, name="workbook")
+app.add_typer(model_app, name="model")
+app.add_typer(validation_app, name="validation")
+
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """Run the Sheetforge CLI."""
+    """Run the Sheetforge CLI with an explicit argv sequence."""
 
-    parser = _build_parser()
-    args = parser.parse_args(argv)
-    payload = args.handler(args)
-    print(json.dumps(payload, indent=2, sort_keys=True))
+    command = get_command(app)
+    command.main(args=list(argv) if argv is not None else None, prog_name="sheetforge", standalone_mode=False)
     return 0
 
 
-def _build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="sheetforge")
-    subcommands = parser.add_subparsers(dest="command", required=True)
+@app.command("extract", hidden=True)
+def extract_alias(
+    workbook: Path = typer.Argument(..., exists=True, dir_okay=False, readable=True, help="Source workbook path."),
+) -> None:
+    """Extract workbook facts as JSON."""
 
-    extract_parser = subcommands.add_parser("extract", help="extract workbook facts as JSON")
-    extract_parser.add_argument("workbook", help="path to a source workbook")
-    extract_parser.set_defaults(handler=_extract_command)
-
-    graph_parser = subcommands.add_parser("graph", help="build dependency graph JSON from a workbook")
-    graph_parser.add_argument("workbook", help="path to a source workbook")
-    graph_parser.set_defaults(handler=_graph_command)
-
-    generate_parser = subcommands.add_parser("generate", help="generate Python from JSON contracts")
-    generate_parser.add_argument("--contract", required=True, help="path to a generated module contract JSON file")
-    generate_parser.add_argument("--expressions", required=True, help="path to a formula expressions JSON object")
-    generate_parser.add_argument("--constants", help="optional path to an input constants JSON object")
-    generate_parser.add_argument("--output", help="optional path for generated Python source")
-    generate_parser.set_defaults(handler=_generate_command)
-
-    report_parser = subcommands.add_parser("validate-report", help="build validation report JSON")
-    report_parser.add_argument("--scenario", required=True, help="path to a validation scenario JSON file")
-    report_parser.add_argument("--generated-values", required=True, help="path to generated output values JSON object")
-    report_parser.add_argument("--oracle-values", required=True, help="path to oracle output values JSON object")
-    report_parser.set_defaults(handler=_validate_report_command)
-
-    return parser
+    _emit_json(_extract_payload(workbook))
 
 
-def _extract_command(args: argparse.Namespace) -> dict[str, JsonValue]:
-    workbook = extract_workbook(args.workbook)
-    return workbook.to_dict()
+@app.command("graph", hidden=True)
+def graph_alias(
+    workbook: Path = typer.Argument(..., exists=True, dir_okay=False, readable=True, help="Source workbook path."),
+) -> None:
+    """Build dependency graph JSON from a workbook."""
+
+    _emit_json(_graph_payload(workbook))
 
 
-def _graph_command(args: argparse.Namespace) -> dict[str, JsonValue]:
-    workbook = extract_workbook(args.workbook)
-    graph = build_dependency_graph(workbook)
+@app.command("generate", hidden=True)
+def generate_alias(
+    contract: Path = typer.Option(
+        ...,
+        "--contract",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Generated module contract JSON file.",
+    ),
+    expressions: Path = typer.Option(
+        ...,
+        "--expressions",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Formula expressions JSON object.",
+    ),
+    constants: Path | None = typer.Option(
+        None,
+        "--constants",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Optional input constants JSON object.",
+    ),
+    output: Path | None = typer.Option(
+        None,
+        "--out",
+        "--output",
+        help="Optional path for generated Python source.",
+    ),
+) -> None:
+    """Generate Python from explicit JSON contracts."""
+
+    _emit_json(_generate_payload(contract=contract, expressions=expressions, constants=constants, output=output))
+
+
+@app.command("validate-report", hidden=True)
+def validate_report_alias(
+    scenario: Path = typer.Option(
+        ...,
+        "--scenario",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Validation scenario JSON file.",
+    ),
+    generated_values: Path = typer.Option(
+        ...,
+        "--generated-values",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Generated model output values JSON object.",
+    ),
+    oracle_values: Path = typer.Option(
+        ...,
+        "--oracle-values",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Oracle output values JSON object.",
+    ),
+) -> None:
+    """Build validation report JSON."""
+
+    _emit_json(
+        _validate_report_payload(
+            scenario=scenario,
+            generated_values=generated_values,
+            oracle_values=oracle_values,
+        )
+    )
+
+
+@workbook_app.command("extract")
+def workbook_extract(
+    workbook: Path = typer.Argument(..., exists=True, dir_okay=False, readable=True, help="Source workbook path."),
+) -> None:
+    """Extract workbook facts as JSON."""
+
+    _emit_json(_extract_payload(workbook))
+
+
+@workbook_app.command("graph")
+def workbook_graph(
+    workbook: Path = typer.Argument(..., exists=True, dir_okay=False, readable=True, help="Source workbook path."),
+) -> None:
+    """Build dependency graph JSON from a workbook."""
+
+    _emit_json(_graph_payload(workbook))
+
+
+@model_app.command("generate")
+def model_generate(
+    contract: Path = typer.Option(
+        ...,
+        "--contract",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Generated module contract JSON file.",
+    ),
+    expressions: Path = typer.Option(
+        ...,
+        "--expressions",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Formula expressions JSON object.",
+    ),
+    constants: Path | None = typer.Option(
+        None,
+        "--constants",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Optional input constants JSON object.",
+    ),
+    output: Path | None = typer.Option(
+        None,
+        "--out",
+        "--output",
+        help="Optional path for generated Python source.",
+    ),
+) -> None:
+    """Generate Python from explicit JSON contracts."""
+
+    _emit_json(_generate_payload(contract=contract, expressions=expressions, constants=constants, output=output))
+
+
+@validation_app.command("report")
+def validation_report(
+    scenario: Path = typer.Option(
+        ...,
+        "--scenario",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Validation scenario JSON file.",
+    ),
+    generated_values: Path = typer.Option(
+        ...,
+        "--generated-values",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Generated model output values JSON object.",
+    ),
+    oracle_values: Path = typer.Option(
+        ...,
+        "--oracle-values",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Oracle output values JSON object.",
+    ),
+) -> None:
+    """Build validation report JSON."""
+
+    _emit_json(
+        _validate_report_payload(
+            scenario=scenario,
+            generated_values=generated_values,
+            oracle_values=oracle_values,
+        )
+    )
+
+
+def _extract_payload(workbook: Path) -> dict[str, JsonValue]:
+    return extract_workbook(workbook).to_dict()
+
+
+def _graph_payload(workbook: Path) -> dict[str, JsonValue]:
+    workbook_record = extract_workbook(workbook)
+    graph = build_dependency_graph(workbook_record)
     return graph.to_dict()
 
 
-def _generate_command(args: argparse.Namespace) -> dict[str, JsonValue]:
-    contract = GeneratedModuleContract.from_dict(_load_object(args.contract))
-    expressions = {
+def _generate_payload(
+    *,
+    contract: Path,
+    expressions: Path,
+    constants: Path | None,
+    output: Path | None,
+) -> dict[str, JsonValue]:
+    module_contract = GeneratedModuleContract.from_dict(_load_object(contract))
+    formula_expressions = {
         cell_ref: FormulaExpression.from_dict(expression)
-        for cell_ref, expression in _load_object(args.expressions).items()
+        for cell_ref, expression in _load_object(expressions).items()
     }
-    constants = _load_object(args.constants) if args.constants else {}
-    output_path = Path(args.output) if args.output else None
     result = generate_python_module(
-        contract=contract,
-        expressions=expressions,
-        constants=constants,
-        output_path=output_path,
+        contract=module_contract,
+        expressions=formula_expressions,
+        constants=_load_object(constants) if constants else {},
+        output_path=output,
     )
     return result.to_dict()
 
 
-def _validate_report_command(args: argparse.Namespace) -> dict[str, JsonValue]:
-    scenario = load_validation_scenario(args.scenario)
+def _validate_report_payload(
+    *,
+    scenario: Path,
+    generated_values: Path,
+    oracle_values: Path,
+) -> dict[str, JsonValue]:
     report = build_validation_report(
-        scenario=scenario,
-        generated_values=_load_object(args.generated_values),
-        oracle_values=_load_object(args.oracle_values),
+        scenario=load_validation_scenario(scenario),
+        generated_values=_load_object(generated_values),
+        oracle_values=_load_object(oracle_values),
     )
     return report.to_dict()
 
 
+def _emit_json(payload: dict[str, JsonValue]) -> None:
+    typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+
+
 def _load_object(path: str | Path) -> dict[str, JsonValue]:
-    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    try:
+        data = json.loads(Path(path).read_text(encoding="utf-8"))
+    except OSError as error:
+        raise typer.BadParameter(f"could not read JSON file {path}: {error}") from error
+    except json.JSONDecodeError as error:
+        raise typer.BadParameter(f"could not parse JSON file {path}: {error}") from error
+
     if not isinstance(data, dict):
-        raise ValueError(f"expected JSON object in {path}")
+        raise typer.BadParameter(f"expected JSON object in {path}")
     return data
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    app()

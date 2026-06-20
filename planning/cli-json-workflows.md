@@ -19,7 +19,7 @@ python -m pip install -e ".[test]"
 Extract workbook facts:
 
 ```bash
-sheetforge extract tmp/private-workbooks/example.xlsx > tmp/extraction.json
+sheetforge workbook extract tmp/private-workbooks/example.xlsx > tmp/extraction.json
 ```
 
 This command calls `sheetforge.extraction.extract_workbook` and writes the `WorkbookRecord` JSON payload.
@@ -27,7 +27,7 @@ This command calls `sheetforge.extraction.extract_workbook` and writes the `Work
 Build dependency graph facts directly from a workbook:
 
 ```bash
-sheetforge graph tmp/private-workbooks/example.xlsx > tmp/dependency-graph.json
+sheetforge workbook graph tmp/private-workbooks/example.xlsx > tmp/dependency-graph.json
 ```
 
 This command calls `extract_workbook`, then `sheetforge.graph.build_dependency_graph`, and writes the `DependencyGraph` JSON payload.
@@ -35,11 +35,11 @@ This command calls `extract_workbook`, then `sheetforge.graph.build_dependency_g
 Generate Python source from explicit JSON inputs:
 
 ```bash
-sheetforge generate \
+sheetforge model generate \
   --contract tmp/contract.json \
   --expressions tmp/expressions.json \
   --constants tmp/constants.json \
-  --output tmp/generated_model.py \
+  --out tmp/generated_model.py \
   > tmp/generation-result.json
 ```
 
@@ -48,7 +48,7 @@ This command calls `sheetforge.generation.generate_python_module`. The contract 
 Build a validation report from already-observed generated and oracle values:
 
 ```bash
-sheetforge validate-report \
+sheetforge validation report \
   --scenario tests/fixtures/synthetic_model/baseline_scenario.json \
   --generated-values tmp/generated-values.json \
   --oracle-values tmp/oracle-values.json \
@@ -97,9 +97,10 @@ Minimal generated/oracle values shape for validation-report input:
 
 ## Stabilization Decisions
 
-- The CLI command names are workflow-oriented: `extract`, `graph`, `generate`, and `validate-report`.
+- The public CLI command groups are workflow-oriented: `workbook`, `model`, and `validation`.
+- The top-level `extract`, `graph`, `generate`, and `validate-report` commands remain compatibility aliases for JSON automation scripts.
 - All successful command payloads are JSON printed to stdout.
-- Generated Python source is written only when `sheetforge generate --output` is provided.
+- Generated Python source is written only when `sheetforge model generate --out` is provided.
 - The CLI does not duplicate extraction, graphing, generation, or validation logic.
 - The CLI does not run the optional oracle interface yet; oracle execution remains a Python API boundary until the backend behavior is better proven against real workbooks.
 - The CLI does not translate every formula in a workbook or infer a generated module contract. Those steps still require explicit Python API usage and project-specific decisions.

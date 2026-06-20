@@ -36,13 +36,13 @@ python -m pip install -e ".[test]"
 The current CLI prints JSON to stdout and stays close to the Python APIs:
 
 ```bash
-sheetforge extract path/to/workbook.xlsx > tmp/extraction.json
-sheetforge graph path/to/workbook.xlsx > tmp/dependency-graph.json
-sheetforge generate --contract tmp/contract.json --expressions tmp/expressions.json --constants tmp/constants.json --output tmp/generated_model.py > tmp/generation-result.json
-sheetforge validate-report --scenario tests/fixtures/synthetic_model/baseline_scenario.json --generated-values tmp/generated-values.json --oracle-values tmp/oracle-values.json > tmp/validation-report.json
+sheetforge workbook extract path/to/workbook.xlsx > tmp/extraction.json
+sheetforge workbook graph path/to/workbook.xlsx > tmp/dependency-graph.json
+sheetforge model generate --contract tmp/contract.json --expressions tmp/expressions.json --constants tmp/constants.json --out tmp/generated_model.py > tmp/generation-result.json
+sheetforge validation report --scenario tests/fixtures/synthetic_model/baseline_scenario.json --generated-values tmp/generated-values.json --oracle-values tmp/oracle-values.json > tmp/validation-report.json
 ```
 
-These commands do not provide a one-step workbook converter. `generate` expects explicit generated-module and formula-expression JSON inputs, and `validate-report` compares already-observed generated/oracle values. See `planning/cli-json-workflows.md` for JSON examples and workflow boundaries.
+The earlier top-level commands `extract`, `graph`, `generate`, and `validate-report` remain available as JSON automation aliases. These commands do not provide a one-step workbook converter. `model generate` expects explicit generated-module and formula-expression JSON inputs, and `validation report` compares already-observed generated/oracle values. See `planning/cli-json-workflows.md` for JSON examples and workflow boundaries.
 
 ## Local Development
 

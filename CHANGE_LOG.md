@@ -65,6 +65,7 @@ This file records completed project work in chronological order.
 - Merged Phase 15 PR #102 and closed parent issue #51.
 - Activated Phase 16 on `feature/p16-cli-docs-public-surface`.
 - Recorded Sheetforge-specific Phase 16 CLI and Sphinx documentation acceptance criteria from the local `fhops` and `femic` reference packages.
+- Refactored the CLI to a Typer/Rich command surface with grouped `workbook`, `model`, and `validation` workflows while preserving hidden top-level JSON automation aliases.
 
 ## 2026-06-19
 
