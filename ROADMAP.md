@@ -228,7 +228,7 @@ Status: complete.
 
 GitHub parent issue: #51
 
-Active branch: `feature/p15-hardening-release-prep`
+Merged PR: #102
 
 Goal: add hardening, documentation, release, and quality tooling only where evidence shows it will pay for itself.
 
@@ -236,13 +236,13 @@ Goal: add hardening, documentation, release, and quality tooling only where evid
 - [x] P15.2 Add release and documentation metadata if needed. Child issue: #76.
 - [x] P15.3 Summarize release readiness and next roadmap. Child issue: #75.
 
-Status: active.
+Status: complete.
 
 ## Phase 16: CLI And Documentation Public Surface
 
 GitHub parent issue: #89
 
-Planned branch: `feature/p16-cli-docs-public-surface`
+Active branch: `feature/p16-cli-docs-public-surface`
 
 Goal: align Sheetforge's CLI feel, command organization, help text, and documentation depth with the other FRESH lab packages `fhops` and `femic`, including full Sphinx documentation published to GitHub Pages from the `main` branch.
 
@@ -251,7 +251,7 @@ Goal: align Sheetforge's CLI feel, command organization, help text, and document
 - [ ] P16.3 Add full Sphinx docs and GitHub Pages workflow. Child issue: #93.
 - [ ] P16.4 Verify CLI/docs surface and closeout. Child issue: #91.
 
-Status: planned backlog.
+Status: active.
 
 ## Phase 17: Real Workbook Formula Semantics
 
@@ -300,6 +300,6 @@ Status: planned backlog.
 
 ## Current Next Steps
 
-1. Open the Phase 15 PR from `feature/p15-hardening-release-prep` back to `main`.
-2. Verify the PR checks and merge once clean.
-3. Close parent issue #51 after the Phase 15 PR is merged.
+1. Work P16.1 in child issue #92 on branch `feature/p16-cli-docs-public-surface`.
+2. Turn the `fhops`/`femic` CLI and docs audit into Sheetforge-specific acceptance criteria.
+3. Keep issue #92, parent issue #89, this roadmap, and `CHANGE_LOG.md` synchronized before refactoring the CLI.

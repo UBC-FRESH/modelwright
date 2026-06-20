@@ -62,6 +62,8 @@ This file records completed project work in chronological order.
 - Added a minimal Ruff quality extra, CI quality job, local quality-check documentation, and release metadata deferral note.
 - Summarized release readiness, unsupported workbook semantics, and the next roadmap horizon through Phases 16-19 with mirrored GitHub issues.
 - Revised the next roadmap horizon so Phase 16 prioritizes FRESH-style Typer/Rich CLI alignment and full Sphinx GitHub Pages documentation modeled on local `fhops` and `femic` repositories.
+- Merged Phase 15 PR #102 and closed parent issue #51.
+- Activated Phase 16 on `feature/p16-cli-docs-public-surface`.
 
 ## 2026-06-19
 
