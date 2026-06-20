@@ -93,12 +93,34 @@ def test_model_generate_command_outputs_result_json_and_writes_model(tmp_path: P
     assert "def calculate(inputs=None):" in output_path.read_text(encoding="utf-8")
 
 
-def test_model_generate_help_has_single_output_path_option() -> None:
-    result = runner.invoke(app, ["model", "generate", "--help"])
+def test_model_generate_rejects_removed_output_option(tmp_path: Path) -> None:
+    contract, expressions, constants = _synthetic_generation_inputs(tmp_path)
+    contract_path = tmp_path / "contract.json"
+    expressions_path = tmp_path / "expressions.json"
+    constants_path = tmp_path / "constants.json"
+    output_path = tmp_path / "generated_model.py"
+    _write_json(contract_path, contract.to_dict())
+    _write_json(expressions_path, {cell_ref: expression.to_dict() for cell_ref, expression in expressions.items()})
+    _write_json(constants_path, constants)
 
-    assert result.exit_code == 0
-    assert "--out" in result.stdout
-    assert "--output" not in result.stdout
+    result = runner.invoke(
+        app,
+        [
+            "model",
+            "generate",
+            "--contract",
+            str(contract_path),
+            "--expressions",
+            str(expressions_path),
+            "--constants",
+            str(constants_path),
+            "--output",
+            str(output_path),
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert not output_path.exists()
 
 
 def test_validation_report_command_outputs_report_json(tmp_path: Path) -> None:
