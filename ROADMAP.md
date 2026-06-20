@@ -242,7 +242,7 @@ Status: complete.
 
 GitHub parent issue: #89
 
-Active branch: `feature/p16-cli-docs-public-surface`
+Completed branch: `feature/p16-cli-docs-public-surface`
 
 Goal: align Sheetforge's CLI feel, command organization, help text, and documentation depth with the other FRESH lab packages `fhops` and `femic`, including full Sphinx documentation published to GitHub Pages from the `main` branch.
 
@@ -251,13 +251,13 @@ Goal: align Sheetforge's CLI feel, command organization, help text, and document
 - [x] P16.3 Add full Sphinx docs and GitHub Pages workflow. Child issue: #93.
 - [x] P16.4 Verify CLI/docs surface and closeout. Child issue: #91.
 
-Status: active.
+Status: complete.
 
 ## Phase 17: Real Workbook Formula Semantics
 
 GitHub parent issue: #88
 
-Planned branch: `feature/p17-real-workbook-formula-semantics`
+Active branch: `feature/p17-real-workbook-formula-semantics`
 
 Goal: expand formula and reference semantics based on real workbook evidence, especially structured references, unsupported functions, parser token forms, operators, external references, volatile functions, named ranges, and cached-value gaps.
 
@@ -266,7 +266,7 @@ Goal: expand formula and reference semantics based on real workbook evidence, es
 - [ ] P17.3 Expand formula translation subset. Child issue: #96.
 - [ ] P17.4 Validate expanded semantics and closeout. Child issue: #94.
 
-Status: planned backlog.
+Status: active.
 
 ## Phase 18: Conversion Planning And Pipeline Orchestration
 
@@ -300,6 +300,6 @@ Status: planned backlog.
 
 ## Current Next Steps
 
-1. Merge Phase 16 PR #108 from `feature/p16-cli-docs-public-surface` into `main`.
-2. Close parent issue #89 after merge.
-3. Activate Phase 17 on `feature/p17-real-workbook-formula-semantics`.
+1. Work P17.1 in child issue #97 on branch `feature/p17-real-workbook-formula-semantics`.
+2. Prioritize unsupported formula/reference semantics from sanitized private evaluation findings.
+3. Keep issue #97, parent issue #88, this roadmap, and `CHANGE_LOG.md` synchronized before implementing structured-reference records.
