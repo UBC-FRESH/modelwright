@@ -69,7 +69,7 @@ This file records completed project work in chronological order.
 - Added full Sphinx documentation with curated guide/reference pages and a GitHub Pages workflow that builds on pull requests and deploys on pushes to `main`.
 - Added repo-root `.venv` bootstrap tooling plus contributor and developer-onboarding documentation for repeatable local setup.
 - Verified the Phase 16 CLI/docs surface locally and recorded Phase 17 real-workbook formula-semantics inputs.
-- Opened Phase 16 PR #108 from `feature/p16-cli-docs-public-surface` back to `main` and verified PR checks for tests, quality, and docs build.
+- Opened Phase 16 PR #108 from `feature/p16-cli-docs-public-surface` back to `main`, verified PR checks for tests, quality, and docs build, and confirmed the post-merge `main` docs Pages deployment succeeded.
 - Merged Phase 16 PR #108, closed parent issue #89, and activated Phase 17 on `feature/p17-real-workbook-formula-semantics`.
 
 ## 2026-06-19
