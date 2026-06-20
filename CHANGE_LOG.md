@@ -43,6 +43,7 @@ This file records completed project work in chronological order.
 - Added a `formulas`-backed oracle for synthetic workbook outputs with JSON scalar normalization and unsupported-input diagnostics.
 - Added oracle-backed validation report assembly for generated synthetic model outputs and recorded Phase 13 private-workbook evaluation inputs.
 - Opened Phase 12 PR #84 from `feature/p12-oracle-backed-validation` back to `main`.
+- Merged Phase 12 PR #84 and closed parent issue #54.
 
 ## 2026-06-19
 
