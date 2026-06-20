@@ -79,6 +79,7 @@ This file records completed project work in chronological order.
 - Added P17.3 pass-one support for boolean literals, unary minus, `^`, `&`, and `#REF!` diagnostics, plus a tracked supported-semantics fixture harness and sanitized convergence note.
 - Added P17.3 pass-two support for scalar/range functions, supported table structured references, table metadata extraction, unresolved structured-reference fast-fail behavior, and expanded supported-semantics fixture coverage; the sanitized private pass increased translated formulas to 72,437 and kept cached generated validation at 10 outputs with 0 mismatches.
 - Added P17.3 pass-three support for `SUMIF`, `SUMIFS`, `COUNTIF`, and `COUNTIFS`; the sanitized private pass increased translated formulas to 185,128 and reduced remaining unsupported-function first failures to `VLOOKUP` and `OFFSET`.
+- Added P17.3 pass-four support for `VLOOKUP` and table-array structured references; the sanitized private pass increased translated formulas to 209,394 and left `OFFSET`, remaining structured references, explicit error references, and oracle calculation failure as residual blockers.
 
 ## 2026-06-19
 

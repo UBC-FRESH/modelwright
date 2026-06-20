@@ -267,7 +267,8 @@ Goal: expand formula and reference semantics based on real workbook evidence, es
   - [x] Pass 1: boolean literals, unary minus, `^`, `&`, and explicit `#REF!` diagnostics.
   - [x] Pass 2: scalar/range functions, supported table structured references, and unresolved structured-reference fast-fail behavior.
   - [x] Pass 3: criteria functions `SUMIF`, `SUMIFS`, `COUNTIF`, and `COUNTIFS`.
-  - [ ] Pass 4: lookup function `VLOOKUP`.
+  - [x] Pass 4: lookup function `VLOOKUP` plus table-array structured references.
+  - [ ] Pass 5 decision: constrained `OFFSET`, remaining structured references, or P17.4 closeout.
 - [ ] P17.4 Validate expanded semantics and closeout. Child issue: #94.
 
 Status: active.
@@ -305,6 +306,6 @@ Status: planned backlog.
 ## Current Next Steps
 
 1. Continue P17.3 in child issue #96 on branch `feature/p17-real-workbook-formula-semantics`.
-2. Implement the next convergent private-workbook blocker slice: lookup function `VLOOKUP`.
-3. Add each newly supported function to `tests/fixtures/supported_semantics/`, then rerun the private-workbook diagnostic pass and record sanitized deltas.
+2. Inspect the remaining private-workbook blockers: `OFFSET`, 5,808 structured-reference failures, 306 explicit error references, and the `formulas` oracle calculation failure.
+3. Decide whether P17.3 needs one more constrained semantics pass or should move to P17.4 closeout with explicit residual blockers.
 4. Keep issue #96, parent issue #88, this roadmap, and `CHANGE_LOG.md` synchronized before Phase 17 closeout validation.

@@ -39,6 +39,10 @@ EXPECTED_OUTPUTS = {
     "Calc!B30": 2,
     "Calc!B31": 6,
     "Calc!B32": 2,
+    "Calc!B33": "two",
+    "Calc!B34": "one",
+    "Calc!B35": "two",
+    "Calc!B36": "one",
     "TableData!B2": 10,
     "TableData!B3": 20,
 }
@@ -105,6 +109,10 @@ def build_workbook(path: str | Path) -> Path:
     calc["B30"] = '=COUNTIFS(CriteriaData!B2:B4,"a",CriteriaData!C2:C4,"east")'
     calc["B31"] = '=SUMIF(CriteriaData!A2:A4,">1")'
     calc["B32"] = '=COUNTIF(CriteriaData!A2:A4,">1")'
+    calc["B33"] = '=VLOOKUP(2,LookupData!A2:B4,2,FALSE)'
+    calc["B34"] = '=VLOOKUP(1.5,LookupData!A2:B4,2,TRUE)'
+    calc["B35"] = '=VLOOKUP(2,LookupTable[],2,FALSE)'
+    calc["B36"] = '=VLOOKUP(1.5,LookupTable[#All],2,TRUE)'
 
     table_data.append(["Amount", "Result"])
     table_data.append([10, "=SemanticsTable[[#This Row],[Amount]]"])
@@ -115,6 +123,13 @@ def build_workbook(path: str | Path) -> Path:
     criteria_data.append([1, "a", "east"])
     criteria_data.append([2, "b", "west"])
     criteria_data.append([4, "a", "east"])
+
+    lookup_data = workbook.create_sheet("LookupData")
+    lookup_data.append(["Key", "Label"])
+    lookup_data.append([1, "one"])
+    lookup_data.append([2, "two"])
+    lookup_data.append([4, "four"])
+    lookup_data.add_table(Table(displayName="LookupTable", ref="A1:B4"))
 
     workbook.save(workbook_path)
     return workbook_path

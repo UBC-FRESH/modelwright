@@ -37,6 +37,7 @@ SUPPORTED_FUNCTIONS = frozenset(
         "SUM",
         "SUMIF",
         "SUMIFS",
+        "VLOOKUP",
     }
 )
 SUPPORTED_OPERATORS = frozenset({"+", "-", "*", "/", "^", "&", ">", ">=", "<", "<=", "=", "<>", "(", ")", ","})

@@ -324,6 +324,41 @@ def _render_module(
         "    )",
         "",
         "",
+        "def _sf_range_lookup_enabled(range_lookup):",
+        "    if isinstance(range_lookup, str):",
+        "        return range_lookup.upper() not in {'FALSE', '0'}",
+        "    return bool(range_lookup)",
+        "",
+        "",
+        "def _sf_vlookup(lookup_value, table_array, col_index_num, range_lookup=True):",
+        "    column_index = int(col_index_num) - 1",
+        "    if column_index < 0:",
+        "        raise ValueError('VLOOKUP column index must be one-based')",
+        "    rows = tuple(tuple(row) for row in table_array)",
+        "    if not rows:",
+        "        raise LookupError('VLOOKUP table is empty')",
+        "    if any(column_index >= len(row) for row in rows):",
+        "        raise IndexError('VLOOKUP column index is outside the table')",
+        "    if not _sf_range_lookup_enabled(range_lookup):",
+        "        for row in rows:",
+        "            if row[0] == lookup_value:",
+        "                return row[column_index]",
+        "        raise LookupError('VLOOKUP exact match not found')",
+        "    candidate = None",
+        "    for row in rows:",
+        "        try:",
+        "            matched = row[0] <= lookup_value",
+        "        except TypeError:",
+        "            continue",
+        "        if matched:",
+        "            candidate = row",
+        "        else:",
+        "            break",
+        "    if candidate is None:",
+        "        raise LookupError('VLOOKUP approximate match not found')",
+        "    return candidate[column_index]",
+        "",
+        "",
         f"def {contract.entrypoint}(inputs=None):",
         "    inputs = {} if inputs is None else dict(inputs)",
     ]
@@ -429,6 +464,18 @@ def _render_function_call(node: FormulaExpressionNode) -> str:
         if len(node.operands) < 2 or len(node.operands) % 2 != 0:
             raise ValueError("COUNTIFS requires criteria range/criteria pairs")
         return f"_sf_countifs({_render_criteria_function_arguments(node.operands)})"
+    if node.function_name == "VLOOKUP":
+        if len(node.operands) not in {3, 4}:
+            raise ValueError("VLOOKUP requires three or four operands")
+        lookup_value, table_array, col_index_num, *range_lookup = node.operands
+        rendered_arguments = [
+            _render_expression(lookup_value),
+            _render_table_array(table_array),
+            _render_expression(col_index_num),
+        ]
+        if range_lookup:
+            rendered_arguments.append(_render_expression(range_lookup[0]))
+        return f"_sf_vlookup({', '.join(rendered_arguments)})"
     raise ValueError(f"unsupported function call: {node.function_name}")
 
 
@@ -472,6 +519,24 @@ def _render_range_reference(reference) -> str:
         for column in range(min_col, max_col + 1)
     ]
     return f"({', '.join(rendered_cells)}{',' if len(rendered_cells) == 1 else ''})"
+
+
+def _render_table_array(node: FormulaExpressionNode) -> str:
+    if node.kind != "reference" or node.reference is None or node.reference.kind != "range":
+        raise ValueError("VLOOKUP table array must be a concrete range reference")
+    reference = node.reference
+    if reference.sheet is None or reference.start_cell is None or reference.end_cell is None:
+        raise ValueError(f"cannot render incomplete VLOOKUP table reference: {reference.normalized}")
+
+    min_col, min_row, max_col, max_row = range_boundaries(f"{reference.start_cell}:{reference.end_cell}")
+    rendered_rows = []
+    for row in range(min_row, max_row + 1):
+        rendered_cells = [
+            symbol_name_for_cell_ref(f"{reference.sheet}!{get_column_letter(column)}{row}")
+            for column in range(min_col, max_col + 1)
+        ]
+        rendered_rows.append(f"({', '.join(rendered_cells)}{',' if len(rendered_cells) == 1 else ''})")
+    return f"({', '.join(rendered_rows)}{',' if len(rendered_rows) == 1 else ''})"
 
 
 def _python_comparison_operator(operator: str | None) -> str:

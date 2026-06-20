@@ -291,3 +291,76 @@ def test_generate_python_module_renders_criteria_functions(tmp_path: Path) -> No
         "Calc!B3": 1,
         "Calc!B4": 1,
     }
+
+
+def test_generate_python_module_renders_vlookup(tmp_path: Path) -> None:
+    contract = GeneratedModuleContract(
+        workbook_id="lookup.xlsx",
+        module_name="lookup",
+        input_refs=("Lookup!A1", "Lookup!A2", "Lookup!B1", "Lookup!B2"),
+        output_refs=("Calc!B1", "Calc!B2"),
+        symbols=(
+            GeneratedSymbol(cell_ref="Lookup!A1", symbol_name="lookup_a1", kind="input"),
+            GeneratedSymbol(cell_ref="Lookup!A2", symbol_name="lookup_a2", kind="input"),
+            GeneratedSymbol(cell_ref="Lookup!B1", symbol_name="lookup_b1", kind="input"),
+            GeneratedSymbol(cell_ref="Lookup!B2", symbol_name="lookup_b2", kind="input"),
+            GeneratedSymbol(
+                cell_ref="Calc!B1",
+                symbol_name="calc_b1",
+                kind="output",
+                raw_formula="=VLOOKUP(2,Lookup!A1:B2,2,FALSE)",
+            ),
+            GeneratedSymbol(
+                cell_ref="Calc!B2",
+                symbol_name="calc_b2",
+                kind="output",
+                raw_formula="=VLOOKUP(1.5,Lookup!A1:B2,2,TRUE)",
+            ),
+        ),
+    )
+    table_range = normalize_reference("Lookup!A1:B2")
+    expressions = {
+        "Calc!B1": formula_expression(
+            "Calc!B1",
+            "=VLOOKUP(2,Lookup!A1:B2,2,FALSE)",
+            FormulaExpressionNode.function_call(
+                "VLOOKUP",
+                (
+                    FormulaExpressionNode.literal(2),
+                    FormulaExpressionNode.reference_to(table_range),
+                    FormulaExpressionNode.literal(2),
+                    FormulaExpressionNode.literal(False),
+                ),
+            ),
+        ),
+        "Calc!B2": formula_expression(
+            "Calc!B2",
+            "=VLOOKUP(1.5,Lookup!A1:B2,2,TRUE)",
+            FormulaExpressionNode.function_call(
+                "VLOOKUP",
+                (
+                    FormulaExpressionNode.literal(1.5),
+                    FormulaExpressionNode.reference_to(table_range),
+                    FormulaExpressionNode.literal(2),
+                    FormulaExpressionNode.literal(True),
+                ),
+            ),
+        ),
+    }
+    output_path = tmp_path / "generated_lookup.py"
+
+    result = generate_python_module(
+        contract=contract,
+        expressions=expressions,
+        constants={"Lookup!A1": 1, "Lookup!A2": 2, "Lookup!B1": "one", "Lookup!B2": "two"},
+        output_path=output_path,
+    )
+    module = load_module(output_path)
+
+    assert result.generated is True
+    assert "_sf_vlookup" in result.source_code
+    assert "((lookup_a1, lookup_b1), (lookup_a2, lookup_b2))" in result.source_code
+    assert module.calculate() == {
+        "Calc!B1": "two",
+        "Calc!B2": "one",
+    }

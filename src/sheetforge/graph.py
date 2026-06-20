@@ -206,7 +206,7 @@ def _resolve_structured_reference(
     tables: dict[str, TableRecord],
 ) -> WorkbookReference | None:
     parsed = _parse_structured_reference(source.original)
-    if parsed is None or parsed.column is None:
+    if parsed is None:
         return None
 
     table = tables.get(parsed.table_name) if parsed.table_name is not None else _table_containing_target(target, tables)
@@ -214,9 +214,15 @@ def _resolve_structured_reference(
         return None
 
     try:
-        min_col, min_row, _max_col, max_row = range_boundaries(table.ref)
+        min_col, min_row, max_col, max_row = range_boundaries(table.ref)
     except ValueError:
         return None
+
+    if parsed.column is None:
+        start_row = min_row if parsed.include_headers else min_row + 1
+        return normalize_reference(
+            f"{table.sheet}!{_column_name(min_col)}{start_row}:{_column_name(max_col)}{max_row}"
+        )
 
     try:
         column_offset = table.columns.index(parsed.column)
@@ -244,6 +250,7 @@ class _StructuredReferenceParts:
     table_name: str | None
     column: str | None
     current_row: bool
+    include_headers: bool
 
 
 def _parse_structured_reference(reference: str) -> _StructuredReferenceParts | None:
@@ -255,6 +262,7 @@ def _parse_structured_reference(reference: str) -> _StructuredReferenceParts | N
     current_row = any(part == "#This Row" or part.startswith("@") for part in bracketed_parts)
     if reference.startswith("[@"):
         current_row = True
+    include_headers = any(part == "#All" for part in bracketed_parts)
 
     column = next(
         (
@@ -268,6 +276,7 @@ def _parse_structured_reference(reference: str) -> _StructuredReferenceParts | N
         table_name=table_name,
         column=column,
         current_row=current_row,
+        include_headers=include_headers,
     )
 
 

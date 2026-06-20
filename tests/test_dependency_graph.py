@@ -131,6 +131,32 @@ def test_dependency_graph_resolves_column_structured_reference_as_range(tmp_path
     ]
 
 
+def test_dependency_graph_resolves_whole_table_structured_references_as_ranges(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "whole-table-structured-reference.xlsx"
+    source = Workbook()
+    sheet = source.active
+    sheet.title = "Data"
+    sheet.append(["Amount", "Rate"])
+    sheet.append([10, 0.1])
+    sheet.append([20, 0.2])
+    sheet["D1"] = "=SUM(InputTable[])"
+    sheet["D2"] = "=SUM(InputTable[#All])"
+    sheet.add_table(Table(displayName="InputTable", ref="A1:B3"))
+    source.save(workbook_path)
+
+    graph = build_dependency_graph(extract_workbook(workbook_path))
+
+    data_body_edges = [edge for edge in graph.execution_edges if edge.target.normalized == "Data!D1"]
+    all_edges = [edge for edge in graph.execution_edges if edge.target.normalized == "Data!D2"]
+    assert graph.diagnostics == ()
+    assert [(edge.source.kind, edge.source.normalized, edge.resolved_from.normalized) for edge in data_body_edges if edge.resolved_from] == [
+        ("range", "Data!A2:B3", "InputTable[]")
+    ]
+    assert [(edge.source.kind, edge.source.normalized, edge.resolved_from.normalized) for edge in all_edges if edge.resolved_from] == [
+        ("range", "Data!A1:B3", "InputTable[#All]")
+    ]
+
+
 def test_dependency_graph_expands_range_execution_edges(tmp_path: Path) -> None:
     workbook_path = tmp_path / "range.xlsx"
     source = Workbook()

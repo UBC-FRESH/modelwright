@@ -18,7 +18,7 @@ def test_supported_semantics_fixture_translates_and_generates(tmp_path: Path) ->
         for cell in workbook.cells
         if cell.formula is None
     }
-    formula_order = tuple(f"Calc!B{index}" for index in range(1, 33)) + ("TableData!B2", "TableData!B3")
+    formula_order = tuple(f"Calc!B{index}" for index in range(1, 37)) + ("TableData!B2", "TableData!B3")
     contract = GeneratedModuleContract(
         workbook_id=workbook.workbook_id,
         module_name="supported_semantics",
