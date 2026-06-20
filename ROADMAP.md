@@ -300,7 +300,7 @@ Goal: resolve or explicitly scope the residual blockers exposed by the 2020 FABL
 
 - [x] P19.1 Resolve or scope unresolved named ranges. Child issue: #107.
 - [x] P19.2 Define circular dependency semantics and policy. Child issue: #105.
-- [ ] P19.3 Resolve deferred workbook dependency and volatile/cache blockers. Child issue: #106.
+- [x] P19.3 Resolve deferred workbook dependency and volatile/cache blockers. Child issue: #106.
 - [ ] P19.4 Rerun 2020 benchmark to convergence and closeout. Child issue: #104.
 
 Status: active.
@@ -322,7 +322,7 @@ Status: planned backlog.
 
 ## Current Next Steps
 
-1. Work P19.3 in child issue #106 on branch `feature/p19-residual-blocker-resolution`.
-2. Resolve or explicitly scope the remaining external-link, volatile-function, structured-reference-provenance, and missing-cached-value blockers.
-3. Update conversion-plan classification so supported structured-reference extraction provenance does not look like an unresolved conversion blocker.
-4. Rerun the 2020 conversion plan with verbose logging and confirm every remaining blocker has an owner, disposition, and next action.
+1. Work P19.4 in child issue #104 on branch `feature/p19-residual-blocker-resolution`.
+2. Rerun the 2020 FABLE benchmark to convergence with verbose logging.
+3. Confirm every remaining residual blocker is resolved, scoped out, or explicitly retained with a named next-phase owner.
+4. Close Phase 19 with roadmap, changelog, planning-note, issue, PR, and verification updates.

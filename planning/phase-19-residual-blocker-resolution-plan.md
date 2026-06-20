@@ -142,6 +142,43 @@ Acceptance criteria:
   when a recalculation oracle is required;
 - update conversion-plan classification to avoid treating deferred policy items as hand-waved success.
 
+Status: complete.
+
+Policy decisions:
+
+- External dependencies are not silently inlined. A workbook with external links requires explicit
+  external workbook materialization, mock inputs, or rejection policy before full conversion or validation.
+- Missing cached formula values are not generation blockers. They are validation evidence blockers unless
+  a recalculation oracle is available or the selected validation outputs have usable cached values.
+- Structured-reference extraction diagnostics are provenance once graphing and translation have resolved
+  those references. They should stay visible in diagnostic summaries but should not be treated as active
+  conversion blockers when graph and translation diagnostics are clean.
+- Volatile-function extraction diagnostics are risk provenance once formula translation is clean. For the
+  2020 benchmark, the remaining volatile diagnostics are not active formula-semantics blockers; they are
+  retained for validation-risk review.
+- Source workbook `named_range_source_error` remains out of scope when unreferenced by formulas or
+  validation rules.
+
+P19.3 rerun evidence:
+
+- graph diagnostics: empty;
+- translation diagnostics: empty;
+- formula cells: 296,976;
+- translated formula cells: 296,976;
+- untranslated formula cells: 0;
+- `unsupported_structured_reference`: disposition `resolved`, extraction provenance only;
+- `unsupported_volatile_function`: disposition `resolved`, validation-risk provenance only;
+- `unsupported_external_link`: disposition `deferred`, owned by explicit external-dependency policy;
+- `missing_cached_formula_value`: disposition `deferred`, owned by oracle/cached-validation strategy.
+
+Local ignored evidence:
+
+```text
+tmp/logs/p19-policy-targeted-tests.log
+tmp/logs/p19-policy-2020-conversion-plan.log
+tmp/conversion-plans/p19-policy-fable-2020.json
+```
+
 ### P19.4 Rerun 2020 Benchmark To Convergence And Closeout
 
 Goal: prove that Phase 19 resolved the residual-blocker layer enough to move to automated validation.

@@ -646,8 +646,8 @@ def _residual_blockers(diagnostics: DiagnosticSummary) -> tuple[ResidualBlocker,
                 code=code,
                 count=count,
                 category=_formula_extraction_blocker_category(code),
-                disposition=_formula_extraction_blocker_disposition(code),
-                next_action=_formula_extraction_next_action(code),
+                disposition=_formula_extraction_blocker_disposition(code, diagnostics),
+                next_action=_formula_extraction_next_action(code, diagnostics),
                 provenance="extraction",
             )
         )
@@ -658,9 +658,9 @@ def _residual_blockers(diagnostics: DiagnosticSummary) -> tuple[ResidualBlocker,
                 index=len(blockers) + 1,
                 code=code,
                 count=count,
-                category="graph_semantics",
-                disposition="next_target",
-                next_action="Define graph semantics or reporting policy for this workbook structure.",
+                category=_graph_blocker_category(code),
+                disposition=_graph_blocker_disposition(code),
+                next_action=_graph_next_action(code),
                 provenance="graph",
             )
         )
@@ -808,8 +808,26 @@ def _extraction_blocker_disposition(code: str) -> BlockerDisposition:
 
 def _extraction_next_action(code: str) -> str:
     if "external" in code:
-        return "Record external workbook dependency and decide whether to inline, mock, or reject it."
+        return "Require explicit external workbook materialization, mock inputs, or rejection policy; do not inline external dependencies silently."
     return "Classify this workbook-extraction diagnostic before claiming conversion readiness."
+
+
+def _graph_blocker_category(code: str) -> BlockerCategory:
+    if "external" in code:
+        return "external_dependency"
+    return "graph_semantics"
+
+
+def _graph_blocker_disposition(code: str) -> BlockerDisposition:
+    if "external" in code:
+        return "deferred"
+    return "next_target"
+
+
+def _graph_next_action(code: str) -> str:
+    if "external" in code:
+        return "Require explicit external workbook materialization, mock inputs, or rejection policy before full conversion."
+    return "Define graph semantics or reporting policy for this workbook structure."
 
 
 def _named_range_blocker_category(code: str) -> BlockerCategory:
@@ -837,6 +855,8 @@ def _named_range_next_action(code: str) -> str:
 
 
 def _formula_extraction_blocker_category(code: str) -> BlockerCategory:
+    if "external" in code:
+        return "external_dependency"
     if code == "missing_cached_formula_value":
         return "missing_cached_values"
     if "structured_reference" in code:
@@ -846,24 +866,47 @@ def _formula_extraction_blocker_category(code: str) -> BlockerCategory:
     return "unknown"
 
 
-def _formula_extraction_blocker_disposition(code: str) -> BlockerDisposition:
+def _formula_extraction_blocker_disposition(
+    code: str,
+    diagnostics: DiagnosticSummary,
+) -> BlockerDisposition:
     if code == "missing_cached_formula_value":
         return "deferred"
+    if "external" in code:
+        return "deferred"
     if "structured_reference" in code:
+        if not _has_unresolved_reference_diagnostics(diagnostics):
+            return "resolved"
         return "deferred"
     if "volatile" in code:
+        if not diagnostics.translation:
+            return "resolved"
         return "deferred"
     return "next_target"
 
 
-def _formula_extraction_next_action(code: str) -> str:
+def _formula_extraction_next_action(
+    code: str,
+    diagnostics: DiagnosticSummary,
+) -> str:
     if code == "missing_cached_formula_value":
-        return "Use a recalculation oracle or select validation outputs with available cached values."
+        return "Not a generation blocker; use a recalculation oracle or select validation outputs with available cached values."
+    if "external" in code:
+        return "Require explicit external workbook materialization, mock inputs, or rejection policy; do not inline external dependencies silently."
     if "structured_reference" in code:
+        if not _has_unresolved_reference_diagnostics(diagnostics):
+            return "No conversion action required; extraction diagnostic is provenance for structured references already resolved by graph and translation."
         return "Keep structured-reference diagnostics visible and separate them from translation failures."
     if "volatile" in code:
+        if not diagnostics.translation:
+            return "No formula-semantics action required while translation is clean; retain volatile-function provenance for validation risk review."
         return "Record volatile formula risk and define deterministic handling where conversion needs it."
     return "Classify this formula-extraction diagnostic before claiming conversion readiness."
+
+
+def _has_unresolved_reference_diagnostics(diagnostics: DiagnosticSummary) -> bool:
+    reference_codes = tuple(diagnostics.graph) + tuple(diagnostics.translation)
+    return any("structured_reference" in code or "reference" in code for code in reference_codes)
 
 
 def _translation_blocker_category(code: str) -> BlockerCategory:

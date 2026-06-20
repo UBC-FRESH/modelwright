@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from openpyxl import Workbook
+from openpyxl.worksheet.table import Table
 from openpyxl.workbook.defined_name import DefinedName
 
 from sheetforge.conversion import ConversionPlan, build_conversion_plan
@@ -138,3 +139,100 @@ def test_build_conversion_plan_classifies_named_range_source_errors(tmp_path: Pa
     assert plan.diagnostic_summary.named_ranges == {"named_range_source_error": 1}
     assert blockers_by_code["named_range_source_error"].category == "source_workbook_defect"
     assert blockers_by_code["named_range_source_error"].disposition == "out_of_scope"
+
+
+def test_build_conversion_plan_classifies_external_formula_references(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "external-reference.xlsx"
+    source = Workbook()
+    sheet = source.active
+    sheet.title = "Calc"
+    sheet["A1"] = "='[external.xlsx]Inputs'!A1"
+    source.save(workbook_path)
+    workbook = extract_workbook(workbook_path)
+    graph = build_dependency_graph(workbook)
+    formula_cell = next(cell for cell in workbook.cells if cell.formula is not None)
+    expressions = {formula_cell.cell_ref: translate_formula_cell(formula_cell, graph)}
+
+    plan = build_conversion_plan(
+        plan_id="external-reference-plan",
+        workbook=workbook,
+        graph=graph,
+        expressions=expressions,
+        benchmark_role="synthetic_fixture",
+    )
+    blockers_by_code = {blocker.diagnostic_code: blocker for blocker in plan.residual_blockers}
+
+    assert blockers_by_code["unsupported_external_link"].category == "external_dependency"
+    assert blockers_by_code["unsupported_external_link"].disposition == "deferred"
+    assert blockers_by_code["external_reference"].category == "external_dependency"
+    assert blockers_by_code["external_reference"].disposition == "deferred"
+
+
+def test_build_conversion_plan_marks_resolved_structured_reference_provenance(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "resolved-structured-reference.xlsx"
+    source = Workbook()
+    sheet = source.active
+    sheet.title = "Data"
+    sheet.append(["Amount", "Result"])
+    sheet.append([10, "=InputTable[[#This Row],[Amount]]"])
+    sheet.add_table(Table(displayName="InputTable", ref="A1:B2"))
+    source.save(workbook_path)
+    workbook = extract_workbook(workbook_path)
+    graph = build_dependency_graph(workbook)
+    reference_index = build_formula_reference_index(graph)
+    formula_cell = next(cell for cell in workbook.cells if cell.formula is not None)
+    expressions = {formula_cell.cell_ref: translate_formula_cell(formula_cell, graph, reference_index)}
+
+    plan = build_conversion_plan(
+        plan_id="resolved-structured-reference-plan",
+        workbook=workbook,
+        graph=graph,
+        expressions=expressions,
+        benchmark_role="synthetic_fixture",
+    )
+    blockers_by_code = {blocker.diagnostic_code: blocker for blocker in plan.residual_blockers}
+
+    assert plan.diagnostic_summary.formula_extraction == {
+        "missing_cached_formula_value": 1,
+        "unsupported_structured_reference": 1,
+    }
+    assert plan.diagnostic_summary.graph == {}
+    assert plan.diagnostic_summary.translation == {}
+    assert blockers_by_code["unsupported_structured_reference"].disposition == "resolved"
+    assert blockers_by_code["unsupported_structured_reference"].next_action.startswith("No conversion action required")
+
+
+def test_build_conversion_plan_marks_resolved_static_offset_volatility(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "resolved-static-offset-volatility.xlsx"
+    source = Workbook()
+    sheet = source.active
+    sheet.title = "Data"
+    sheet.append(["Amount", "Result"])
+    sheet.append([10, None])
+    sheet.append([20, "=OFFSET(InputTable[[#This Row],[Amount]],-1,0)"])
+    sheet.add_table(Table(displayName="InputTable", ref="A1:B3"))
+    source.save(workbook_path)
+    workbook = extract_workbook(workbook_path)
+    graph = build_dependency_graph(workbook)
+    reference_index = build_formula_reference_index(graph)
+    formula_cell = next(cell for cell in workbook.cells if cell.formula is not None)
+    expressions = {formula_cell.cell_ref: translate_formula_cell(formula_cell, graph, reference_index)}
+
+    plan = build_conversion_plan(
+        plan_id="resolved-static-offset-volatility-plan",
+        workbook=workbook,
+        graph=graph,
+        expressions=expressions,
+        benchmark_role="synthetic_fixture",
+    )
+    blockers_by_code = {blocker.diagnostic_code: blocker for blocker in plan.residual_blockers}
+
+    assert plan.diagnostic_summary.formula_extraction == {
+        "missing_cached_formula_value": 1,
+        "unsupported_structured_reference": 1,
+        "unsupported_volatile_function": 1,
+    }
+    assert plan.diagnostic_summary.translation == {}
+    assert blockers_by_code["unsupported_volatile_function"].disposition == "resolved"
+    assert blockers_by_code["unsupported_volatile_function"].next_action.startswith("No formula-semantics action required")
+    assert blockers_by_code["missing_cached_formula_value"].disposition == "deferred"
