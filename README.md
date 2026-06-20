@@ -4,11 +4,11 @@
 
 The intended direction is a generic workflow that can inspect workbook structure, extract formulas and dependencies, generate maintainable Python source, and validate the generated model against the original workbook outputs.
 
-This repository is currently an early implementation skeleton. It defines minimal Python package and test scaffolding plus initial validation, extraction, graph, generation, and oracle records, but does not yet provide a command-line interface, release stability guarantee, catalog schema, or full workbook conversion.
+This repository is currently an early implementation skeleton. It defines minimal Python package and test scaffolding plus initial validation, extraction, graph, generation, oracle records, and thin JSON command-line wrappers, but does not yet provide a release stability guarantee, catalog schema, or full workbook conversion.
 
 ## Current Focus
 
-- Build the first package-backed validation/report and workbook extraction cores.
+- Build the first package-backed validation/report, workbook extraction, generation, and CLI cores.
 - Keep extraction, code generation, validation, diagnostics, and reporting responsibilities separate.
 - Avoid committing private notes, source workbooks, generated clones, or large artifacts while the project shape is still being established.
 
@@ -25,7 +25,24 @@ The durable API is organized by module responsibility:
 
 The package root `sheetforge` exposes a curated convenience facade for those records and functions. Module-level imports remain preferred for implementation work because this project is still pre-release.
 
-There is no CLI yet. Future CLI commands should be thin wrappers around these Python APIs.
+## Command-Line Interface
+
+Install the package locally before using the console script:
+
+```bash
+python -m pip install -e ".[test]"
+```
+
+The current CLI prints JSON to stdout and stays close to the Python APIs:
+
+```bash
+sheetforge extract path/to/workbook.xlsx > tmp/extraction.json
+sheetforge graph path/to/workbook.xlsx > tmp/dependency-graph.json
+sheetforge generate --contract tmp/contract.json --expressions tmp/expressions.json --constants tmp/constants.json --output tmp/generated_model.py > tmp/generation-result.json
+sheetforge validate-report --scenario tests/fixtures/synthetic_model/baseline_scenario.json --generated-values tmp/generated-values.json --oracle-values tmp/oracle-values.json > tmp/validation-report.json
+```
+
+These commands do not provide a one-step workbook converter. `generate` expects explicit generated-module and formula-expression JSON inputs, and `validate-report` compares already-observed generated/oracle values. See `planning/cli-json-workflows.md` for JSON examples and workflow boundaries.
 
 ## Local Development
 

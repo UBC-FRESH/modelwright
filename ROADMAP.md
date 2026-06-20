@@ -220,7 +220,7 @@ Goal: stabilize the Python API and add thin CLI wrappers only after the internal
 
 - [x] P14.1 Review and stabilize Python API boundaries. Child issue: #73.
 - [x] P14.2 Add thin CLI command groups. Child issue: #71.
-- [ ] P14.3 Document CLI and JSON workflows. Child issue: #78.
+- [x] P14.3 Document CLI and JSON workflows. Child issue: #78.
 
 Status: active.
 
@@ -240,6 +240,6 @@ Status: planned backlog.
 
 ## Current Next Steps
 
-1. Work P14.3 in child issue #78 on branch `feature/p14-cli-api-stabilization`.
-2. Document the CLI commands and JSON workflow boundaries added in P14.2.
-3. Keep issue #78, parent issue #53, this roadmap, and `CHANGE_LOG.md` synchronized before opening the Phase 14 PR.
+1. Open the Phase 14 PR from `feature/p14-cli-api-stabilization` back to `main`.
+2. Verify the PR checks and merge once clean.
+3. Close parent issue #53 after the Phase 14 PR is merged.
