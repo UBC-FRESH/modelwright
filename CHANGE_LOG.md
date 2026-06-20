@@ -58,6 +58,7 @@ This file records completed project work in chronological order.
 - Opened Phase 14 PR #86 from `feature/p14-cli-api-stabilization` back to `main`.
 - Merged Phase 14 PR #86 and closed parent issue #53.
 - Activated Phase 15 on `feature/p15-hardening-release-prep`.
+- Decided the Phase 15 hardening tooling boundary: keep `pytest`, add at most a lightweight lint lane next, and defer formatter, type checker, coverage threshold, and pre-commit hooks.
 
 ## 2026-06-19
 

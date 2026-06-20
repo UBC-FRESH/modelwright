@@ -232,7 +232,7 @@ Active branch: `feature/p15-hardening-release-prep`
 
 Goal: add hardening, documentation, release, and quality tooling only where evidence shows it will pay for itself.
 
-- [ ] P15.1 Decide hardening tooling from evidence. Child issue: #77.
+- [x] P15.1 Decide hardening tooling from evidence. Child issue: #77.
 - [ ] P15.2 Add release and documentation metadata if needed. Child issue: #76.
 - [ ] P15.3 Summarize release readiness and next roadmap. Child issue: #75.
 
@@ -240,6 +240,6 @@ Status: active.
 
 ## Current Next Steps
 
-1. Work P15.1 in child issue #77 on branch `feature/p15-hardening-release-prep`.
-2. Decide which hardening tooling is justified by current evidence.
-3. Keep issue #77, parent issue #51, this roadmap, and `CHANGE_LOG.md` synchronized before adding release/documentation metadata.
+1. Work P15.2 in child issue #76 on branch `feature/p15-hardening-release-prep`.
+2. Add only release/documentation metadata and lightweight quality tooling justified by P15.1.
+3. Keep issue #76, parent issue #51, this roadmap, and `CHANGE_LOG.md` synchronized before summarizing release readiness.
