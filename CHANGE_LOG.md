@@ -6,6 +6,7 @@ This file records completed project work in chronological order.
 
 - Added validation report core objects for comparison records, diagnostics, report status, mismatch extraction, and JSON-serializable boundaries.
 - Added the tracked synthetic fixture builder, baseline scenario JSON, expected output JSON, and tests that generate the workbook in a pytest temporary directory.
+- Added baseline and intentional numeric mismatch regression tests using the synthetic fixture assets and validation report core.
 
 ## 2026-06-19
 
