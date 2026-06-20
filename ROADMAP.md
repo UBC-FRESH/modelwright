@@ -296,6 +296,8 @@ GitHub parent issue: #103
 
 Active branch: `feature/p19-residual-blocker-resolution`
 
+Open PR: #111
+
 Goal: resolve or explicitly scope the residual blockers exposed by the 2020 FABLE conversion plan before treating validation automation as meaningful evidence.
 
 - [x] P19.1 Resolve or scope unresolved named ranges. Child issue: #107.
