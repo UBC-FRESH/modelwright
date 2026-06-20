@@ -99,6 +99,55 @@ The loop should stop only when one of these conditions is true:
 
 Translation progress is necessary but not sufficient. A slice is not "good to go" for workbook import unless generated outputs can also be validated against cached workbook values, `formulas`, Excel-backed validation, or a documented hybrid oracle.
 
+## Convergence Contract
+
+P17 should converge toward importing the private sample workbook. Convergence means each implementation pass must make measurable progress toward a smaller, clearer blocker set and a larger validated generated subset.
+
+The baseline from the current private diagnostic pass is:
+
+- formula cells: 215,728;
+- translated formula cells: 51,274;
+- untranslated formula cells: 164,454;
+- first-failure unsupported functions: 137,769;
+- first-failure unsupported formula tokens: 24,707;
+- first-failure unsupported operators: 1,978;
+- generated direct-output subset validated against cached workbook values: 10 outputs, 0 mismatches.
+
+Each P17.3 implementation pass must report:
+
+- translated formula count delta;
+- unsupported diagnostic count delta by code;
+- top remaining unsupported function/operator/token categories;
+- newly exposed unsupported categories;
+- generated subset size delta, when candidate selection can safely expand;
+- validation status for any expanded generated subset.
+
+A pass counts as convergent only if at least one of these is true:
+
+- translated formula count increases;
+- a high-count unsupported category is eliminated or materially reduced;
+- a generic diagnostic is replaced by a sharper diagnostic that enables a specific next implementation decision;
+- generated subset size increases and validates;
+- a remaining blocker is explicitly classified as deferred structural work with a reason.
+
+A pass is non-convergent if it only moves failures between generic categories, adds support without improving private diagnostics, or expands generated code without validation evidence.
+
+P17.3 should prioritize work in this order:
+
+1. Low-risk parser/expression unblockers: boolean literals, unary minus, `^`, and `&`.
+2. Scalar functions: `AND`, `OR`, `IFERROR`, `MIN`, `SUM`, `AVERAGE`, `CONCATENATE`.
+3. Criteria/range functions: `SUMIF`, `SUMIFS`, `COUNTIFS`.
+4. Error-reference diagnostics: `#REF!`.
+5. `OFFSET`: implement only if a constrained, provenance-safe subset is clear; otherwise emit a sharper unsupported diagnostic.
+
+This order is designed to expose downstream blockers quickly while avoiding premature table, external workbook, or volatile/reference-returning semantics.
+
+P17.4 closeout should not merely summarize work. It should decide one of these outcomes:
+
+- converged for the current target import scope: selected formulas translate and generated outputs validate;
+- partially converged: remaining blockers are enumerated, lower in count, and assigned to concrete later phases;
+- not converged: progress metrics failed to improve, requiring a scope or architecture decision before more implementation.
+
 ## Full Private Sample Import Scope
 
 To fully import the current private sample workbook, P17 needs more than adding scalar Excel functions. The intended P17 scope is:

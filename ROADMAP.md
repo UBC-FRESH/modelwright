@@ -301,5 +301,5 @@ Status: planned backlog.
 ## Current Next Steps
 
 1. Work P17.3 in child issue #96 on branch `feature/p17-real-workbook-formula-semantics`.
-2. Use the blocker-find-resolve-rerun loop from `planning/phase-17-semantics-prioritization.md`.
+2. Use the blocker-find-resolve-rerun convergence contract from `planning/phase-17-semantics-prioritization.md`.
 3. Keep issue #96, parent issue #88, this roadmap, and `CHANGE_LOG.md` synchronized before Phase 17 closeout validation.

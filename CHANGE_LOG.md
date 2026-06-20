@@ -75,6 +75,7 @@ This file records completed project work in chronological order.
 - Added first-class structured-reference diagnostics across reference normalization, workbook extraction, dependency graphing, and formula translation blocking.
 - Expanded Phase 17 planning with the sanitized private-workbook formula-function, operator, and token scope needed for full sample-workbook import.
 - Codified the Phase 17 blocker-find-resolve-rerun loop for private-workbook formula semantics and validation evidence.
+- Added explicit Phase 17 convergence metrics, pass/fail rules, and implementation priority order for private-workbook import progress.
 
 ## 2026-06-19
 
