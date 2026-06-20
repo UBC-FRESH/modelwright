@@ -9,6 +9,11 @@ from sheetforge.extraction import (
     WorkbookRecord,
     extract_workbook,
 )
+from sheetforge.references import (
+    WorkbookReference,
+    normalize_cell_reference,
+    normalize_reference,
+)
 from sheetforge.validation import (
     ComparisonResult,
     ComparisonRules,
@@ -41,10 +46,13 @@ __all__ = [
     "SheetRecord",
     "ValidationReport",
     "ValidationScenario",
+    "WorkbookReference",
     "WorkbookRecord",
     "__version__",
     "build_validation_report",
     "compare_scalar_output",
     "extract_workbook",
     "load_validation_scenario",
+    "normalize_cell_reference",
+    "normalize_reference",
 ]

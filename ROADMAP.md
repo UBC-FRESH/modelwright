@@ -148,7 +148,7 @@ Active branch: `feature/p9-dependency-graph-core`
 
 Goal: build normalized reference and dependency graph behavior on top of extracted workbook records.
 
-- [ ] P9.1 Add canonical reference model. Child issue: #55.
+- [x] P9.1 Add canonical reference model. Child issue: #55.
 - [ ] P9.2 Resolve named ranges and dependency edges. Child issue: #62.
 - [ ] P9.3 Add graph diagnostics and readiness note. Child issue: #60.
 
@@ -240,6 +240,6 @@ Status: planned backlog.
 
 ## Current Next Steps
 
-1. Work P9.1 in child issue #55 on branch `feature/p9-dependency-graph-core`.
-2. Add the canonical reference model for workbook, sheet, cell, range, named range, unresolved reference, and external reference cases.
-3. Keep issue #55, parent issue #49, this roadmap, and `CHANGE_LOG.md` synchronized before resolving dependency edges.
+1. Work P9.2 in child issue #62 on branch `feature/p9-dependency-graph-core`.
+2. Resolve named ranges and dependency edges on top of extracted workbook records.
+3. Keep issue #62, parent issue #49, this roadmap, and `CHANGE_LOG.md` synchronized before Phase 9 closeout.
