@@ -270,9 +270,9 @@ Goal: expand formula and reference semantics based on real workbook evidence, es
   - [x] Pass 4: lookup function `VLOOKUP` plus table-array structured references.
   - [x] Pass 5: constrained cross-table current-row structured references.
   - [x] Pass 6: constrained static `OFFSET` support.
-- [ ] P17.4 Validate expanded semantics and closeout. Child issue: #94.
+- [x] P17.4 Validate expanded semantics and closeout. Child issue: #94.
 
-Status: active.
+Status: complete pending PR.
 
 ## Phase 18: Conversion Planning And Pipeline Orchestration
 
@@ -306,7 +306,7 @@ Status: planned backlog.
 
 ## Current Next Steps
 
-1. Move to P17.4 in child issue #94 on branch `feature/p17-real-workbook-formula-semantics`.
-2. Rerun the full verification path and summarize final P17 private-workbook diagnostics.
-3. Treat the 306 explicit error-reference formulas as sharp residual blockers rather than supported generated behavior.
-4. Record the `formulas` oracle calculation failure as a validation-oracle limitation and prepare Phase 18 conversion-planning inputs.
+1. Open the Phase 17 PR from `feature/p17-real-workbook-formula-semantics` to `main`.
+2. Verify PR checks.
+3. Merge the Phase 17 PR and close parent issue #88.
+4. Activate Phase 18 on `feature/p18-conversion-planning-pipeline`.

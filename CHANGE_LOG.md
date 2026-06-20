@@ -82,6 +82,7 @@ This file records completed project work in chronological order.
 - Added P17.3 pass-four support for `VLOOKUP` and table-array structured references; the sanitized private pass increased translated formulas to 209,394 and left `OFFSET`, remaining structured references, explicit error references, and oracle calculation failure as residual blockers.
 - Added P17.3 pass-five support for constrained cross-table current-row structured references; the sanitized private pass increased translated formulas to 215,202, cleared structured-reference first failures, and left `OFFSET`, explicit error references, and oracle calculation failure as residual blockers.
 - Added P17.3 pass-six support for constrained static `OFFSET` translation; the sanitized private pass increased translated formulas to 215,422, cleared unsupported-function first failures, and left explicit error references plus oracle calculation failure as residual blockers for closeout.
+- Closed Phase 17 with sanitized final diagnostics, classified explicit error references and oracle calculation failure as residual blockers, and recorded Phase 18 conversion-planning inputs.
 
 ## 2026-06-19
 
