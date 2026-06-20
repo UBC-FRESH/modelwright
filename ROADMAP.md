@@ -119,7 +119,7 @@ Active branch: `feature/p7-validation-scenario-comparison-core`
 
 Goal: turn the Phase 6 validation report records and synthetic fixture JSON into reusable scenario loading and scalar comparison helpers. This phase should not add workbook extraction, code generation, Excel-backed validation, CLI, or broad oracle execution.
 
-- [ ] P7.1 Add validation scenario objects and loader. Child issue: #46.
+- [x] P7.1 Add validation scenario objects and loader. Child issue: #46.
 - [ ] P7.2 Add scalar comparison helpers. Child issue: #45.
 - [ ] P7.3 Build validation reports from observed values. Child issue: #44.
 - [ ] P7.4 Summarize validation-core readiness. Child issue: #43.
@@ -240,6 +240,6 @@ Status: planned backlog.
 
 ## Current Next Steps
 
-1. Work P7.1 in child issue #46 on branch `feature/p7-validation-scenario-comparison-core`.
-2. Add validation scenario objects and a JSON loader using the tracked synthetic scenario fixture.
-3. Keep issue #46, this roadmap, and `CHANGE_LOG.md` synchronized before moving to scalar comparison helpers.
+1. Work P7.2 in child issue #45 on branch `feature/p7-validation-scenario-comparison-core`.
+2. Add scalar comparison helpers for numeric tolerance, exact text, and missing outputs.
+3. Keep issue #45, this roadmap, and `CHANGE_LOG.md` synchronized before building reports from observed values.

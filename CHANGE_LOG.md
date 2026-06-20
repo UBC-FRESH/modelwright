@@ -11,6 +11,7 @@ This file records completed project work in chronological order.
 - Opened Phase 6 PR #41 from `feature/p6-initial-package-validation-core` back to `main`.
 - Merged Phase 6 PR #41, closed parent issue #34, and activated Phase 7 on `feature/p7-validation-scenario-comparison-core`.
 - Expanded the roadmap and GitHub issue backlog through Phase 15, with the long-term sequence recorded in `planning/long-term-roadmap.md`.
+- Added validation scenario objects and a JSON loader for fixture-backed validation scenario files.
 
 ## 2026-06-19
 
