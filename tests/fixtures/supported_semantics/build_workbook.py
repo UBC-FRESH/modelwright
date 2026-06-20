@@ -33,6 +33,12 @@ EXPECTED_OUTPUTS = {
     "Calc!B24": 7 / 3,
     "Calc!B25": "xy3",
     "Calc!B26": 30,
+    "Calc!B27": 5,
+    "Calc!B28": 2,
+    "Calc!B29": 5,
+    "Calc!B30": 2,
+    "Calc!B31": 6,
+    "Calc!B32": 2,
     "TableData!B2": 10,
     "TableData!B3": 20,
 }
@@ -49,6 +55,7 @@ def build_workbook(path: str | Path) -> Path:
     inputs.title = "Inputs"
     calc = workbook.create_sheet("Calc")
     table_data = workbook.create_sheet("TableData")
+    criteria_data = workbook.create_sheet("CriteriaData")
 
     inputs["A1"] = "Input"
     inputs["B1"] = "Value"
@@ -92,11 +99,22 @@ def build_workbook(path: str | Path) -> Path:
     calc["B24"] = "=AVERAGE(Inputs!B5:B7)"
     calc["B25"] = '=CONCATENATE(Inputs!B3,"y",Inputs!B2)'
     calc["B26"] = "=SUM(SemanticsTable[Amount])"
+    calc["B27"] = '=SUMIF(CriteriaData!B2:B4,"a",CriteriaData!A2:A4)'
+    calc["B28"] = '=COUNTIF(CriteriaData!B2:B4,"a")'
+    calc["B29"] = '=SUMIFS(CriteriaData!A2:A4,CriteriaData!B2:B4,"a",CriteriaData!C2:C4,"east")'
+    calc["B30"] = '=COUNTIFS(CriteriaData!B2:B4,"a",CriteriaData!C2:C4,"east")'
+    calc["B31"] = '=SUMIF(CriteriaData!A2:A4,">1")'
+    calc["B32"] = '=COUNTIF(CriteriaData!A2:A4,">1")'
 
     table_data.append(["Amount", "Result"])
     table_data.append([10, "=SemanticsTable[[#This Row],[Amount]]"])
     table_data.append([20, "=SemanticsTable[[#This Row],[Amount]]"])
     table_data.add_table(Table(displayName="SemanticsTable", ref="A1:B3"))
+
+    criteria_data.append(["Amount", "Category", "Region"])
+    criteria_data.append([1, "a", "east"])
+    criteria_data.append([2, "b", "west"])
+    criteria_data.append([4, "a", "east"])
 
     workbook.save(workbook_path)
     return workbook_path

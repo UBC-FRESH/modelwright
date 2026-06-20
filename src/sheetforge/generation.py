@@ -221,6 +221,8 @@ def _render_module(
         f"Source workbook: {contract.workbook_id}",
         '"""',
         "",
+        "import fnmatch",
+        "",
         "",
         "def _sf_flatten(values):",
         "    for value in values:",
@@ -240,6 +242,86 @@ def _render_module(
         "        return value_fn()",
         "    except Exception:",
         "        return fallback",
+        "",
+        "",
+        "def _sf_coerce_criteria(raw, sample):",
+        "    if isinstance(raw, str):",
+        "        upper = raw.upper()",
+        "        if upper == 'TRUE':",
+        "            return True",
+        "        if upper == 'FALSE':",
+        "            return False",
+        "        try:",
+        "            number = float(raw)",
+        "        except ValueError:",
+        "            return raw",
+        "        if number.is_integer():",
+        "            return int(number)",
+        "        return number",
+        "    return raw",
+        "",
+        "",
+        "def _sf_compare_criteria(value, operator, expected):",
+        "    if operator == '=':",
+        "        return value == expected",
+        "    if operator == '<>':",
+        "        return value != expected",
+        "    if operator == '>':",
+        "        return value > expected",
+        "    if operator == '>=':",
+        "        return value >= expected",
+        "    if operator == '<':",
+        "        return value < expected",
+        "    if operator == '<=':",
+        "        return value <= expected",
+        "    raise ValueError(f'unsupported criteria operator: {operator}')",
+        "",
+        "",
+        "def _sf_matches_criteria(value, criteria):",
+        "    if isinstance(criteria, str):",
+        "        for operator in ('>=', '<=', '<>', '>', '<', '='):",
+        "            if criteria.startswith(operator):",
+        "                expected = _sf_coerce_criteria(criteria[len(operator):], value)",
+        "                return _sf_compare_criteria(value, operator, expected)",
+        "        if '*' in criteria or '?' in criteria:",
+        "            return fnmatch.fnmatchcase(str(value), criteria)",
+        "    return value == criteria",
+        "",
+        "",
+        "def _sf_sumif(criteria_range, criteria, sum_range=None):",
+        "    criteria_values = tuple(_sf_flatten((criteria_range,)))",
+        "    sum_values = criteria_values if sum_range is None else tuple(_sf_flatten((sum_range,)))",
+        "    return sum(",
+        "        sum_value",
+        "        for criteria_value, sum_value in zip(criteria_values, sum_values)",
+        "        if _sf_matches_criteria(criteria_value, criteria)",
+        "    )",
+        "",
+        "",
+        "def _sf_countif(criteria_range, criteria):",
+        "    return sum(1 for value in _sf_flatten((criteria_range,)) if _sf_matches_criteria(value, criteria))",
+        "",
+        "",
+        "def _sf_sumifs(sum_range, *criteria_pairs):",
+        "    sum_values = tuple(_sf_flatten((sum_range,)))",
+        "    criteria_ranges = [tuple(_sf_flatten((criteria_range,))) for criteria_range, _criteria in criteria_pairs]",
+        "    total = 0",
+        "    for index, sum_value in enumerate(sum_values):",
+        "        if all(_sf_matches_criteria(criteria_range[index], criteria) for criteria_range, criteria in zip(criteria_ranges, (criteria for _range, criteria in criteria_pairs))):",
+        "            total += sum_value",
+        "    return total",
+        "",
+        "",
+        "def _sf_countifs(*criteria_pairs):",
+        "    criteria_ranges = [tuple(_sf_flatten((criteria_range,))) for criteria_range, _criteria in criteria_pairs]",
+        "    if not criteria_ranges:",
+        "        return 0",
+        "    criteria_values = tuple(criteria for _range, criteria in criteria_pairs)",
+        "    return sum(",
+        "        1",
+        "        for index in range(len(criteria_ranges[0]))",
+        "        if all(_sf_matches_criteria(criteria_range[index], criteria) for criteria_range, criteria in zip(criteria_ranges, criteria_values))",
+        "    )",
         "",
         "",
         f"def {contract.entrypoint}(inputs=None):",
@@ -331,7 +413,45 @@ def _render_function_call(node: FormulaExpressionNode) -> str:
         return f"_sf_average(_sf_flatten({_render_argument_tuple(node.operands)}))"
     if node.function_name == "CONCATENATE":
         return f"''.join(str(value) for value in _sf_flatten({_render_argument_tuple(node.operands)}))"
+    if node.function_name == "SUMIF":
+        if len(node.operands) not in {2, 3}:
+            raise ValueError("SUMIF requires two or three operands")
+        return f"_sf_sumif({_render_function_arguments(node.operands)})"
+    if node.function_name == "COUNTIF":
+        if len(node.operands) != 2:
+            raise ValueError("COUNTIF requires two operands")
+        return f"_sf_countif({_render_function_arguments(node.operands)})"
+    if node.function_name == "SUMIFS":
+        if len(node.operands) < 3 or len(node.operands) % 2 != 1:
+            raise ValueError("SUMIFS requires a sum range followed by criteria range/criteria pairs")
+        return f"_sf_sumifs({_render_criteria_function_arguments(node.operands)})"
+    if node.function_name == "COUNTIFS":
+        if len(node.operands) < 2 or len(node.operands) % 2 != 0:
+            raise ValueError("COUNTIFS requires criteria range/criteria pairs")
+        return f"_sf_countifs({_render_criteria_function_arguments(node.operands)})"
     raise ValueError(f"unsupported function call: {node.function_name}")
+
+
+def _render_function_arguments(operands: tuple[FormulaExpressionNode, ...]) -> str:
+    return ", ".join(_render_expression(operand) for operand in operands)
+
+
+def _render_criteria_function_arguments(operands: tuple[FormulaExpressionNode, ...]) -> str:
+    if len(operands) < 2:
+        return ""
+
+    rendered: list[str] = []
+    if len(operands) % 2 == 1:
+        rendered.append(_render_expression(operands[0]))
+        pair_operands = operands[1:]
+    else:
+        pair_operands = operands
+
+    rendered.extend(
+        f"({_render_expression(pair_operands[index])}, {_render_expression(pair_operands[index + 1])})"
+        for index in range(0, len(pair_operands), 2)
+    )
+    return ", ".join(rendered)
 
 
 def _render_argument_tuple(operands: tuple[FormulaExpressionNode, ...]) -> str:

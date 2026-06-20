@@ -26,6 +26,8 @@ SUPPORTED_FUNCTIONS = frozenset(
         "AND",
         "AVERAGE",
         "CONCATENATE",
+        "COUNTIF",
+        "COUNTIFS",
         "IF",
         "IFERROR",
         "MAX",
@@ -33,6 +35,8 @@ SUPPORTED_FUNCTIONS = frozenset(
         "OR",
         "ROUND",
         "SUM",
+        "SUMIF",
+        "SUMIFS",
     }
 )
 SUPPORTED_OPERATORS = frozenset({"+", "-", "*", "/", "^", "&", ">", ">=", "<", "<=", "=", "<>", "(", ")", ","})

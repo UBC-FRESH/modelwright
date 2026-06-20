@@ -195,3 +195,99 @@ def test_generate_python_module_renders_p17_operator_slice(tmp_path: Path) -> No
         "Calc!B3": 9,
         "Calc!B4": "xy",
     }
+
+
+def test_generate_python_module_renders_criteria_functions(tmp_path: Path) -> None:
+    contract = GeneratedModuleContract(
+        workbook_id="criteria.xlsx",
+        module_name="criteria",
+        input_refs=("Data!A1", "Data!A2", "Data!B1", "Data!B2"),
+        output_refs=("Calc!B1", "Calc!B2", "Calc!B3", "Calc!B4"),
+        symbols=(
+            GeneratedSymbol(cell_ref="Data!A1", symbol_name="data_a1", kind="input"),
+            GeneratedSymbol(cell_ref="Data!A2", symbol_name="data_a2", kind="input"),
+            GeneratedSymbol(cell_ref="Data!B1", symbol_name="data_b1", kind="input"),
+            GeneratedSymbol(cell_ref="Data!B2", symbol_name="data_b2", kind="input"),
+            GeneratedSymbol(cell_ref="Calc!B1", symbol_name="calc_b1", kind="output", raw_formula="=SUMIF(A1:A2,\">1\")"),
+            GeneratedSymbol(cell_ref="Calc!B2", symbol_name="calc_b2", kind="output", raw_formula="=COUNTIF(A1:A2,\">1\")"),
+            GeneratedSymbol(
+                cell_ref="Calc!B3",
+                symbol_name="calc_b3",
+                kind="output",
+                raw_formula='=SUMIFS(A1:A2,B1:B2,"x")',
+            ),
+            GeneratedSymbol(
+                cell_ref="Calc!B4",
+                symbol_name="calc_b4",
+                kind="output",
+                raw_formula='=COUNTIFS(B1:B2,"x")',
+            ),
+        ),
+    )
+    amount_range = normalize_reference("Data!A1:A2")
+    label_range = normalize_reference("Data!B1:B2")
+    expressions = {
+        "Calc!B1": formula_expression(
+            "Calc!B1",
+            '=SUMIF(A1:A2,">1")',
+            FormulaExpressionNode.function_call(
+                "SUMIF",
+                (
+                    FormulaExpressionNode.reference_to(amount_range),
+                    FormulaExpressionNode.literal(">1"),
+                ),
+            ),
+        ),
+        "Calc!B2": formula_expression(
+            "Calc!B2",
+            '=COUNTIF(A1:A2,">1")',
+            FormulaExpressionNode.function_call(
+                "COUNTIF",
+                (
+                    FormulaExpressionNode.reference_to(amount_range),
+                    FormulaExpressionNode.literal(">1"),
+                ),
+            ),
+        ),
+        "Calc!B3": formula_expression(
+            "Calc!B3",
+            '=SUMIFS(A1:A2,B1:B2,"x")',
+            FormulaExpressionNode.function_call(
+                "SUMIFS",
+                (
+                    FormulaExpressionNode.reference_to(amount_range),
+                    FormulaExpressionNode.reference_to(label_range),
+                    FormulaExpressionNode.literal("x"),
+                ),
+            ),
+        ),
+        "Calc!B4": formula_expression(
+            "Calc!B4",
+            '=COUNTIFS(B1:B2,"x")',
+            FormulaExpressionNode.function_call(
+                "COUNTIFS",
+                (
+                    FormulaExpressionNode.reference_to(label_range),
+                    FormulaExpressionNode.literal("x"),
+                ),
+            ),
+        ),
+    }
+    output_path = tmp_path / "generated_criteria.py"
+
+    result = generate_python_module(
+        contract=contract,
+        expressions=expressions,
+        constants={"Data!A1": 1, "Data!A2": 4, "Data!B1": "x", "Data!B2": "y"},
+        output_path=output_path,
+    )
+    module = load_module(output_path)
+
+    assert result.generated is True
+    assert "_sf_sumif" in result.source_code
+    assert module.calculate() == {
+        "Calc!B1": 4,
+        "Calc!B2": 1,
+        "Calc!B3": 1,
+        "Calc!B4": 1,
+    }

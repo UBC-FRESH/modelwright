@@ -266,7 +266,7 @@ Goal: expand formula and reference semantics based on real workbook evidence, es
 - [ ] P17.3 Expand formula translation subset. Child issue: #96.
   - [x] Pass 1: boolean literals, unary minus, `^`, `&`, and explicit `#REF!` diagnostics.
   - [x] Pass 2: scalar/range functions, supported table structured references, and unresolved structured-reference fast-fail behavior.
-  - [ ] Pass 3: criteria functions `SUMIF`, `SUMIFS`, `COUNTIF`, and `COUNTIFS`.
+  - [x] Pass 3: criteria functions `SUMIF`, `SUMIFS`, `COUNTIF`, and `COUNTIFS`.
   - [ ] Pass 4: lookup function `VLOOKUP`.
 - [ ] P17.4 Validate expanded semantics and closeout. Child issue: #94.
 
@@ -305,6 +305,6 @@ Status: planned backlog.
 ## Current Next Steps
 
 1. Continue P17.3 in child issue #96 on branch `feature/p17-real-workbook-formula-semantics`.
-2. Implement the next convergent private-workbook blocker slice: criteria functions `SUMIF`, `SUMIFS`, `COUNTIF`, and `COUNTIFS`.
+2. Implement the next convergent private-workbook blocker slice: lookup function `VLOOKUP`.
 3. Add each newly supported function to `tests/fixtures/supported_semantics/`, then rerun the private-workbook diagnostic pass and record sanitized deltas.
 4. Keep issue #96, parent issue #88, this roadmap, and `CHANGE_LOG.md` synchronized before Phase 17 closeout validation.
