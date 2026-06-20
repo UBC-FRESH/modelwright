@@ -103,6 +103,7 @@ This file records completed project work in chronological order.
 - Closed Phase 19 with a final verbose 2020 FABLE conversion-plan rerun showing empty graph and translation diagnostics, 296,976 of 296,976 formulas translated, and all remaining residual blockers resolved, out of scope, or assigned to Phase 20 validation/generation owners.
 - Merged Phase 19 PR #111, closed parent issue #103, and activated Phase 20 on `feature/p20-automated-validation-reports`.
 - Created the Phase 20 validation/evaluation plan and mirrored the phase/task structure into GitHub issues #112 through #116.
+- Added the P20.1 generated-model execution API with structured execution diagnostics, JSON-serializable observed outputs, package facade exports, API docs, and synthetic tests.
 
 ## 2026-06-19
 

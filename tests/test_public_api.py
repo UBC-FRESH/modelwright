@@ -10,6 +10,8 @@ def test_root_facade_exports_primary_entrypoints() -> None:
     assert "FormulasWorkbookOracle" in sheetforge.__all__
     assert "build_conversion_plan" in sheetforge.__all__
     assert "ConversionPlan" in sheetforge.__all__
+    assert "execute_generated_model" in sheetforge.__all__
+    assert "GeneratedExecutionResult" in sheetforge.__all__
 
 
 def test_root_facade_does_not_export_internal_helpers() -> None:

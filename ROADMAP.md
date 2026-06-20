@@ -315,7 +315,7 @@ Active branch: `feature/p20-automated-validation-reports`
 
 Goal: after residual blockers have concrete resolution or scope decisions, make generated-model execution, oracle execution where available, cached-value comparisons, and benchmark evaluation reports repeatable through APIs and CLI commands.
 
-- [ ] P20.1 Add generated model execution API. Child issue: #113.
+- [x] P20.1 Add generated model execution API. Child issue: #113.
 - [ ] P20.2 Orchestrate oracle and cached-value validation. Child issue: #114.
 - [ ] P20.3 Add evaluation report CLI and JSON outputs. Child issue: #115.
 - [ ] P20.4 Run repeatable evaluation and closeout. Child issue: #116.
@@ -324,7 +324,7 @@ Status: active.
 
 ## Current Next Steps
 
-1. Work P20.1 in child issue #113 on branch `feature/p20-automated-validation-reports`.
-2. Define a small generated-model execution API for explicit contracts and output refs.
-3. Keep execution isolated from workbook extraction and return JSON-serializable output values and diagnostics.
-4. Add synthetic tests before using benchmark workbooks.
+1. Work P20.2 in child issue #114 on branch `feature/p20-automated-validation-reports`.
+2. Orchestrate generated-output, cached-value, and oracle validation paths without hiding missing cached values.
+3. Preserve oracle failures as explicit validation blockers.
+4. Add focused synthetic tests before using benchmark workbooks.

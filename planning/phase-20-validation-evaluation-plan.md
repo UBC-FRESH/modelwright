@@ -39,6 +39,18 @@ Acceptance criteria:
 - support explicit input overrides and output refs;
 - add synthetic fixture tests before using benchmark workbooks.
 
+Status: complete.
+
+Result:
+
+- added `sheetforge.execution` with `ExecutionDiagnostic`, `GeneratedExecutionResult`, and
+  `execute_generated_model`;
+- kept execution tied to explicit `GeneratedModuleContract` objects and generated Python module paths;
+- isolated generated-model execution from workbook extraction;
+- returned JSON-serializable output values and execution diagnostics;
+- added synthetic tests for default execution, input overrides, payload round-trip, missing generated
+  model files, and missing declared outputs.
+
 ### P20.2 Oracle And Cached-Value Validation Orchestration
 
 Goal: compare generated outputs against cached workbook values and oracle outputs where available.
