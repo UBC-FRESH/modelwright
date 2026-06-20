@@ -68,6 +68,7 @@ This file records completed project work in chronological order.
 - Refactored the CLI to a tight Typer/Rich command surface with grouped `workbook`, `model`, and `validation` workflows.
 - Added full Sphinx documentation with curated guide/reference pages and a GitHub Pages workflow that builds on pull requests and deploys on pushes to `main`.
 - Added repo-root `.venv` bootstrap tooling plus contributor and developer-onboarding documentation for repeatable local setup.
+- Verified the Phase 16 CLI/docs surface locally and recorded Phase 17 real-workbook formula-semantics inputs.
 
 ## 2026-06-19
 
