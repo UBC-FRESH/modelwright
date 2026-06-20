@@ -12,7 +12,6 @@ from sheetforge.extraction import (
 from sheetforge.formulas import (
     FormulaExpression,
     FormulaExpressionNode,
-    FormulaReferenceIndex,
     FormulaTranslationDiagnostic,
     build_formula_reference_index,
     translate_formula_cell,
@@ -33,11 +32,9 @@ from sheetforge.graph import (
 )
 from sheetforge.oracles import (
     OracleDiagnostic,
-    OracleOutputs,
     OracleRequest,
     OracleResult,
     WorkbookOracle,
-    missing_optional_dependency_diagnostic,
 )
 from sheetforge.oracle_validation import build_oracle_validation_report
 from sheetforge.references import (
@@ -72,7 +69,6 @@ __all__ = [
     "ExtractionDiagnostic",
     "FormulaExpression",
     "FormulaExpressionNode",
-    "FormulaReferenceIndex",
     "FormulaRecord",
     "FormulaTranslationDiagnostic",
     "FormulasWorkbookOracle",
@@ -84,7 +80,6 @@ __all__ = [
     "NamedRangeRecord",
     "OracleConfig",
     "OracleDiagnostic",
-    "OracleOutputs",
     "OracleRequest",
     "OracleResult",
     "ScenarioInput",
@@ -104,9 +99,7 @@ __all__ = [
     "extract_workbook",
     "generate_python_module",
     "load_validation_scenario",
-    "missing_optional_dependency_diagnostic",
     "normalize_cell_reference",
     "normalize_reference",
-    "symbol_name_for_cell_ref",
     "translate_formula_cell",
 ]
