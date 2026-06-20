@@ -294,9 +294,9 @@ Status: complete.
 
 GitHub parent issue: #103
 
-Active branch: `feature/p19-residual-blocker-resolution`
+Completed branch: `feature/p19-residual-blocker-resolution`
 
-Open PR: #111
+Merged PR: #111
 
 Goal: resolve or explicitly scope the residual blockers exposed by the 2020 FABLE conversion plan before treating validation automation as meaningful evidence.
 
@@ -305,26 +305,26 @@ Goal: resolve or explicitly scope the residual blockers exposed by the 2020 FABL
 - [x] P19.3 Resolve deferred workbook dependency and volatile/cache blockers. Child issue: #106.
 - [x] P19.4 Rerun 2020 benchmark to convergence and closeout. Child issue: #104.
 
-Status: complete pending PR.
+Status: complete.
 
 ## Phase 20: Automated Validation And Evaluation Reports
 
-GitHub parent issue: TBD
+GitHub parent issue: #112
 
-Planned branch: `feature/p20-automated-validation-reports`
+Active branch: `feature/p20-automated-validation-reports`
 
 Goal: after residual blockers have concrete resolution or scope decisions, make generated-model execution, oracle execution where available, cached-value comparisons, and benchmark evaluation reports repeatable through APIs and CLI commands.
 
-- [ ] P20.1 Add generated model execution API. Child issue: TBD.
-- [ ] P20.2 Orchestrate oracle and cached-value validation. Child issue: TBD.
-- [ ] P20.3 Add evaluation report CLI and JSON outputs. Child issue: TBD.
-- [ ] P20.4 Run repeatable evaluation and closeout. Child issue: TBD.
+- [ ] P20.1 Add generated model execution API. Child issue: #113.
+- [ ] P20.2 Orchestrate oracle and cached-value validation. Child issue: #114.
+- [ ] P20.3 Add evaluation report CLI and JSON outputs. Child issue: #115.
+- [ ] P20.4 Run repeatable evaluation and closeout. Child issue: #116.
 
-Status: planned backlog.
+Status: active.
 
 ## Current Next Steps
 
-1. Open and review the Phase 19 PR from `feature/p19-residual-blocker-resolution` back to `main`.
-2. Merge the Phase 19 PR after checks pass.
-3. Close parent issue #103 after merge.
-4. Activate Phase 20 only after Phase 19 is merged back to `main`.
+1. Work P20.1 in child issue #113 on branch `feature/p20-automated-validation-reports`.
+2. Define a small generated-model execution API for explicit contracts and output refs.
+3. Keep execution isolated from workbook extraction and return JSON-serializable output values and diagnostics.
+4. Add synthetic tests before using benchmark workbooks.
