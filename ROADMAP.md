@@ -162,7 +162,7 @@ Active branch: `feature/p10-formula-translation-core`
 
 Goal: translate the first supported Excel formula subset into internal operations ready for generated Python.
 
-- [ ] P10.1 Add formula expression model. Child issue: #61.
+- [x] P10.1 Add formula expression model. Child issue: #61.
 - [ ] P10.2 Translate supported synthetic formula subset. Child issue: #59.
 - [ ] P10.3 Add unsupported formula diagnostics and closeout. Child issue: #66.
 
@@ -240,6 +240,6 @@ Status: planned backlog.
 
 ## Current Next Steps
 
-1. Work P10.1 in child issue #61 on branch `feature/p10-formula-translation-core`.
-2. Add the formula expression model for supported literals, references, operators, function calls, and diagnostics.
-3. Keep issue #61, parent issue #48, this roadmap, and `CHANGE_LOG.md` synchronized before translating the synthetic formula subset.
+1. Work P10.2 in child issue #59 on branch `feature/p10-formula-translation-core`.
+2. Translate the supported synthetic formula subset into formula expression records.
+3. Keep issue #59, parent issue #48, this roadmap, and `CHANGE_LOG.md` synchronized before unsupported diagnostics closeout.

@@ -9,6 +9,11 @@ from sheetforge.extraction import (
     WorkbookRecord,
     extract_workbook,
 )
+from sheetforge.formulas import (
+    FormulaExpression,
+    FormulaExpressionNode,
+    FormulaTranslationDiagnostic,
+)
 from sheetforge.graph import (
     DependencyEdge,
     DependencyGraph,
@@ -44,7 +49,10 @@ __all__ = [
     "DependencyGraph",
     "Diagnostic",
     "ExtractionDiagnostic",
+    "FormulaExpression",
+    "FormulaExpressionNode",
     "FormulaRecord",
+    "FormulaTranslationDiagnostic",
     "MISSING_VALUE",
     "NamedRangeRecord",
     "OracleConfig",
