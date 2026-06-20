@@ -92,6 +92,9 @@ This file records completed project work in chronological order.
 - Added a benchmark materialization helper that downloads or consumes a local Dropbox ZIP/directory, verifies the public FABLE workbook payloads by checksum, and writes them to canonical ignored paths.
 - Added a `dev` dependency extra and linked benchmark materialization into the repo-local bootstrap ritual through `scripts/bootstrap_dev_env.sh --benchmarks`.
 - Added the P18.3 `sheetforge conversion plan` CLI command for JSON conversion-plan reports over extraction, dependency graphing, and formula translation.
+- Standardized the Sphinx documentation build on the Read the Docs theme used by the other FRESH lab packages.
+- Expanded conversion-plan residual-blocker classification across extraction, named ranges, formula extraction, graphing, validation, and generation diagnostics.
+- Closed Phase 18 with synthetic and 2020 FABLE conversion-plan workflow evidence and recorded Phase 19 validation automation inputs.
 
 ## 2026-06-19
 

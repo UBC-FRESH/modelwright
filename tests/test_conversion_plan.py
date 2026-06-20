@@ -76,7 +76,10 @@ def test_build_conversion_plan_summarizes_clean_synthetic_workflow(tmp_path: Pat
     assert plan.generation.selected_outputs == 1
     assert plan.validation.cached_validation_status == "pass"
     assert plan.workflow_status.overall == "partial"
-    assert plan.residual_blockers[0].category == "validation_oracle"
+    blockers_by_code = {blocker.diagnostic_code: blocker for blocker in plan.residual_blockers}
+    assert blockers_by_code["missing_cached_formula_value"].category == "missing_cached_values"
+    assert blockers_by_code["missing_cached_formula_value"].disposition == "deferred"
+    assert blockers_by_code["oracle_calculation_failed"].category == "validation_oracle"
     assert payload["privacy_review"]["contains_source_path"] is False
     assert ConversionPlan.from_dict(json.loads(json.dumps(payload))) == plan
 
@@ -105,6 +108,7 @@ def test_build_conversion_plan_classifies_translation_blockers(tmp_path: Path) -
     assert plan.coverage.formula_cells == 1
     assert plan.coverage.translated_formula_cells == 0
     assert plan.diagnostic_summary.translation == {"unsupported_function": 1}
-    assert plan.residual_blockers[0].category == "unsupported_formula_semantics"
-    assert plan.residual_blockers[0].disposition == "next_target"
+    blockers_by_code = {blocker.diagnostic_code: blocker for blocker in plan.residual_blockers}
+    assert blockers_by_code["unsupported_function"].category == "unsupported_formula_semantics"
+    assert blockers_by_code["unsupported_function"].disposition == "next_target"
     assert plan.recommendations[0].action == "Implement support or a sharper diagnostic for this translation blocker."

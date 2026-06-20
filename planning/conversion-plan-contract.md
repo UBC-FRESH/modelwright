@@ -175,6 +175,7 @@ Rules:
 - A blocker with `disposition=next_target` should be actionable enough to become a task or subtask issue.
 - Source workbook defects should not be treated as Sheetforge semantics gaps.
 - Validation oracle failures should be separated from formula translation failures.
+- Extraction, named-range, graph, cached-value, volatile-function, structured-reference, and external-link diagnostics should remain visible as residual blockers even when formula translation coverage is complete.
 
 ### GenerationSummary
 

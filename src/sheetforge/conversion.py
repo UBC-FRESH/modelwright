@@ -612,36 +612,135 @@ def _workflow_status(
 
 def _residual_blockers(diagnostics: DiagnosticSummary) -> tuple[ResidualBlocker, ...]:
     blockers: list[ResidualBlocker] = []
-    for index, (code, count) in enumerate(sorted(diagnostics.translation.items()), start=1):
+    for code, count in sorted(diagnostics.workbook_extraction.items()):
         blockers.append(
-            ResidualBlocker(
-                blocker_id=f"translation-{index:03d}",
-                category=_translation_blocker_category(code),
-                diagnostic_code=code,
-                item=code,
+            _diagnostic_blocker(
+                prefix="extraction",
+                index=len(blockers) + 1,
+                code=code,
                 count=count,
-                severity="warning",
+                category=_extraction_blocker_category(code),
+                disposition=_extraction_blocker_disposition(code),
+                next_action=_extraction_next_action(code),
+                provenance="extraction",
+            )
+        )
+    for code, count in sorted(diagnostics.named_ranges.items()):
+        blockers.append(
+            _diagnostic_blocker(
+                prefix="named-range",
+                index=len(blockers) + 1,
+                code=code,
+                count=count,
+                category=_named_range_blocker_category(code),
+                disposition=_named_range_blocker_disposition(code),
+                next_action=_named_range_next_action(code),
+                provenance="extraction",
+            )
+        )
+    for code, count in sorted(diagnostics.formula_extraction.items()):
+        blockers.append(
+            _diagnostic_blocker(
+                prefix="formula-extraction",
+                index=len(blockers) + 1,
+                code=code,
+                count=count,
+                category=_formula_extraction_blocker_category(code),
+                disposition=_formula_extraction_blocker_disposition(code),
+                next_action=_formula_extraction_next_action(code),
+                provenance="extraction",
+            )
+        )
+    for code, count in sorted(diagnostics.graph.items()):
+        blockers.append(
+            _diagnostic_blocker(
+                prefix="graph",
+                index=len(blockers) + 1,
+                code=code,
+                count=count,
+                category="graph_semantics",
+                disposition="next_target",
+                next_action="Define graph semantics or reporting policy for this workbook structure.",
+                provenance="graph",
+            )
+        )
+    for code, count in sorted(diagnostics.translation.items()):
+        blockers.append(
+            _diagnostic_blocker(
+                prefix="translation",
+                index=len(blockers) + 1,
+                code=code,
+                count=count,
+                category=_translation_blocker_category(code),
                 disposition=_translation_blocker_disposition(code),
                 next_action=_translation_next_action(code),
                 provenance="translation",
             )
         )
-    offset = len(blockers)
-    for index, (code, count) in enumerate(sorted(diagnostics.oracle_validation.items()), start=1):
+    for code, count in sorted(diagnostics.generation.items()):
         blockers.append(
-            ResidualBlocker(
-                blocker_id=f"validation-{offset + index:03d}",
-                category="validation_oracle",
-                diagnostic_code=code,
-                item=code,
+            _diagnostic_blocker(
+                prefix="generation",
+                index=len(blockers) + 1,
+                code=code,
                 count=count,
-                severity="warning",
+                category="generation_scope",
+                disposition="next_target",
+                next_action="Refine generated-model scope or code generation support for this diagnostic.",
+                provenance="generation",
+            )
+        )
+    for code, count in sorted(diagnostics.cached_validation.items()):
+        blockers.append(
+            _diagnostic_blocker(
+                prefix="cached-validation",
+                index=len(blockers) + 1,
+                code=code,
+                count=count,
+                category="missing_cached_values" if "missing" in code else "unknown",
+                disposition="deferred",
+                next_action="Record cached-value limitation and select validation examples that can be compared.",
+                provenance="validation",
+            )
+        )
+    for code, count in sorted(diagnostics.oracle_validation.items()):
+        blockers.append(
+            _diagnostic_blocker(
+                prefix="oracle-validation",
+                index=len(blockers) + 1,
+                code=code,
+                count=count,
+                category="validation_oracle",
                 disposition="deferred",
                 next_action="Record oracle limitation and select a validation strategy.",
                 provenance="validation",
             )
         )
     return tuple(blockers)
+
+
+def _diagnostic_blocker(
+    *,
+    prefix: str,
+    index: int,
+    code: str,
+    count: int,
+    category: BlockerCategory,
+    disposition: BlockerDisposition,
+    next_action: str,
+    provenance: str,
+) -> ResidualBlocker:
+    return ResidualBlocker(
+        blocker_id=f"{prefix}-{index:03d}",
+        category=category,
+        diagnostic_code=code,
+        item=code,
+        count=count,
+        severity="warning",
+        disposition=disposition,
+        next_action=next_action,
+        provenance=provenance,
+    )
 
 
 def _recommendations(
@@ -693,6 +792,72 @@ def _file_type(source_path: str) -> str:
     if "." not in source_path:
         return ""
     return f".{source_path.rsplit('.', 1)[1].lower()}"
+
+
+def _extraction_blocker_category(code: str) -> BlockerCategory:
+    if "external" in code:
+        return "external_dependency"
+    return "unknown"
+
+
+def _extraction_blocker_disposition(code: str) -> BlockerDisposition:
+    if "external" in code:
+        return "deferred"
+    return "next_target"
+
+
+def _extraction_next_action(code: str) -> str:
+    if "external" in code:
+        return "Record external workbook dependency and decide whether to inline, mock, or reject it."
+    return "Classify this workbook-extraction diagnostic before claiming conversion readiness."
+
+
+def _named_range_blocker_category(code: str) -> BlockerCategory:
+    if "named_range" in code or "defined_name" in code:
+        return "unsupported_reference_semantics"
+    return "unknown"
+
+
+def _named_range_blocker_disposition(code: str) -> BlockerDisposition:
+    if "unresolved" in code:
+        return "next_target"
+    return "deferred"
+
+
+def _named_range_next_action(code: str) -> str:
+    if "unresolved" in code:
+        return "Resolve named-range semantics or document why the range is out of conversion scope."
+    return "Classify this named-range diagnostic before claiming conversion readiness."
+
+
+def _formula_extraction_blocker_category(code: str) -> BlockerCategory:
+    if code == "missing_cached_formula_value":
+        return "missing_cached_values"
+    if "structured_reference" in code:
+        return "unsupported_reference_semantics"
+    if "volatile" in code:
+        return "unsupported_formula_semantics"
+    return "unknown"
+
+
+def _formula_extraction_blocker_disposition(code: str) -> BlockerDisposition:
+    if code == "missing_cached_formula_value":
+        return "deferred"
+    if "structured_reference" in code:
+        return "deferred"
+    if "volatile" in code:
+        return "deferred"
+    return "next_target"
+
+
+def _formula_extraction_next_action(code: str) -> str:
+    if code == "missing_cached_formula_value":
+        return "Use a recalculation oracle or select validation outputs with available cached values."
+    if "structured_reference" in code:
+        return "Keep structured-reference diagnostics visible and separate them from translation failures."
+    if "volatile" in code:
+        return "Record volatile formula risk and define deterministic handling where conversion needs it."
+    return "Classify this formula-extraction diagnostic before claiming conversion readiness."
 
 
 def _translation_blocker_category(code: str) -> BlockerCategory:
