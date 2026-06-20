@@ -36,6 +36,15 @@ Conversion Planning
 and residual blockers into an inspectable conversion plan. A conversion plan can report partial success
 without claiming that a full workbook clone or equivalence proof exists.
 
+The CLI wrapper is:
+
+.. code-block:: bash
+
+   sheetforge conversion plan path/to/workbook.xlsx > tmp/conversion-plan.json
+
+This command runs extraction, dependency graphing, and formula translation. It leaves generation and
+validation as explicit later workflow steps and reports those stages as ``not_run``.
+
 Validation
 ----------
 

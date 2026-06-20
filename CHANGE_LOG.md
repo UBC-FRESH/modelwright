@@ -91,6 +91,7 @@ This file records completed project work in chronological order.
 - Promoted the public FABLE Calculator workbooks to official external benchmark status by tracking the source URL, local placement instructions, roles, and checksums while keeping workbook binaries untracked under ignored `tmp/`.
 - Added a benchmark materialization helper that downloads or consumes a local Dropbox ZIP/directory, verifies the public FABLE workbook payloads by checksum, and writes them to canonical ignored paths.
 - Added a `dev` dependency extra and linked benchmark materialization into the repo-local bootstrap ritual through `scripts/bootstrap_dev_env.sh --benchmarks`.
+- Added the P18.3 `sheetforge conversion plan` CLI command for JSON conversion-plan reports over extraction, dependency graphing, and formula translation.
 
 ## 2026-06-19
 

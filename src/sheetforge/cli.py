@@ -5,13 +5,14 @@ from __future__ import annotations
 import json
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import typer
 from typer.main import get_command
 
+from sheetforge.conversion import BenchmarkRole, build_conversion_plan
 from sheetforge.extraction import extract_workbook
-from sheetforge.formulas import FormulaExpression
+from sheetforge.formulas import FormulaExpression, build_formula_reference_index, translate_formula_cell
 from sheetforge.generation import GeneratedModuleContract, generate_python_module
 from sheetforge.graph import build_dependency_graph
 from sheetforge.validation import build_validation_report, load_validation_scenario
@@ -39,10 +40,16 @@ validation_app = typer.Typer(
     no_args_is_help=True,
     help="Build validation reports from observed output values.",
 )
+conversion_app = typer.Typer(
+    add_completion=False,
+    no_args_is_help=True,
+    help="Assemble conversion planning reports.",
+)
 
 app.add_typer(workbook_app, name="workbook")
 app.add_typer(model_app, name="model")
 app.add_typer(validation_app, name="validation")
+app.add_typer(conversion_app, name="conversion")
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -146,6 +153,43 @@ def validation_report(
     )
 
 
+@conversion_app.command("plan")
+def conversion_plan(
+    workbook: Path = typer.Argument(..., exists=True, dir_okay=False, readable=True, help="Source workbook path."),
+    plan_id: str | None = typer.Option(
+        None,
+        "--plan-id",
+        help="Stable plan identifier. Defaults to conversion-plan:<workbook filename>.",
+    ),
+    benchmark_role: str = typer.Option(
+        "ad_hoc_private",
+        "--benchmark-role",
+        help="Benchmark role for the source workbook.",
+    ),
+    sheetforge_commit: str = typer.Option(
+        "unknown",
+        "--sheetforge-commit",
+        help="Sheetforge commit identifier to record in the plan.",
+    ),
+    include_source_path: bool = typer.Option(
+        False,
+        "--include-source-path",
+        help="Include the local workbook path in JSON output. Off by default for safer sharing.",
+    ),
+) -> None:
+    """Build a conversion plan from workbook extraction, graphing, and translation."""
+
+    _emit_json(
+        _conversion_plan_payload(
+            workbook=workbook,
+            plan_id=plan_id,
+            benchmark_role=_parse_benchmark_role(benchmark_role),
+            sheetforge_commit=sheetforge_commit,
+            include_source_path=include_source_path,
+        )
+    )
+
+
 def _extract_payload(workbook: Path) -> dict[str, JsonValue]:
     return extract_workbook(workbook).to_dict()
 
@@ -191,6 +235,34 @@ def _validate_report_payload(
     return report.to_dict()
 
 
+def _conversion_plan_payload(
+    *,
+    workbook: Path,
+    plan_id: str | None,
+    benchmark_role: BenchmarkRole,
+    sheetforge_commit: str,
+    include_source_path: bool,
+) -> dict[str, JsonValue]:
+    workbook_record = extract_workbook(workbook)
+    graph = build_dependency_graph(workbook_record)
+    reference_index = build_formula_reference_index(graph)
+    expressions = {
+        cell.cell_ref: translate_formula_cell(cell, graph, reference_index)
+        for cell in workbook_record.cells
+        if cell.formula is not None
+    }
+    plan = build_conversion_plan(
+        plan_id=plan_id or f"conversion-plan:{workbook.name}",
+        workbook=workbook_record,
+        graph=graph,
+        expressions=expressions,
+        benchmark_role=benchmark_role,
+        sheetforge_commit=sheetforge_commit,
+        include_source_path=include_source_path,
+    )
+    return plan.to_dict()
+
+
 def _emit_json(payload: dict[str, JsonValue]) -> None:
     typer.echo(json.dumps(payload, indent=2, sort_keys=True))
 
@@ -206,6 +278,20 @@ def _load_object(path: str | Path) -> dict[str, JsonValue]:
     if not isinstance(data, dict):
         raise typer.BadParameter(f"expected JSON object in {path}")
     return data
+
+
+def _parse_benchmark_role(value: str) -> BenchmarkRole:
+    supported: tuple[BenchmarkRole, ...] = (
+        "primary_benchmark",
+        "stress_benchmark",
+        "broken_reference_regression",
+        "synthetic_fixture",
+        "ad_hoc_private",
+    )
+    if value not in supported:
+        supported_values = ", ".join(supported)
+        raise typer.BadParameter(f"unsupported benchmark role {value!r}; expected one of: {supported_values}")
+    return cast(BenchmarkRole, value)
 
 
 if __name__ == "__main__":

@@ -32,6 +32,7 @@ def test_cli_help_exposes_fresh_style_workflow_groups() -> None:
     assert "workbook" in result.stdout
     assert "model" in result.stdout
     assert "validation" in result.stdout
+    assert "conversion" in result.stdout
 
 
 def test_workbook_extract_command_outputs_workbook_json(tmp_path: Path) -> None:
@@ -151,6 +152,56 @@ def test_validation_report_command_outputs_report_json(tmp_path: Path) -> None:
     assert payload["scenario_id"] == "synthetic_model_baseline"
     assert payload["status"] == "pass"
     assert payload["mismatches"] == []
+
+
+def test_conversion_plan_command_outputs_plan_json(tmp_path: Path) -> None:
+    workbook_path = build_workbook(tmp_path / "synthetic_model.xlsx")
+
+    result = runner.invoke(
+        app,
+        [
+            "conversion",
+            "plan",
+            str(workbook_path),
+            "--plan-id",
+            "synthetic-plan",
+            "--benchmark-role",
+            "synthetic_fixture",
+            "--sheetforge-commit",
+            "test-commit",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["plan_id"] == "synthetic-plan"
+    assert payload["sheetforge_commit"] == "test-commit"
+    assert payload["source"]["workbook_id"] == "synthetic_model.xlsx"
+    assert payload["source"]["benchmark_role"] == "synthetic_fixture"
+    assert payload["source"]["source_path"] is None
+    assert payload["workflow_status"]["extraction"] == "pass"
+    assert payload["workflow_status"]["dependency_graph"] == "pass"
+    assert payload["workflow_status"]["formula_translation"] == "pass"
+    assert payload["workflow_status"]["generation"] == "not_run"
+    assert payload["coverage"]["translation_coverage"] == 1.0
+
+
+def test_conversion_plan_command_rejects_unknown_benchmark_role(tmp_path: Path) -> None:
+    workbook_path = build_workbook(tmp_path / "synthetic_model.xlsx")
+
+    result = runner.invoke(
+        app,
+        [
+            "conversion",
+            "plan",
+            str(workbook_path),
+            "--benchmark-role",
+            "not-a-role",
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert "unsupported benchmark role" in result.stderr
 
 
 def _synthetic_generation_inputs(tmp_path: Path):

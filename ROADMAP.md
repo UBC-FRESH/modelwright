@@ -285,7 +285,7 @@ Goal: turn extraction, graphing, translation, generation, and validation pieces 
 - [x] P18.1 Define conversion plan JSON contract. Child issue: #101.
 - [x] P18.2 Build conversion plan API. Child issue: #99.
   - [x] Track official external FABLE benchmark metadata and add a helper that materializes the untracked workbook files into canonical ignored paths.
-- [ ] P18.3 Add conversion planning CLI. Child issue: #100.
+- [x] P18.3 Add conversion planning CLI. Child issue: #100.
 - [ ] P18.4 Test conversion planning workflow and closeout. Child issue: #98.
 
 Status: active.
@@ -307,7 +307,7 @@ Status: planned backlog.
 
 ## Current Next Steps
 
-1. Work P18.3 in child issue #100 on branch `feature/p18-conversion-planning-pipeline`.
-2. Add a thin conversion-planning CLI over `build_conversion_plan`.
-3. Keep the CLI JSON output aligned with `planning/conversion-plan-contract.md`.
-4. Keep issue #100, parent issue #87, this roadmap, and `CHANGE_LOG.md` synchronized before moving to P18.4.
+1. Work P18.4 in child issue #98 on branch `feature/p18-conversion-planning-pipeline`.
+2. Run the conversion planning workflow against the synthetic fixture and FABLE benchmark scaffolding.
+3. Record closeout evidence, residual blockers, and Phase 19 inputs.
+4. Keep issue #98, parent issue #87, this roadmap, and `CHANGE_LOG.md` synchronized before opening the Phase 18 PR.
