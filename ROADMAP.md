@@ -2,7 +2,7 @@
 
 This roadmap is the current project plan and issue tracker map for `sheetforge`.
 
-The repository is intentionally lightweight at this stage. Do not add a package layout, dependency manager, test framework, CLI, or CI contract until research and prototypes provide enough evidence for those choices.
+The near-term implementation direction is recorded here. Broader phase rationale is recorded in `planning/long-term-roadmap.md`.
 
 ## Phase 0: Governance Bootstrap
 
@@ -125,6 +125,118 @@ Goal: turn the Phase 6 validation report records and synthetic fixture JSON into
 - [ ] P7.4 Summarize validation-core readiness. Child issue: #43.
 
 Status: active.
+
+## Phase 8: Workbook Extraction Core
+
+GitHub parent issue: #50
+
+Planned branch: `feature/p8-workbook-extraction-core`
+
+Goal: move the proven `openpyxl` extraction concepts into package code for workbook, worksheet, cell, formula, named-range, and diagnostic records.
+
+- [ ] P8.1 Add extraction record objects. Child issue: #58.
+- [ ] P8.2 Implement `openpyxl` workbook extraction. Child issue: #57.
+- [ ] P8.3 Add extraction tests and closeout. Child issue: #56.
+
+Status: planned backlog.
+
+## Phase 9: Dependency Graph Core
+
+GitHub parent issue: #49
+
+Planned branch: `feature/p9-dependency-graph-core`
+
+Goal: build normalized reference and dependency graph behavior on top of extracted workbook records.
+
+- [ ] P9.1 Add canonical reference model. Child issue: #55.
+- [ ] P9.2 Resolve named ranges and dependency edges. Child issue: #62.
+- [ ] P9.3 Add graph diagnostics and readiness note. Child issue: #60.
+
+Status: planned backlog.
+
+## Phase 10: Formula Translation Core
+
+GitHub parent issue: #48
+
+Planned branch: `feature/p10-formula-translation-core`
+
+Goal: translate the first supported Excel formula subset into internal operations ready for generated Python.
+
+- [ ] P10.1 Add formula expression model. Child issue: #61.
+- [ ] P10.2 Translate supported synthetic formula subset. Child issue: #59.
+- [ ] P10.3 Add unsupported formula diagnostics and closeout. Child issue: #66.
+
+Status: planned backlog.
+
+## Phase 11: Generated Python Model Core
+
+GitHub parent issue: #47
+
+Planned branch: `feature/p11-generated-python-model-core`
+
+Goal: generate small standalone Python modules from extracted and translated workbook logic.
+
+- [ ] P11.1 Define generated module contract. Child issue: #65.
+- [ ] P11.2 Generate Python from translated workbook logic. Child issue: #64.
+- [ ] P11.3 Test generated model outputs and closeout. Child issue: #63.
+
+Status: planned backlog.
+
+## Phase 12: Oracle-Backed Validation
+
+GitHub parent issue: #54
+
+Planned branch: `feature/p12-oracle-backed-validation`
+
+Goal: introduce optional source-workbook oracle execution, starting with a pure-Python `formulas`-backed lane before any Excel-backed validation.
+
+- [ ] P12.1 Define oracle interface and optional dependency boundary. Child issue: #70.
+- [ ] P12.2 Add `formulas`-backed oracle for synthetic workbook. Child issue: #69.
+- [ ] P12.3 Compare generated model against oracle outputs. Child issue: #68.
+
+Status: planned backlog.
+
+## Phase 13: Real Workbook Evaluation Lane
+
+GitHub parent issue: #52
+
+Planned branch: `feature/p13-real-workbook-evaluation-lane`
+
+Goal: use private workbooks under ignored `tmp/` to evaluate the pipeline and record sanitized findings without committing source workbooks or private outputs.
+
+- [ ] P13.1 Define private workbook evaluation protocol. Child issue: #67.
+- [ ] P13.2 Run first private workbook evaluation locally. Child issue: #74.
+- [ ] P13.3 Record sanitized findings and unsupported features. Child issue: #72.
+
+Status: planned backlog.
+
+## Phase 14: CLI And API Stabilization
+
+GitHub parent issue: #53
+
+Planned branch: `feature/p14-cli-api-stabilization`
+
+Goal: stabilize the Python API and add thin CLI wrappers only after the internal flow is coherent.
+
+- [ ] P14.1 Review and stabilize Python API boundaries. Child issue: #73.
+- [ ] P14.2 Add thin CLI command groups. Child issue: #71.
+- [ ] P14.3 Document CLI and JSON workflows. Child issue: #78.
+
+Status: planned backlog.
+
+## Phase 15: Hardening And Release Prep
+
+GitHub parent issue: #51
+
+Planned branch: `feature/p15-hardening-release-prep`
+
+Goal: add hardening, documentation, release, and quality tooling only where evidence shows it will pay for itself.
+
+- [ ] P15.1 Decide hardening tooling from evidence. Child issue: #77.
+- [ ] P15.2 Add release and documentation metadata if needed. Child issue: #76.
+- [ ] P15.3 Summarize release readiness and next roadmap. Child issue: #75.
+
+Status: planned backlog.
 
 ## Current Next Steps
 
