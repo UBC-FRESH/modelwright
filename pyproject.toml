@@ -12,11 +12,12 @@ license = { text = "TBD" }
 authors = [
   { name = "UBC FRESH" }
 ]
-dependencies = []
+dependencies = [
+  "openpyxl>=3.1"
+]
 
 [project.optional-dependencies]
 test = [
-  "openpyxl>=3.1",
   "pytest>=8"
 ]
 

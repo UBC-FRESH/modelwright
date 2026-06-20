@@ -16,6 +16,11 @@ This file records completed project work in chronological order.
 - Added a validation report builder that compares scenario outputs from observed generated and oracle value mappings.
 - Closed the Phase 7 validation-core planning loop by recording Phase 8 extraction inputs in `planning/phase-7-closeout-phase-8-inputs.md`.
 - Opened Phase 7 PR #79 from `feature/p7-validation-scenario-comparison-core` back to `main`.
+- Merged Phase 7 PR #79, closed parent issue #42, and activated Phase 8 on `feature/p8-workbook-extraction-core`.
+- Added extraction record objects for workbooks, sheets, cells, formulas, named ranges, and extraction diagnostics.
+- Added `openpyxl` workbook extraction for sheets, non-empty cells, formulas, named ranges, and initial extraction diagnostics.
+- Closed the Phase 8 extraction-core planning loop by recording Phase 9 dependency graph inputs in `planning/phase-8-closeout-phase-9-inputs.md`.
+- Opened Phase 8 PR #80 from `feature/p8-workbook-extraction-core` back to `main`.
 
 ## 2026-06-19
 
