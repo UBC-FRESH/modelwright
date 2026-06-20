@@ -46,6 +46,46 @@ Primary inputs:
 
    Missing cached values are already extraction diagnostics. This remains a validation-evidence issue and should feed Phase 19 automated evaluation/reporting work.
 
+## P17 Formula And Operator Scope
+
+A local private-workbook diagnostic aggregation was run under ignored `tmp/` to identify the unsupported formula semantics needed by the current private sample workbook. The tracked scope below includes only sanitized Excel function/operator/token names and counts. It does not include source formulas, workbook names, sheet names, named ranges, values, or paths.
+
+The current P17 goal is broad enough to cover every unsupported function and operator observed in the private sample workbook's first-failure translation diagnostics:
+
+| Category | Item | Count | P17 stance |
+| --- | ---: | ---: | --- |
+| Function | `SUMIFS` | 89,853 | In scope for P17 translation support. |
+| Function | `IFERROR` | 25,674 | In scope for P17 translation support. |
+| Function | `AND` | 12,372 | In scope for P17 translation support. |
+| Function | `SUMIF` | 5,220 | In scope for P17 translation support. |
+| Function | `COUNTIFS` | 1,164 | In scope for P17 translation support. |
+| Function | `MIN` | 1,144 | In scope for P17 translation support. |
+| Function | `OR` | 858 | In scope for P17 translation support. |
+| Function | `SUM` | 724 | In scope for P17 translation support. |
+| Function | `AVERAGE` | 307 | In scope for P17 translation support. |
+| Function | `CONCATENATE` | 288 | In scope for P17 translation support. |
+| Function | `OFFSET` | 165 | In scope for P17 diagnostics and, if feasible, constrained support; volatile/reference-returning semantics make this higher risk than scalar functions. |
+| Operator | `^` | 1,898 | In scope for P17 translation support. |
+| Operator | `&` | 80 | In scope for P17 translation support. |
+| Token | `FALSE` | 24,266 | In scope for P17 boolean literal support. |
+| Token | `#REF!` | 306 | In scope for explicit error-reference diagnostics, not silent translation. |
+| Token | unary `-` | 135 | In scope for P17 unary operator support. |
+
+These counts are first-failure diagnostics, not a complete proof that the listed items are the only required semantics. The translator stops when it hits the first unsupported construct in a formula, so implementing high-count items may reveal additional unsupported functions, operators, token forms, or reference forms in later passes.
+
+## Full Private Sample Import Scope
+
+To fully import the current private sample workbook, P17 needs more than adding scalar Excel functions. The intended P17 scope is:
+
+- represent structured references distinctly and keep them blocked unless table semantics are modeled;
+- support the listed functions where their inputs can be represented by existing scalar/range expression records;
+- support the listed operators and boolean literals;
+- add explicit diagnostics for `#REF!`, unsupported structured/table semantics, unresolved named ranges, external references, volatile/reference-returning behavior, and missing cached values;
+- keep generation blocked for formulas whose dependencies or semantics remain unsupported;
+- rerun sanitized private diagnostics after each expansion slice to discover second-order blockers.
+
+This scope is intentionally wide enough to pursue full private-sample import, but P17 should still land it in slices. The project should not claim full workbook equivalence until generated outputs are validated against cached workbook values, `formulas`, Excel-backed validation, or an explicitly documented hybrid oracle.
+
 ## Next Implementation Slice
 
 P17.2 should add structured-reference extraction records and diagnostics.
@@ -80,3 +120,21 @@ Do not implement these in P17.2 unless they are required to represent structured
 - cache-value validation policy.
 
 Those belong in later P17 tasks or Phase 19 validation/report orchestration.
+
+## P17.3 Starting Scope
+
+P17.3 should start with expression-model changes that unlock many of the listed items without touching table semantics:
+
+- boolean literals, especially `FALSE`;
+- unary minus;
+- `&` string concatenation;
+- `^` exponentiation;
+- scalar logical functions: `AND`, `OR`;
+- scalar error handling: `IFERROR`;
+- scalar/range aggregations: `SUM`, `MIN`, `AVERAGE`;
+- criteria aggregations: `SUMIF`, `SUMIFS`, `COUNTIFS`;
+- text concatenation: `CONCATENATE`;
+- explicit diagnostics for `#REF!`;
+- constrained `OFFSET` handling or a more specific unsupported diagnostic if safe support is not feasible in P17.
+
+Structured-reference evaluation, external workbook execution, and unconstrained volatile/reference-returning formulas remain blocked until their provenance and validation semantics are explicit.

@@ -73,6 +73,7 @@ This file records completed project work in chronological order.
 - Merged Phase 16 PR #108, closed parent issue #89, and activated Phase 17 on `feature/p17-real-workbook-formula-semantics`.
 - Prioritized Phase 17 real-workbook semantics gaps and selected structured-reference extraction diagnostics as the next implementation slice.
 - Added first-class structured-reference diagnostics across reference normalization, workbook extraction, dependency graphing, and formula translation blocking.
+- Expanded Phase 17 planning with the sanitized private-workbook formula-function, operator, and token scope needed for full sample-workbook import.
 
 ## 2026-06-19
 
