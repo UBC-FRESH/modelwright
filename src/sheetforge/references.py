@@ -10,11 +10,12 @@ from openpyxl.utils.cell import range_boundaries
 
 
 JsonValue = str | int | float | bool | None | list[Any] | dict[str, Any]
-ReferenceKind = Literal["cell", "range", "named_range", "external", "unresolved"]
+ReferenceKind = Literal["cell", "range", "named_range", "structured", "external", "unresolved"]
 
 _CELL_RE = re.compile(r"^\$?[A-Za-z]{1,3}\$?\d+$")
 _SHEET_AND_COORD_RE = re.compile(r"^(?P<sheet>'[^']+'|[^!]+)!(?P<coord>.+)$")
 _NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_.]*$")
+_EXTERNAL_WORKBOOK_RE = re.compile(r"\[[^\]]+\.(?:xlsx|xlsm|xlsb|xls|csv)\]", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
@@ -67,13 +68,21 @@ def normalize_reference(reference: str, *, current_sheet: str | None = None) -> 
     if not reference:
         return _unresolved(original, "empty_reference")
 
-    if "[" in reference or "]" in reference:
+    if _is_external_reference(reference):
         return WorkbookReference(
             kind="external",
             original=original,
             normalized=reference,
             workbook=_external_workbook(reference),
             diagnostic_code="external_reference",
+        )
+
+    if _is_structured_reference(reference):
+        return WorkbookReference(
+            kind="structured",
+            original=original,
+            normalized=reference,
+            diagnostic_code="unsupported_structured_reference",
         )
 
     sheet_name, coordinate = _split_sheet_and_coordinate(reference)
@@ -162,6 +171,18 @@ def _is_cell_or_range(coordinate: str) -> bool:
 
 def _is_named_range(reference: str) -> bool:
     return bool(_NAME_RE.match(reference)) and not _CELL_RE.match(reference)
+
+
+def _is_external_reference(reference: str) -> bool:
+    return bool(_EXTERNAL_WORKBOOK_RE.search(reference)) or _looks_like_external_reference(reference)
+
+
+def _is_structured_reference(reference: str) -> bool:
+    return "[" in reference and "]" in reference
+
+
+def _looks_like_external_reference(reference: str) -> bool:
+    return "[" in reference and "]" in reference and "!" in reference
 
 
 def _external_workbook(reference: str) -> str | None:

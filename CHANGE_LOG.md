@@ -69,7 +69,21 @@ This file records completed project work in chronological order.
 - Added full Sphinx documentation with curated guide/reference pages and a GitHub Pages workflow that builds on pull requests and deploys on pushes to `main`.
 - Added repo-root `.venv` bootstrap tooling plus contributor and developer-onboarding documentation for repeatable local setup.
 - Verified the Phase 16 CLI/docs surface locally and recorded Phase 17 real-workbook formula-semantics inputs.
-- Opened Phase 16 PR #108 from `feature/p16-cli-docs-public-surface` back to `main` and verified PR checks for tests, quality, and docs build.
+- Opened Phase 16 PR #108 from `feature/p16-cli-docs-public-surface` back to `main`, verified PR checks for tests, quality, and docs build, and confirmed the post-merge `main` docs Pages deployment succeeded.
+- Merged Phase 16 PR #108, closed parent issue #89, and activated Phase 17 on `feature/p17-real-workbook-formula-semantics`.
+- Prioritized Phase 17 real-workbook semantics gaps and selected structured-reference extraction diagnostics as the next implementation slice.
+- Added first-class structured-reference diagnostics across reference normalization, workbook extraction, dependency graphing, and formula translation blocking.
+- Expanded Phase 17 planning with the sanitized private-workbook formula-function, operator, and token scope needed for full sample-workbook import.
+- Codified the Phase 17 blocker-find-resolve-rerun loop for private-workbook formula semantics and validation evidence.
+- Added explicit Phase 17 convergence metrics, pass/fail rules, and implementation priority order for private-workbook import progress.
+- Added P17.3 pass-one support for boolean literals, unary minus, `^`, `&`, and `#REF!` diagnostics, plus a tracked supported-semantics fixture harness and sanitized convergence note.
+- Added P17.3 pass-two support for scalar/range functions, supported table structured references, table metadata extraction, unresolved structured-reference fast-fail behavior, and expanded supported-semantics fixture coverage; the sanitized private pass increased translated formulas to 72,437 and kept cached generated validation at 10 outputs with 0 mismatches.
+- Added P17.3 pass-three support for `SUMIF`, `SUMIFS`, `COUNTIF`, and `COUNTIFS`; the sanitized private pass increased translated formulas to 185,128 and reduced remaining unsupported-function first failures to `VLOOKUP` and `OFFSET`.
+- Added P17.3 pass-four support for `VLOOKUP` and table-array structured references; the sanitized private pass increased translated formulas to 209,394 and left `OFFSET`, remaining structured references, explicit error references, and oracle calculation failure as residual blockers.
+- Added P17.3 pass-five support for constrained cross-table current-row structured references; the sanitized private pass increased translated formulas to 215,202, cleared structured-reference first failures, and left `OFFSET`, explicit error references, and oracle calculation failure as residual blockers.
+- Added P17.3 pass-six support for constrained static `OFFSET` translation; the sanitized private pass increased translated formulas to 215,422, cleared unsupported-function first failures, and left explicit error references plus oracle calculation failure as residual blockers for closeout.
+- Closed Phase 17 with sanitized final diagnostics, classified explicit error references and oracle calculation failure as residual blockers, and recorded Phase 18 conversion-planning inputs.
+- Shifted the primary private benchmark direction to the 2020 workbook after cross-version inspection showed the 2019 workbook contains explicit broken references; the 2020 baseline translated 296,319 of 296,976 formulas and exposed `_XLFN.IFNA` as the next formula-semantics blocker.
 
 ## 2026-06-19
 

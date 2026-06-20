@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from openpyxl import Workbook
+from openpyxl.worksheet.table import Table
 from openpyxl.workbook.defined_name import DefinedName
 
 from sheetforge.extraction import extract_workbook
@@ -94,6 +95,50 @@ def test_extract_workbook_reports_volatile_formula(tmp_path: Path) -> None:
         "missing_cached_formula_value",
         "unsupported_volatile_function",
     }
+
+
+def test_extract_workbook_reports_structured_reference_formula(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "structured-reference.xlsx"
+    source = Workbook()
+    sheet = source.active
+    sheet.title = "Data"
+    sheet["A1"] = "Amount"
+    sheet["A2"] = 10
+    sheet["B1"] = "=Table1[Amount]"
+    source.save(workbook_path)
+
+    workbook = extract_workbook(workbook_path)
+    cell = next(cell for cell in workbook.cells if cell.cell_ref == "Data!B1")
+
+    assert cell.formula is not None
+    assert cell.formula.raw_references == ("Table1[Amount]",)
+    assert {diagnostic.code for diagnostic in cell.formula.diagnostics} == {
+        "missing_cached_formula_value",
+        "unsupported_structured_reference",
+    }
+
+
+def test_extract_workbook_reads_table_metadata(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "table.xlsx"
+    source = Workbook()
+    sheet = source.active
+    sheet.title = "Data"
+    sheet.append(["Amount", "Rate", "Result"])
+    sheet.append([10, 0.1, None])
+    sheet.append([20, 0.2, None])
+    sheet.add_table(Table(displayName="InputTable", ref="A1:C3"))
+    source.save(workbook_path)
+
+    workbook = extract_workbook(workbook_path)
+
+    assert [table.to_dict() for table in workbook.tables] == [
+        {
+            "name": "InputTable",
+            "sheet": "Data",
+            "ref": "A1:C3",
+            "columns": ["Amount", "Rate", "Result"],
+        }
+    ]
 
 
 def test_extract_workbook_reports_unresolved_non_range_defined_name(tmp_path: Path) -> None:

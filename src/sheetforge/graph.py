@@ -7,7 +7,7 @@ from typing import Any, Literal
 
 from openpyxl.utils.cell import range_boundaries
 
-from sheetforge.extraction import CellRecord, WorkbookRecord
+from sheetforge.extraction import CellRecord, TableRecord, WorkbookRecord
 from sheetforge.references import WorkbookReference, normalize_reference
 
 
@@ -85,6 +85,7 @@ def build_dependency_graph(workbook: WorkbookRecord) -> DependencyGraph:
     """Build semantic and execution dependency edges from extracted formulas."""
 
     named_ranges = _named_range_destinations(workbook)
+    tables = {table.name: table for table in workbook.tables}
     edges: list[DependencyEdge] = []
     diagnostics: list[str] = []
 
@@ -96,16 +97,20 @@ def build_dependency_graph(workbook: WorkbookRecord) -> DependencyGraph:
         current_sheet = target.sheet
         for raw_reference in cell.formula.raw_references:
             source = normalize_reference(raw_reference, current_sheet=current_sheet)
+            execution_edges = _execution_edges_for(source, target, raw_reference, named_ranges, tables)
+            diagnostic_code = source.diagnostic_code
+            if source.kind == "structured" and all(edge.diagnostic_code is None for edge in execution_edges):
+                diagnostic_code = None
             edges.append(
                 DependencyEdge(
                     source=source,
                     target=target,
                     edge_kind="semantic",
                     raw_reference=raw_reference,
-                    diagnostic_code=source.diagnostic_code,
+                    diagnostic_code=diagnostic_code,
                 )
             )
-            edges.extend(_execution_edges_for(source, target, raw_reference, named_ranges))
+            edges.extend(execution_edges)
 
     diagnostics.extend(_diagnostic_codes(edges))
     diagnostics.extend(_circular_dependency_codes(edges))
@@ -135,6 +140,7 @@ def _execution_edges_for(
     target: WorkbookReference,
     raw_reference: str,
     named_ranges: dict[str, tuple[WorkbookReference, ...]],
+    tables: dict[str, TableRecord],
 ) -> tuple[DependencyEdge, ...]:
     if source.kind == "cell":
         return (
@@ -170,6 +176,19 @@ def _execution_edges_for(
             for destination in named_ranges[source.name]
         )
 
+    if source.kind == "structured":
+        resolved = _resolve_structured_reference(source, target, tables)
+        if resolved is not None:
+            return (
+                DependencyEdge(
+                    source=resolved,
+                    target=target,
+                    edge_kind="execution",
+                    raw_reference=raw_reference,
+                    resolved_from=source,
+                ),
+            )
+
     return (
         DependencyEdge(
             source=source,
@@ -179,6 +198,178 @@ def _execution_edges_for(
             diagnostic_code=source.diagnostic_code or f"unsupported_{source.kind}_dependency",
         ),
     )
+
+
+def _resolve_structured_reference(
+    source: WorkbookReference,
+    target: WorkbookReference,
+    tables: dict[str, TableRecord],
+) -> WorkbookReference | None:
+    parsed = _parse_structured_reference(source.original)
+    if parsed is None:
+        return None
+
+    table = tables.get(parsed.table_name) if parsed.table_name is not None else _table_containing_target(target, tables)
+    if table is None:
+        return None
+
+    try:
+        min_col, min_row, max_col, max_row = range_boundaries(table.ref)
+    except ValueError:
+        return None
+
+    if parsed.column is None:
+        start_row = min_row if parsed.include_headers else min_row + 1
+        return normalize_reference(
+            f"{table.sheet}!{_column_name(min_col)}{start_row}:{_column_name(max_col)}{max_row}"
+        )
+
+    try:
+        column_offset = table.columns.index(parsed.column)
+    except ValueError:
+        return None
+
+    column_name = _column_name(min_col + column_offset)
+    data_start_row = min_row + 1
+    if parsed.current_row:
+        if target.sheet != table.sheet or target.start_cell is None:
+            return _resolve_cross_table_current_row(
+                source_table=table,
+                target=target,
+                column_name=column_name,
+                tables=tables,
+            )
+        try:
+            _target_col, target_row, _target_max_col, _target_max_row = range_boundaries(target.start_cell)
+        except ValueError:
+            return None
+        if target_row < data_start_row or target_row > max_row:
+            return _resolve_cross_table_current_row(
+                source_table=table,
+                target=target,
+                column_name=column_name,
+                tables=tables,
+            )
+        return normalize_reference(f"{table.sheet}!{column_name}{target_row}")
+
+    return normalize_reference(f"{table.sheet}!{column_name}{data_start_row}:{column_name}{max_row}")
+
+
+def _resolve_cross_table_current_row(
+    *,
+    source_table: TableRecord,
+    target: WorkbookReference,
+    column_name: str,
+    tables: dict[str, TableRecord],
+) -> WorkbookReference | None:
+    target_table = _table_containing_target(target, tables)
+    if target_table is None or target.start_cell is None:
+        return None
+
+    try:
+        _target_col, target_row, _target_max_col, _target_max_row = range_boundaries(target.start_cell)
+        _source_min_col, source_min_row, _source_max_col, source_max_row = range_boundaries(source_table.ref)
+        _target_min_col, target_min_row, _target_table_max_col, target_max_row = range_boundaries(target_table.ref)
+    except ValueError:
+        return None
+
+    source_data_rows = source_max_row - source_min_row
+    target_data_rows = target_max_row - target_min_row
+    if source_data_rows != target_data_rows:
+        return None
+
+    target_offset = target_row - (target_min_row + 1)
+    mapped_row = source_min_row + 1 + target_offset
+    if mapped_row < source_min_row + 1 or mapped_row > source_max_row:
+        return None
+    return normalize_reference(f"{source_table.sheet}!{column_name}{mapped_row}")
+
+
+@dataclass(frozen=True)
+class _StructuredReferenceParts:
+    table_name: str | None
+    column: str | None
+    current_row: bool
+    include_headers: bool
+
+
+def _parse_structured_reference(reference: str) -> _StructuredReferenceParts | None:
+    if "[" not in reference or "]" not in reference:
+        return None
+
+    table_name = reference.split("[", 1)[0] or None
+    bracketed_parts = _bracketed_parts(reference)
+    current_row = any(part == "#This Row" or part.startswith("@") for part in bracketed_parts)
+    if reference.startswith("[@"):
+        current_row = True
+    include_headers = any(part == "#All" for part in bracketed_parts)
+
+    column = next(
+        (
+            _clean_structured_selector(part)
+            for part in reversed(bracketed_parts)
+            if not part.startswith("#")
+        ),
+        None,
+    )
+    return _StructuredReferenceParts(
+        table_name=table_name,
+        column=column,
+        current_row=current_row,
+        include_headers=include_headers,
+    )
+
+
+def _bracketed_parts(reference: str) -> tuple[str, ...]:
+    parts: list[str] = []
+    current: list[str] = []
+    depth = 0
+    for character in reference:
+        if character == "[":
+            if depth > 0:
+                current.append(character)
+            depth += 1
+            continue
+        if character == "]":
+            depth -= 1
+            if depth == 0:
+                part = "".join(current)
+                current = []
+                if part.startswith("[") and part.endswith("]"):
+                    parts.extend(_bracketed_parts(part))
+                elif part:
+                    parts.append(part)
+                continue
+            current.append(character)
+            continue
+        if depth > 0:
+            current.append(character)
+    return tuple(parts)
+
+
+def _clean_structured_selector(selector: str) -> str:
+    return selector.removeprefix("@").replace("''", "'")
+
+
+def _table_containing_target(target: WorkbookReference, tables: dict[str, TableRecord]) -> TableRecord | None:
+    if target.sheet is None or target.start_cell is None:
+        return None
+
+    try:
+        target_col, target_row, _target_max_col, _target_max_row = range_boundaries(target.start_cell)
+    except ValueError:
+        return None
+
+    for table in tables.values():
+        if table.sheet != target.sheet:
+            continue
+        try:
+            min_col, min_row, max_col, max_row = range_boundaries(table.ref)
+        except ValueError:
+            continue
+        if min_col <= target_col <= max_col and min_row <= target_row <= max_row:
+            return table
+    return None
 
 
 def _expand_range_reference(source: WorkbookReference) -> tuple[WorkbookReference, ...]:

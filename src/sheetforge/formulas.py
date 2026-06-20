@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 from typing import Any, Literal
 
 from openpyxl.formula.tokenizer import Tokenizer
+from openpyxl.utils.cell import get_column_letter, range_boundaries
 
 from sheetforge.extraction import CellRecord
 from sheetforge.graph import DependencyGraph
@@ -18,11 +19,30 @@ from sheetforge.references import normalize_reference
 
 
 JsonValue = str | int | float | bool | None | list[Any] | dict[str, Any]
-ExpressionKind = Literal["literal", "reference", "binary", "comparison", "function_call"]
+ExpressionKind = Literal["literal", "reference", "unary", "binary", "comparison", "function_call"]
 DiagnosticSeverity = Literal["info", "warning", "error"]
 FormulaReferenceIndex = dict[tuple[str, str], WorkbookReference]
-SUPPORTED_FUNCTIONS = frozenset({"ROUND", "IF"})
-SUPPORTED_OPERATORS = frozenset({"+", "-", "*", "/", ">", ">=", "<", "<=", "=", "<>", "(", ")", ","})
+SUPPORTED_FUNCTIONS = frozenset(
+    {
+        "AND",
+        "AVERAGE",
+        "CONCATENATE",
+        "COUNTIF",
+        "COUNTIFS",
+        "IF",
+        "IFERROR",
+        "MAX",
+        "MIN",
+        "OR",
+        "OFFSET",
+        "ROUND",
+        "SUM",
+        "SUMIF",
+        "SUMIFS",
+        "VLOOKUP",
+    }
+)
+SUPPORTED_OPERATORS = frozenset({"+", "-", "*", "/", "^", "&", ">", ">=", "<", "<=", "=", "<>", "(", ")", ","})
 
 
 @dataclass(frozen=True)
@@ -73,6 +93,14 @@ class FormulaExpressionNode:
     @classmethod
     def reference_to(cls, reference: WorkbookReference) -> "FormulaExpressionNode":
         return cls(kind="reference", reference=reference)
+
+    @classmethod
+    def unary(
+        cls,
+        operator: str,
+        operand: "FormulaExpressionNode",
+    ) -> "FormulaExpressionNode":
+        return cls(kind="unary", operator=operator, operands=(operand,))
 
     @classmethod
     def binary(
@@ -254,13 +282,20 @@ class _FormulaParser:
         return expression
 
     def _parse_comparison(self) -> FormulaExpressionNode:
-        left = self._parse_additive()
+        left = self._parse_concatenation()
         token = self._peek()
         if token is not None and token.value in {">", ">=", "<", "<=", "=", "<>"}:
             self._advance()
-            right = self._parse_additive()
+            right = self._parse_concatenation()
             return FormulaExpressionNode.comparison(token.value, left, right)
         return left
+
+    def _parse_concatenation(self) -> FormulaExpressionNode:
+        expression = self._parse_additive()
+        while (token := self._peek()) is not None and token.value == "&":
+            self._advance()
+            expression = FormulaExpressionNode.binary(token.value, expression, self._parse_additive())
+        return expression
 
     def _parse_additive(self) -> FormulaExpressionNode:
         expression = self._parse_multiplicative()
@@ -270,11 +305,28 @@ class _FormulaParser:
         return expression
 
     def _parse_multiplicative(self) -> FormulaExpressionNode:
-        expression = self._parse_primary()
+        expression = self._parse_exponent()
         while (token := self._peek()) is not None and token.value in {"*", "/"}:
             self._advance()
-            expression = FormulaExpressionNode.binary(token.value, expression, self._parse_primary())
+            expression = FormulaExpressionNode.binary(token.value, expression, self._parse_exponent())
         return expression
+
+    def _parse_exponent(self) -> FormulaExpressionNode:
+        expression = self._parse_unary()
+        while (token := self._peek()) is not None and token.value == "^":
+            self._advance()
+            expression = FormulaExpressionNode.binary(token.value, expression, self._parse_unary())
+        return expression
+
+    def _parse_unary(self) -> FormulaExpressionNode:
+        token = self._peek()
+        if token is not None and token.kind == "operator" and token.value in {"+", "-"}:
+            self._advance()
+            operand = self._parse_unary()
+            if token.value == "+":
+                return operand
+            return FormulaExpressionNode.unary(token.value, operand)
+        return self._parse_primary()
 
     def _parse_primary(self) -> FormulaExpressionNode:
         token = self._advance()
@@ -282,6 +334,8 @@ class _FormulaParser:
             return FormulaExpressionNode.literal(_number_value(token.value))
         if token.kind == "text":
             return FormulaExpressionNode.literal(token.value)
+        if token.kind == "logical":
+            return FormulaExpressionNode.literal(token.value == "TRUE")
         if token.kind == "reference":
             return FormulaExpressionNode.reference_to(self._resolved_reference(token.value))
         if token.kind == "identifier":
@@ -314,19 +368,42 @@ class _FormulaParser:
                 self._advance()
                 continue
             self._expect(")")
+            if function_name == "OFFSET":
+                return _static_offset_reference(arguments)
             return FormulaExpressionNode.function_call(function_name, tuple(arguments))
 
     def _resolved_reference(self, raw_reference: str) -> WorkbookReference:
+        semantic_reference = normalize_reference(raw_reference, current_sheet=_sheet_name(self.cell.cell_ref))
+        if semantic_reference.kind == "range":
+            return semantic_reference
+
         if self.reference_index is not None:
             source = self.reference_index.get((self.cell.cell_ref, raw_reference))
             if source is not None:
+                if source.kind == "structured":
+                    raise FormulaTranslationError(
+                        "unsupported_structured_reference",
+                        "structured references are not supported",
+                        raw_reference,
+                    )
                 return source
 
         for edge in self.graph.execution_edges:
             if edge.target.normalized == self.cell.cell_ref and edge.raw_reference == raw_reference:
+                if edge.source.kind == "structured":
+                    raise FormulaTranslationError(
+                        "unsupported_structured_reference",
+                        "structured references are not supported",
+                        raw_reference,
+                    )
                 return edge.source
 
-        semantic_reference = normalize_reference(raw_reference, current_sheet=_sheet_name(self.cell.cell_ref))
+        if semantic_reference.kind == "structured":
+            raise FormulaTranslationError(
+                "unsupported_structured_reference",
+                "structured references are not supported",
+                raw_reference,
+            )
         if semantic_reference.kind == "named_range":
             raise FormulaTranslationError("unresolved_named_range", "named range could not be resolved", raw_reference)
         return semantic_reference
@@ -373,6 +450,15 @@ def _formula_tokens(raw_formula: str) -> tuple[_FormulaToken, ...]:
         if token.type == "OPERAND" and token.subtype == "TEXT":
             tokens.append(_FormulaToken("text", token.value.strip('"')))
             continue
+        if token.type == "OPERAND" and token.subtype == "LOGICAL":
+            tokens.append(_FormulaToken("logical", token.value.upper()))
+            continue
+        if token.type == "OPERAND" and token.subtype == "ERROR":
+            raise FormulaTranslationError(
+                "unsupported_error_reference",
+                "formula contains an unsupported error reference",
+                token.value,
+            )
         if token.type == "OPERAND" and token.subtype == "RANGE":
             tokens.append(_FormulaToken("reference", token.value))
             continue
@@ -390,6 +476,80 @@ def _number_value(raw_value: str) -> int | float:
     if value.is_integer():
         return int(value)
     return value
+
+
+def _static_offset_reference(arguments: list[FormulaExpressionNode]) -> FormulaExpressionNode:
+    if len(arguments) != 3:
+        raise FormulaTranslationError(
+            "unsupported_offset_shape",
+            "only static three-argument OFFSET references are supported",
+            "OFFSET",
+        )
+
+    base, rows, columns = arguments
+    if base.kind != "reference" or base.reference is None or base.reference.kind != "cell":
+        raise FormulaTranslationError(
+            "unsupported_offset_reference",
+            "OFFSET base reference must resolve to one concrete cell",
+            "OFFSET",
+        )
+    row_offset = _literal_integer(rows)
+    column_offset = _literal_integer(columns)
+    if row_offset is None or column_offset is None:
+        raise FormulaTranslationError(
+            "unsupported_offset_argument",
+            "OFFSET row and column offsets must be static integers",
+            "OFFSET",
+        )
+    reference = _shift_cell_reference(base.reference, row_offset=row_offset, column_offset=column_offset)
+    return FormulaExpressionNode.reference_to(reference)
+
+
+def _literal_integer(node: FormulaExpressionNode) -> int | None:
+    if node.kind == "literal" and isinstance(node.value, int):
+        return node.value
+    if node.kind == "unary" and node.operator == "-":
+        (operand,) = node.operands
+        value = _literal_integer(operand)
+        return None if value is None else -value
+    return None
+
+
+def _shift_cell_reference(
+    reference: WorkbookReference,
+    *,
+    row_offset: int,
+    column_offset: int,
+) -> WorkbookReference:
+    if reference.sheet is None or reference.start_cell is None:
+        raise FormulaTranslationError(
+            "unsupported_offset_reference",
+            "OFFSET base reference must include a sheet and cell coordinate",
+            "OFFSET",
+        )
+    try:
+        min_col, min_row, max_col, max_row = range_boundaries(reference.start_cell)
+    except ValueError as error:
+        raise FormulaTranslationError(
+            "unsupported_offset_reference",
+            "OFFSET base reference must include a valid cell coordinate",
+            "OFFSET",
+        ) from error
+    if min_col != max_col or min_row != max_row:
+        raise FormulaTranslationError(
+            "unsupported_offset_reference",
+            "OFFSET base reference must resolve to one concrete cell",
+            "OFFSET",
+        )
+    shifted_column = min_col + column_offset
+    shifted_row = min_row + row_offset
+    if shifted_column < 1 or shifted_row < 1:
+        raise FormulaTranslationError(
+            "unsupported_offset_reference",
+            "OFFSET resolved outside the worksheet grid",
+            "OFFSET",
+        )
+    return normalize_reference(f"{reference.sheet}!{get_column_letter(shifted_column)}{shifted_row}")
 
 
 def _sheet_name(cell_ref: str) -> str:
