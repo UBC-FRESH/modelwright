@@ -21,6 +21,12 @@ This file records completed project work in chronological order.
 - Added `openpyxl` workbook extraction for sheets, non-empty cells, formulas, named ranges, and initial extraction diagnostics.
 - Closed the Phase 8 extraction-core planning loop by recording Phase 9 dependency graph inputs in `planning/phase-8-closeout-phase-9-inputs.md`.
 - Opened Phase 8 PR #80 from `feature/p8-workbook-extraction-core` back to `main`.
+- Merged Phase 8 PR #80, closed parent issue #50, and activated Phase 9 on `feature/p9-dependency-graph-core`.
+- Added a canonical workbook reference model and normalization helpers for cells, ranges, named ranges, external references, and unresolved references.
+- Added dependency graph records and graph building from extracted formula references, including named-range resolution and semantic/execution edges.
+- Added dependency graph diagnostics coverage for ranges, external references, and simple circular dependencies.
+- Closed the Phase 9 dependency-graph planning loop by recording Phase 10 formula translation inputs in `planning/phase-9-closeout-phase-10-inputs.md`.
+- Opened Phase 9 PR #81 from `feature/p9-dependency-graph-core` back to `main`.
 
 ## 2026-06-19
 

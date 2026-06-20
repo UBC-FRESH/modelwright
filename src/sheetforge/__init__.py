@@ -9,6 +9,16 @@ from sheetforge.extraction import (
     WorkbookRecord,
     extract_workbook,
 )
+from sheetforge.graph import (
+    DependencyEdge,
+    DependencyGraph,
+    build_dependency_graph,
+)
+from sheetforge.references import (
+    WorkbookReference,
+    normalize_cell_reference,
+    normalize_reference,
+)
 from sheetforge.validation import (
     ComparisonResult,
     ComparisonRules,
@@ -30,6 +40,8 @@ __all__ = [
     "CellRecord",
     "ComparisonResult",
     "ComparisonRules",
+    "DependencyEdge",
+    "DependencyGraph",
     "Diagnostic",
     "ExtractionDiagnostic",
     "FormulaRecord",
@@ -41,10 +53,14 @@ __all__ = [
     "SheetRecord",
     "ValidationReport",
     "ValidationScenario",
+    "WorkbookReference",
     "WorkbookRecord",
     "__version__",
+    "build_dependency_graph",
     "build_validation_report",
     "compare_scalar_output",
     "extract_workbook",
     "load_validation_scenario",
+    "normalize_cell_reference",
+    "normalize_reference",
 ]
