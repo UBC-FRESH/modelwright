@@ -23,7 +23,6 @@ from sheetforge.generation import (
     GenerationDiagnostic,
     GenerationResult,
     generate_python_module,
-    symbol_name_for_cell_ref,
 )
 from sheetforge.graph import (
     DependencyEdge,

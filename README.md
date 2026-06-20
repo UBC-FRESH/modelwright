@@ -52,11 +52,25 @@ Install the package with test dependencies:
 python -m pip install -e ".[test]"
 ```
 
+Install the lightweight quality-check extra when working on code changes:
+
+```bash
+python -m pip install -e ".[quality]"
+```
+
+Run lint checks:
+
+```bash
+python -m ruff check .
+```
+
 Run tests:
 
 ```bash
 python -m pytest
 ```
+
+`sheetforge` is pre-release. The package metadata is sufficient for local editable installs and CI, but publishing metadata, release artifacts, and compatibility guarantees are intentionally deferred until the conversion workflow is more proven.
 
 ## Repository Conventions
 

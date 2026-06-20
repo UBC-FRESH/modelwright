@@ -59,6 +59,7 @@ This file records completed project work in chronological order.
 - Merged Phase 14 PR #86 and closed parent issue #53.
 - Activated Phase 15 on `feature/p15-hardening-release-prep`.
 - Decided the Phase 15 hardening tooling boundary: keep `pytest`, add at most a lightweight lint lane next, and defer formatter, type checker, coverage threshold, and pre-commit hooks.
+- Added a minimal Ruff quality extra, CI quality job, local quality-check documentation, and release metadata deferral note.
 
 ## 2026-06-19
 
