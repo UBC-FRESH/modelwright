@@ -48,6 +48,7 @@ This file records completed project work in chronological order.
 - Defined the private workbook evaluation protocol for ignored local inputs, sanitized tracked notes, local commands, and stop conditions.
 - Ran the first private workbook evaluation locally under ignored `tmp/`, added a generic unresolved defined-name extraction fix, and recorded package extraction runtime as the first private-workbook blocker.
 - Extended private-workbook evaluation support with sparse populated-cell extraction, verbose extraction progress hooks, indexed formula-reference lookup, and generated-subset validation against cached workbook outputs.
+- Recorded sanitized `eval-001` findings, including generated-subset validation results and the structured-reference blocker for the pure-Python oracle.
 
 ## 2026-06-19
 
