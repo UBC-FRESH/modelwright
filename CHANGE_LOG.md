@@ -32,6 +32,7 @@ This file records completed project work in chronological order.
 - Added formula translation for the supported synthetic workbook subset, including references, named ranges, arithmetic, `ROUND`, `IF`, and `>`.
 - Added formula translation diagnostics coverage for unsupported functions and unsupported operators.
 - Closed the Phase 10 formula-translation planning loop by recording Phase 11 generated-model inputs in `planning/phase-10-closeout-phase-11-inputs.md`.
+- Opened Phase 10 PR #82 from `feature/p10-formula-translation-core` back to `main`.
 
 ## 2026-06-19
 

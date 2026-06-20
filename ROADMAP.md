@@ -160,13 +160,15 @@ GitHub parent issue: #48
 
 Active branch: `feature/p10-formula-translation-core`
 
+Open PR: #82
+
 Goal: translate the first supported Excel formula subset into internal operations ready for generated Python.
 
 - [x] P10.1 Add formula expression model. Child issue: #61.
 - [x] P10.2 Translate supported synthetic formula subset. Child issue: #59.
 - [x] P10.3 Add unsupported formula diagnostics and closeout. Child issue: #66.
 
-Status: ready for PR.
+Status: PR open.
 
 ## Phase 11: Generated Python Model Core
 
@@ -240,6 +242,6 @@ Status: planned backlog.
 
 ## Current Next Steps
 
-1. Open the Phase 10 PR from `feature/p10-formula-translation-core` to `main`.
-2. Merge the Phase 10 PR after checks pass.
-3. Close parent issue #48 after the PR merges, then activate Phase 11 on `feature/p11-generated-python-model-core`.
+1. Merge Phase 10 PR #82 after checks pass.
+2. Close parent issue #48 after PR #82 merges.
+3. Activate Phase 11 on `feature/p11-generated-python-model-core`.
