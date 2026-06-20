@@ -23,6 +23,7 @@ This file records completed project work in chronological order.
 - Opened Phase 8 PR #80 from `feature/p8-workbook-extraction-core` back to `main`.
 - Merged Phase 8 PR #80, closed parent issue #50, and activated Phase 9 on `feature/p9-dependency-graph-core`.
 - Added a canonical workbook reference model and normalization helpers for cells, ranges, named ranges, external references, and unresolved references.
+- Added dependency graph records and graph building from extracted formula references, including named-range resolution and semantic/execution edges.
 
 ## 2026-06-19
 

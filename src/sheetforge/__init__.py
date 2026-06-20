@@ -9,6 +9,11 @@ from sheetforge.extraction import (
     WorkbookRecord,
     extract_workbook,
 )
+from sheetforge.graph import (
+    DependencyEdge,
+    DependencyGraph,
+    build_dependency_graph,
+)
 from sheetforge.references import (
     WorkbookReference,
     normalize_cell_reference,
@@ -35,6 +40,8 @@ __all__ = [
     "CellRecord",
     "ComparisonResult",
     "ComparisonRules",
+    "DependencyEdge",
+    "DependencyGraph",
     "Diagnostic",
     "ExtractionDiagnostic",
     "FormulaRecord",
@@ -49,6 +56,7 @@ __all__ = [
     "WorkbookReference",
     "WorkbookRecord",
     "__version__",
+    "build_dependency_graph",
     "build_validation_report",
     "compare_scalar_output",
     "extract_workbook",
