@@ -214,9 +214,7 @@ Status: complete.
 
 GitHub parent issue: #53
 
-Active branch: `feature/p14-cli-api-stabilization`
-
-Open PR: #86
+Merged PR: #86
 
 Goal: stabilize the Python API and add thin CLI wrappers only after the internal flow is coherent.
 
@@ -224,13 +222,13 @@ Goal: stabilize the Python API and add thin CLI wrappers only after the internal
 - [x] P14.2 Add thin CLI command groups. Child issue: #71.
 - [x] P14.3 Document CLI and JSON workflows. Child issue: #78.
 
-Status: active.
+Status: complete.
 
 ## Phase 15: Hardening And Release Prep
 
 GitHub parent issue: #51
 
-Planned branch: `feature/p15-hardening-release-prep`
+Active branch: `feature/p15-hardening-release-prep`
 
 Goal: add hardening, documentation, release, and quality tooling only where evidence shows it will pay for itself.
 
@@ -238,10 +236,10 @@ Goal: add hardening, documentation, release, and quality tooling only where evid
 - [ ] P15.2 Add release and documentation metadata if needed. Child issue: #76.
 - [ ] P15.3 Summarize release readiness and next roadmap. Child issue: #75.
 
-Status: planned backlog.
+Status: active.
 
 ## Current Next Steps
 
-1. Verify Phase 14 PR #86 checks.
-2. Merge PR #86 once clean.
-3. Close parent issue #53 after the Phase 14 PR is merged.
+1. Work P15.1 in child issue #77 on branch `feature/p15-hardening-release-prep`.
+2. Decide which hardening tooling is justified by current evidence.
+3. Keep issue #77, parent issue #51, this roadmap, and `CHANGE_LOG.md` synchronized before adding release/documentation metadata.

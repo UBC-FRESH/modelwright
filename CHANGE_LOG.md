@@ -56,6 +56,8 @@ This file records completed project work in chronological order.
 - Added thin JSON CLI command groups for extraction, dependency graph building, generated Python module creation, and validation report assembly.
 - Documented the CLI JSON workflows, command expectations, and stabilization decisions.
 - Opened Phase 14 PR #86 from `feature/p14-cli-api-stabilization` back to `main`.
+- Merged Phase 14 PR #86 and closed parent issue #53.
+- Activated Phase 15 on `feature/p15-hardening-release-prep`.
 
 ## 2026-06-19
 
