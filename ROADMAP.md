@@ -99,6 +99,8 @@ GitHub parent issue: #34
 
 Active branch: `feature/p6-initial-package-validation-core`
 
+Open PR: #41
+
 Goal: build the first durable code-bearing slice from the Phase 5 decisions: package skeleton, validation report core, synthetic fixtures, regression tests, and minimal default CI after tests exist.
 
 - [x] P6.1 Add package and test skeleton. Child issue: #38.
@@ -111,6 +113,6 @@ Status: ready for PR.
 
 ## Current Next Steps
 
-1. Close P6.5 child issue #39 after committing the first default CI workflow.
-2. Open the Phase 6 PR from `feature/p6-initial-package-validation-core` back to `main`.
-3. After PR merge, close parent issue #34 and plan the next implementation phase from the Phase 6 results.
+1. Review and merge Phase 6 PR #41 from `feature/p6-initial-package-validation-core` back to `main`.
+2. After PR #41 merges, close parent issue #34.
+3. Plan the next implementation phase from the Phase 6 results.

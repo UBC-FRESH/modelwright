@@ -8,6 +8,7 @@ This file records completed project work in chronological order.
 - Added the tracked synthetic fixture builder, baseline scenario JSON, expected output JSON, and tests that generate the workbook in a pytest temporary directory.
 - Added baseline and intentional numeric mismatch regression tests using the synthetic fixture assets and validation report core.
 - Added the first default GitHub Actions workflow for editable install and `python -m pytest`.
+- Opened Phase 6 PR #41 from `feature/p6-initial-package-validation-core` back to `main`.
 
 ## 2026-06-19
 
