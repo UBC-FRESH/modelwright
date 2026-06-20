@@ -64,6 +64,7 @@ This file records completed project work in chronological order.
 - Revised the next roadmap horizon so Phase 16 prioritizes FRESH-style Typer/Rich CLI alignment and full Sphinx GitHub Pages documentation modeled on local `fhops` and `femic` repositories.
 - Merged Phase 15 PR #102 and closed parent issue #51.
 - Activated Phase 16 on `feature/p16-cli-docs-public-surface`.
+- Recorded Sheetforge-specific Phase 16 CLI and Sphinx documentation acceptance criteria from the local `fhops` and `femic` reference packages.
 
 ## 2026-06-19
 
