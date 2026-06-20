@@ -41,6 +41,7 @@ This file records completed project work in chronological order.
 - Merged Phase 11 PR #83, closed parent issue #47, and activated Phase 12 on `feature/p12-oracle-backed-validation`.
 - Added oracle interface records and the optional `formulas` dependency boundary for oracle-backed validation.
 - Added a `formulas`-backed oracle for synthetic workbook outputs with JSON scalar normalization and unsupported-input diagnostics.
+- Added oracle-backed validation report assembly for generated synthetic model outputs and recorded Phase 13 private-workbook evaluation inputs.
 
 ## 2026-06-19
 

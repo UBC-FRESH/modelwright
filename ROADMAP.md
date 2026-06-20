@@ -192,9 +192,9 @@ Goal: introduce optional source-workbook oracle execution, starting with a pure-
 
 - [x] P12.1 Define oracle interface and optional dependency boundary. Child issue: #70.
 - [x] P12.2 Add `formulas`-backed oracle for synthetic workbook. Child issue: #69.
-- [ ] P12.3 Compare generated model against oracle outputs. Child issue: #68.
+- [x] P12.3 Compare generated model against oracle outputs. Child issue: #68.
 
-Status: active.
+Status: implementation complete; PR pending.
 
 ## Phase 13: Real Workbook Evaluation Lane
 
@@ -240,6 +240,6 @@ Status: planned backlog.
 
 ## Current Next Steps
 
-1. Work P12.3 in child issue #68 on branch `feature/p12-oracle-backed-validation`.
-2. Compare generated model outputs against `formulas` oracle outputs for the synthetic workbook.
-3. Keep issue #68, parent issue #54, this roadmap, and `CHANGE_LOG.md` synchronized before opening the Phase 12 PR.
+1. Open the Phase 12 PR from `feature/p12-oracle-backed-validation` back to `main`.
+2. Verify the PR checks and merge when ready.
+3. Close parent issue #54 only after the PR has merged.

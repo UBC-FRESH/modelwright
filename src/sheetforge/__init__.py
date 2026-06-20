@@ -37,6 +37,7 @@ from sheetforge.oracles import (
     WorkbookOracle,
     missing_optional_dependency_diagnostic,
 )
+from sheetforge.oracle_validation import build_oracle_validation_report
 from sheetforge.references import (
     WorkbookReference,
     normalize_cell_reference,
@@ -93,6 +94,7 @@ __all__ = [
     "WorkbookRecord",
     "__version__",
     "build_dependency_graph",
+    "build_oracle_validation_report",
     "build_validation_report",
     "compare_scalar_output",
     "extract_workbook",
