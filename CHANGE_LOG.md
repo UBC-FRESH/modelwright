@@ -105,6 +105,7 @@ This file records completed project work in chronological order.
 - Created the Phase 20 validation/evaluation plan and mirrored the phase/task structure into GitHub issues #112 through #116.
 - Added the P20.1 generated-model execution API with structured execution diagnostics, JSON-serializable observed outputs, package facade exports, API docs, and synthetic tests.
 - Added P20.2 validation orchestration over generated outputs, cached workbook values, and optional oracle results, preserving missing cached values and oracle failures as explicit validation evidence.
+- Added P20.3 CLI commands for generated model execution and validation evaluation JSON reports, with verbose progress on stderr and documented workflow boundaries.
 
 ## 2026-06-19
 

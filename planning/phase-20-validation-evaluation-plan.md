@@ -84,6 +84,17 @@ Acceptance criteria:
 - emit JSON suitable for ignored local benchmark reports;
 - keep verbose progress logging available for long workbook runs.
 
+Status: complete.
+
+Result:
+
+- added `sheetforge model execute` for `execute_generated_model`;
+- added `sheetforge validation evaluate` for `evaluate_generated_model`;
+- allowed cached validation from either source workbook extraction or existing `WorkbookRecord` JSON;
+- allowed oracle-backed validation from already-materialized `OracleResult` JSON;
+- kept verbose progress on stderr so stdout remains JSON;
+- documented CLI workflow boundaries and added focused CLI tests.
+
 ### P20.4 Repeatable Evaluation Closeout
 
 Goal: run the synthetic and 2020 FABLE evaluation workflows and record what is proven.

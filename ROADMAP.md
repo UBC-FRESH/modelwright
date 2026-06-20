@@ -317,14 +317,14 @@ Goal: after residual blockers have concrete resolution or scope decisions, make 
 
 - [x] P20.1 Add generated model execution API. Child issue: #113.
 - [x] P20.2 Orchestrate oracle and cached-value validation. Child issue: #114.
-- [ ] P20.3 Add evaluation report CLI and JSON outputs. Child issue: #115.
+- [x] P20.3 Add evaluation report CLI and JSON outputs. Child issue: #115.
 - [ ] P20.4 Run repeatable evaluation and closeout. Child issue: #116.
 
 Status: active.
 
 ## Current Next Steps
 
-1. Work P20.3 in child issue #115 on branch `feature/p20-automated-validation-reports`.
-2. Add thin CLI wrappers over the Phase 20 evaluation APIs.
-3. Emit JSON suitable for ignored local benchmark reports.
-4. Keep verbose progress logging available for long workbook runs.
+1. Work P20.4 in child issue #116 on branch `feature/p20-automated-validation-reports`.
+2. Run synthetic evaluation end to end.
+3. Run the 2020 FABLE benchmark evaluation with verbose logging.
+4. Record what is proven, what remains unproven, and Phase 21 inputs.

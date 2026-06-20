@@ -11,7 +11,7 @@ Workflow groups:
 
 - ``sheetforge workbook``: extraction and dependency graph commands;
 - ``sheetforge model``: generated Python model commands;
-- ``sheetforge validation``: validation report commands;
+- ``sheetforge validation``: validation report and evaluation commands;
 - ``sheetforge conversion``: conversion planning reports.
 
 Workbook Commands
@@ -34,6 +34,12 @@ Model Commands
      --out tmp/generated_model.py \
      > tmp/generation-result.json
 
+   sheetforge model execute \
+     --contract tmp/contract.json \
+     --model tmp/generated_model.py \
+     --inputs tmp/input-overrides.json \
+     > tmp/generated-values.json
+
 Validation Commands
 -------------------
 
@@ -44,6 +50,19 @@ Validation Commands
      --generated-values tmp/generated-values.json \
      --oracle-values tmp/oracle-values.json \
      > tmp/validation-report.json
+
+   sheetforge validation evaluate \
+     --contract tmp/contract.json \
+     --model tmp/generated_model.py \
+     --scenario tmp/scenario.json \
+     --workbook-record tmp/extraction.json \
+     --oracle-result tmp/oracle-result.json \
+     --verbose \
+     > tmp/evaluation-report.json
+
+The evaluation command executes the generated Python model, then builds cached-workbook and/or
+oracle-backed validation reports when those inputs are supplied. Verbose progress is written to stderr so
+stdout remains valid JSON for redirected reports.
 
 Conversion Commands
 -------------------

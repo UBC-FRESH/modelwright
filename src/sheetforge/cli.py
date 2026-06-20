@@ -11,10 +11,13 @@ import typer
 from typer.main import get_command
 
 from sheetforge.conversion import BenchmarkRole, build_conversion_plan
-from sheetforge.extraction import extract_workbook
+from sheetforge.evaluation import evaluate_generated_model
+from sheetforge.execution import execute_generated_model
+from sheetforge.extraction import WorkbookRecord, extract_workbook
 from sheetforge.formulas import FormulaExpression, build_formula_reference_index, translate_formula_cell
 from sheetforge.generation import GeneratedModuleContract, generate_python_module
 from sheetforge.graph import build_dependency_graph
+from sheetforge.oracles import OracleResult
 from sheetforge.validation import build_validation_report, load_validation_scenario
 
 
@@ -115,6 +118,38 @@ def model_generate(
     _emit_json(_generate_payload(contract=contract, expressions=expressions, constants=constants, output=output))
 
 
+@model_app.command("execute")
+def model_execute(
+    contract: Path = typer.Option(
+        ...,
+        "--contract",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Generated module contract JSON file.",
+    ),
+    model: Path = typer.Option(
+        ...,
+        "--model",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Generated Python model file.",
+    ),
+    inputs: Path | None = typer.Option(
+        None,
+        "--inputs",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Optional generated model input overrides JSON object.",
+    ),
+) -> None:
+    """Execute generated Python model JSON outputs."""
+
+    _emit_json(_execute_payload(contract=contract, model=model, inputs=inputs))
+
+
 @validation_app.command("report")
 def validation_report(
     scenario: Path = typer.Option(
@@ -149,6 +184,77 @@ def validation_report(
             scenario=scenario,
             generated_values=generated_values,
             oracle_values=oracle_values,
+        )
+    )
+
+
+@validation_app.command("evaluate")
+def validation_evaluate(
+    contract: Path = typer.Option(
+        ...,
+        "--contract",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Generated module contract JSON file.",
+    ),
+    model: Path = typer.Option(
+        ...,
+        "--model",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Generated Python model file.",
+    ),
+    scenario: Path = typer.Option(
+        ...,
+        "--scenario",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Validation scenario JSON file.",
+    ),
+    workbook: Path | None = typer.Option(
+        None,
+        "--workbook",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Optional source workbook path used for cached workbook validation.",
+    ),
+    workbook_record: Path | None = typer.Option(
+        None,
+        "--workbook-record",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Optional extracted WorkbookRecord JSON used for cached workbook validation.",
+    ),
+    oracle_result: Path | None = typer.Option(
+        None,
+        "--oracle-result",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Optional OracleResult JSON used for oracle-backed validation.",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        help="Print progress messages to stderr while keeping stdout as JSON.",
+    ),
+) -> None:
+    """Execute generated model and build available validation reports."""
+
+    _emit_json(
+        _evaluate_payload(
+            contract=contract,
+            model=model,
+            scenario=scenario,
+            workbook=workbook,
+            workbook_record=workbook_record,
+            oracle_result=oracle_result,
+            verbose=verbose,
         )
     )
 
@@ -221,6 +327,20 @@ def _generate_payload(
     return result.to_dict()
 
 
+def _execute_payload(
+    *,
+    contract: Path,
+    model: Path,
+    inputs: Path | None,
+) -> dict[str, JsonValue]:
+    result = execute_generated_model(
+        contract=GeneratedModuleContract.from_dict(_load_object(contract)),
+        module_path=model,
+        inputs=_load_object(inputs) if inputs else {},
+    )
+    return result.to_dict()
+
+
 def _validate_report_payload(
     *,
     scenario: Path,
@@ -233,6 +353,54 @@ def _validate_report_payload(
         oracle_values=_load_object(oracle_values),
     )
     return report.to_dict()
+
+
+def _evaluate_payload(
+    *,
+    contract: Path,
+    model: Path,
+    scenario: Path,
+    workbook: Path | None,
+    workbook_record: Path | None,
+    oracle_result: Path | None,
+    verbose: bool,
+) -> dict[str, JsonValue]:
+    if workbook is not None and workbook_record is not None:
+        raise typer.BadParameter("use --workbook or --workbook-record, not both")
+
+    def progress(message: str) -> None:
+        if verbose:
+            typer.echo(message, err=True)
+
+    progress("load contract")
+    module_contract = GeneratedModuleContract.from_dict(_load_object(contract))
+    progress("load scenario")
+    validation_scenario = load_validation_scenario(scenario)
+
+    extracted_workbook = None
+    if workbook is not None:
+        progress("extract workbook start")
+        extracted_workbook = extract_workbook(workbook, progress=progress if verbose else None)
+        progress("extract workbook done")
+    elif workbook_record is not None:
+        progress("load workbook record")
+        extracted_workbook = WorkbookRecord.from_dict(_load_object(workbook_record))
+
+    loaded_oracle_result = None
+    if oracle_result is not None:
+        progress("load oracle result")
+        loaded_oracle_result = OracleResult.from_dict(_load_object(oracle_result))
+
+    progress("evaluate generated model")
+    result = evaluate_generated_model(
+        contract=module_contract,
+        module_path=model,
+        scenario=validation_scenario,
+        workbook=extracted_workbook,
+        oracle_result=loaded_oracle_result,
+    )
+    progress("evaluate generated model done")
+    return result.to_dict()
 
 
 def _conversion_plan_payload(

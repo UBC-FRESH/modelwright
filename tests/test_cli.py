@@ -6,10 +6,12 @@ from typer.testing import CliRunner
 
 from sheetforge.cli import app
 from sheetforge.extraction import extract_workbook
+from sheetforge.extraction import CellRecord, WorkbookRecord
 from sheetforge.formulas import translate_formula_cell
 from sheetforge.generation import (
     GeneratedModuleContract,
     GeneratedSymbol,
+    generate_python_module,
     symbol_name_for_cell_ref,
 )
 from sheetforge.graph import build_dependency_graph
@@ -124,6 +126,37 @@ def test_model_generate_rejects_removed_output_option(tmp_path: Path) -> None:
     assert not output_path.exists()
 
 
+def test_model_execute_command_outputs_generated_values(tmp_path: Path) -> None:
+    contract, expressions, constants = _synthetic_generation_inputs(tmp_path)
+    contract_path = tmp_path / "contract.json"
+    output_path = tmp_path / "generated_model.py"
+    _write_json(contract_path, contract.to_dict())
+    generation_result = generate_python_module(
+        contract=contract,
+        expressions=expressions,
+        constants=constants,
+        output_path=output_path,
+    )
+    assert generation_result.generated is True
+
+    result = runner.invoke(
+        app,
+        [
+            "model",
+            "execute",
+            "--contract",
+            str(contract_path),
+            "--model",
+            str(output_path),
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["executed"] is True
+    assert payload["output_values"] == {"Summary!B2": 70.2, "Summary!B3": "ok"}
+
+
 def test_validation_report_command_outputs_report_json(tmp_path: Path) -> None:
     fixture_root = Path(__file__).parent / "fixtures" / "synthetic_model"
     generated_values = {"Summary!B2": 70.2, "Summary!B3": "ok"}
@@ -152,6 +185,58 @@ def test_validation_report_command_outputs_report_json(tmp_path: Path) -> None:
     assert payload["scenario_id"] == "synthetic_model_baseline"
     assert payload["status"] == "pass"
     assert payload["mismatches"] == []
+
+
+def test_validation_evaluate_command_outputs_evaluation_json(tmp_path: Path) -> None:
+    fixture_root = Path(__file__).parent / "fixtures" / "synthetic_model"
+    contract, expressions, constants = _synthetic_generation_inputs(tmp_path)
+    contract_path = tmp_path / "contract.json"
+    output_path = tmp_path / "generated_model.py"
+    workbook_record_path = tmp_path / "workbook-record.json"
+    _write_json(contract_path, contract.to_dict())
+    _write_json(
+        workbook_record_path,
+        WorkbookRecord(
+            workbook_id="synthetic_model.xlsx",
+            source_path="synthetic_model.xlsx",
+            cells=(
+                CellRecord(cell_ref="Summary!B2", kind="formula", raw_value="=Calc!B4", cached_value=70.2),
+                CellRecord(cell_ref="Summary!B3", kind="formula", raw_value='=IF(B2>100,"high","ok")', cached_value="ok"),
+            ),
+        ).to_dict(),
+    )
+    generation_result = generate_python_module(
+        contract=contract,
+        expressions=expressions,
+        constants=constants,
+        output_path=output_path,
+    )
+    assert generation_result.generated is True
+
+    result = runner.invoke(
+        app,
+        [
+            "validation",
+            "evaluate",
+            "--contract",
+            str(contract_path),
+            "--model",
+            str(output_path),
+            "--scenario",
+            str(fixture_root / "baseline_scenario.json"),
+            "--workbook-record",
+            str(workbook_record_path),
+            "--verbose",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert "evaluate generated model" in result.stderr
+    assert payload["generated_execution"]["executed"] is True
+    assert payload["cached_validation_report"]["status"] == "pass"
+    assert payload["cached_validation_report"]["oracle_backend"] == "cached_workbook"
+    assert payload["oracle_validation_report"] is None
 
 
 def test_conversion_plan_command_outputs_plan_json(tmp_path: Path) -> None:
