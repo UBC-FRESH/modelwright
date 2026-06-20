@@ -13,6 +13,7 @@ from sheetforge.formulas import (
     FormulaExpression,
     FormulaExpressionNode,
     FormulaTranslationDiagnostic,
+    translate_formula_cell,
 )
 from sheetforge.graph import (
     DependencyEdge,
@@ -71,4 +72,5 @@ __all__ = [
     "load_validation_scenario",
     "normalize_cell_reference",
     "normalize_reference",
+    "translate_formula_cell",
 ]

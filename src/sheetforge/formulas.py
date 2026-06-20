@@ -9,12 +9,18 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
+from openpyxl.formula.tokenizer import Tokenizer
+
+from sheetforge.extraction import CellRecord
+from sheetforge.graph import DependencyGraph
 from sheetforge.references import WorkbookReference
+from sheetforge.references import normalize_reference
 
 
 JsonValue = str | int | float | bool | None | list[Any] | dict[str, Any]
 ExpressionKind = Literal["literal", "reference", "binary", "comparison", "function_call"]
 DiagnosticSeverity = Literal["info", "warning", "error"]
+SUPPORTED_FUNCTIONS = frozenset({"ROUND", "IF"})
 
 
 @dataclass(frozen=True)
@@ -148,3 +154,208 @@ class FormulaExpression:
             "translated": self.translated,
             "diagnostics": [diagnostic.to_dict() for diagnostic in self.diagnostics],
         }
+
+
+def translate_formula_cell(cell: CellRecord, graph: DependencyGraph) -> FormulaExpression:
+    """Translate one supported formula cell into an expression tree."""
+
+    if cell.formula is None:
+        return FormulaExpression(
+            source_cell=cell.cell_ref,
+            raw_formula=str(cell.raw_value),
+            diagnostics=(
+                FormulaTranslationDiagnostic(
+                    code="not_a_formula_cell",
+                    message="cell does not contain a formula record",
+                    severity="error",
+                    location=cell.cell_ref,
+                    raw_value=cell.raw_value,
+                ),
+            ),
+        )
+
+    raw_formula = cell.formula.raw_formula
+    try:
+        tokens = _formula_tokens(raw_formula)
+        parser = _FormulaParser(tokens=tokens, cell=cell, graph=graph)
+        root = parser.parse()
+    except FormulaTranslationError as error:
+        return FormulaExpression(
+            source_cell=cell.cell_ref,
+            raw_formula=raw_formula,
+            diagnostics=(
+                FormulaTranslationDiagnostic(
+                    code=error.code,
+                    message=error.message,
+                    severity="error",
+                    location=cell.cell_ref,
+                    raw_value=error.raw_value,
+                ),
+            ),
+        )
+
+    return FormulaExpression(source_cell=cell.cell_ref, raw_formula=raw_formula, root=root)
+
+
+@dataclass(frozen=True)
+class _FormulaToken:
+    kind: str
+    value: str
+
+
+class FormulaTranslationError(Exception):
+    def __init__(self, code: str, message: str, raw_value: JsonValue = None) -> None:
+        super().__init__(message)
+        self.code = code
+        self.message = message
+        self.raw_value = raw_value
+
+
+class _FormulaParser:
+    def __init__(self, *, tokens: tuple[_FormulaToken, ...], cell: CellRecord, graph: DependencyGraph) -> None:
+        self.tokens = tokens
+        self.cell = cell
+        self.graph = graph
+        self.index = 0
+
+    def parse(self) -> FormulaExpressionNode:
+        expression = self._parse_comparison()
+        if self._peek() is not None:
+            token = self._peek()
+            raise FormulaTranslationError("unexpected_formula_token", "unexpected token after expression", token.value)
+        return expression
+
+    def _parse_comparison(self) -> FormulaExpressionNode:
+        left = self._parse_additive()
+        token = self._peek()
+        if token is not None and token.value in {">", ">=", "<", "<=", "=", "<>"}:
+            self._advance()
+            right = self._parse_additive()
+            return FormulaExpressionNode.comparison(token.value, left, right)
+        return left
+
+    def _parse_additive(self) -> FormulaExpressionNode:
+        expression = self._parse_multiplicative()
+        while (token := self._peek()) is not None and token.value in {"+", "-"}:
+            self._advance()
+            expression = FormulaExpressionNode.binary(token.value, expression, self._parse_multiplicative())
+        return expression
+
+    def _parse_multiplicative(self) -> FormulaExpressionNode:
+        expression = self._parse_primary()
+        while (token := self._peek()) is not None and token.value in {"*", "/"}:
+            self._advance()
+            expression = FormulaExpressionNode.binary(token.value, expression, self._parse_primary())
+        return expression
+
+    def _parse_primary(self) -> FormulaExpressionNode:
+        token = self._advance()
+        if token.kind == "number":
+            return FormulaExpressionNode.literal(_number_value(token.value))
+        if token.kind == "text":
+            return FormulaExpressionNode.literal(token.value)
+        if token.kind == "reference":
+            return FormulaExpressionNode.reference_to(self._resolved_reference(token.value))
+        if token.kind == "identifier":
+            return self._parse_function_call(token.value)
+        if token.value == "(":
+            expression = self._parse_comparison()
+            self._expect(")")
+            return expression
+        raise FormulaTranslationError("unsupported_formula_token", "unsupported formula token", token.value)
+
+    def _parse_function_call(self, function_name: str) -> FormulaExpressionNode:
+        self._expect("(")
+        function_name = function_name.upper()
+        if function_name not in SUPPORTED_FUNCTIONS:
+            raise FormulaTranslationError(
+                "unsupported_function",
+                f"function {function_name} is not supported",
+                function_name,
+            )
+
+        arguments: list[FormulaExpressionNode] = []
+        if (token := self._peek()) is not None and token.value == ")":
+            self._advance()
+            return FormulaExpressionNode.function_call(function_name, tuple(arguments))
+
+        while True:
+            arguments.append(self._parse_comparison())
+            token = self._peek()
+            if token is not None and token.value == ",":
+                self._advance()
+                continue
+            self._expect(")")
+            return FormulaExpressionNode.function_call(function_name, tuple(arguments))
+
+    def _resolved_reference(self, raw_reference: str) -> WorkbookReference:
+        for edge in self.graph.execution_edges:
+            if edge.target.normalized == self.cell.cell_ref and edge.raw_reference == raw_reference:
+                return edge.source
+
+        semantic_reference = normalize_reference(raw_reference, current_sheet=_sheet_name(self.cell.cell_ref))
+        if semantic_reference.kind == "named_range":
+            raise FormulaTranslationError("unresolved_named_range", "named range could not be resolved", raw_reference)
+        return semantic_reference
+
+    def _peek(self) -> _FormulaToken | None:
+        if self.index >= len(self.tokens):
+            return None
+        return self.tokens[self.index]
+
+    def _advance(self) -> _FormulaToken:
+        token = self._peek()
+        if token is None:
+            raise FormulaTranslationError("unexpected_formula_end", "formula ended unexpectedly")
+        self.index += 1
+        return token
+
+    def _expect(self, value: str) -> None:
+        token = self._advance()
+        if token.value != value:
+            raise FormulaTranslationError("unexpected_formula_token", f"expected {value}", token.value)
+
+
+def _formula_tokens(raw_formula: str) -> tuple[_FormulaToken, ...]:
+    tokens: list[_FormulaToken] = []
+    for token in Tokenizer(raw_formula).items:
+        if token.type == "WHITE-SPACE":
+            continue
+        if token.type == "FUNC" and token.subtype == "OPEN":
+            tokens.append(_FormulaToken("identifier", token.value[:-1]))
+            tokens.append(_FormulaToken("operator", "("))
+            continue
+        if token.type == "FUNC" and token.subtype == "CLOSE":
+            tokens.append(_FormulaToken("operator", ")"))
+            continue
+        if token.type == "PAREN":
+            tokens.append(_FormulaToken("operator", token.value))
+            continue
+        if token.type == "SEP":
+            tokens.append(_FormulaToken("operator", token.value))
+            continue
+        if token.type == "OPERAND" and token.subtype == "NUMBER":
+            tokens.append(_FormulaToken("number", token.value))
+            continue
+        if token.type == "OPERAND" and token.subtype == "TEXT":
+            tokens.append(_FormulaToken("text", token.value.strip('"')))
+            continue
+        if token.type == "OPERAND" and token.subtype == "RANGE":
+            tokens.append(_FormulaToken("reference", token.value))
+            continue
+        if token.type.startswith("OPERATOR"):
+            tokens.append(_FormulaToken("operator", token.value))
+            continue
+        raise FormulaTranslationError("unsupported_formula_token", "unsupported formula token", token.value)
+    return tuple(tokens)
+
+
+def _number_value(raw_value: str) -> int | float:
+    value = float(raw_value)
+    if value.is_integer():
+        return int(value)
+    return value
+
+
+def _sheet_name(cell_ref: str) -> str:
+    return cell_ref.split("!", 1)[0]
