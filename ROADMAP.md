@@ -301,9 +301,9 @@ Goal: resolve or explicitly scope the residual blockers exposed by the 2020 FABL
 - [x] P19.1 Resolve or scope unresolved named ranges. Child issue: #107.
 - [x] P19.2 Define circular dependency semantics and policy. Child issue: #105.
 - [x] P19.3 Resolve deferred workbook dependency and volatile/cache blockers. Child issue: #106.
-- [ ] P19.4 Rerun 2020 benchmark to convergence and closeout. Child issue: #104.
+- [x] P19.4 Rerun 2020 benchmark to convergence and closeout. Child issue: #104.
 
-Status: active.
+Status: complete pending PR.
 
 ## Phase 20: Automated Validation And Evaluation Reports
 
@@ -322,7 +322,7 @@ Status: planned backlog.
 
 ## Current Next Steps
 
-1. Work P19.4 in child issue #104 on branch `feature/p19-residual-blocker-resolution`.
-2. Rerun the 2020 FABLE benchmark to convergence with verbose logging.
-3. Confirm every remaining residual blocker is resolved, scoped out, or explicitly retained with a named next-phase owner.
-4. Close Phase 19 with roadmap, changelog, planning-note, issue, PR, and verification updates.
+1. Open and review the Phase 19 PR from `feature/p19-residual-blocker-resolution` back to `main`.
+2. Merge the Phase 19 PR after checks pass.
+3. Close parent issue #103 after merge.
+4. Activate Phase 20 only after Phase 19 is merged back to `main`.

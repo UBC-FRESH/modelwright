@@ -192,6 +192,53 @@ Acceptance criteria:
 - update `ROADMAP.md`, `CHANGE_LOG.md`, this planning note, and GitHub issues;
 - only then activate Phase 20 validation/evaluation automation.
 
+Status: complete pending PR.
+
+Final 2020 benchmark evidence:
+
+- extraction: pass;
+- dependency graph: pass;
+- formula translation: pass;
+- generation: not run in Phase 19;
+- cached validation: not run in Phase 19;
+- oracle validation: not run in Phase 19;
+- formula cells: 296,976;
+- translated formula cells: 296,976;
+- untranslated formula cells: 0;
+- translation coverage: 1.0;
+- graph diagnostics: empty;
+- translation diagnostics: empty.
+
+Final residual blocker state:
+
+- `named_range_source_error`: source workbook defect, `out_of_scope`; the remaining defect is stale
+  unreferenced defined-name metadata.
+- `unsupported_structured_reference`: unsupported reference semantics category, `resolved`; extraction
+  provenance only because graph and translation resolved the structured references needed by the 2020
+  benchmark.
+- `unsupported_volatile_function`: unsupported formula semantics category, `resolved`; validation-risk
+  provenance only because translation is clean.
+- `unsupported_external_link`: external dependency category, `deferred`; Phase 20+ validation/generation
+  work must require explicit external workbook materialization, mock inputs, or rejection policy.
+- `missing_cached_formula_value`: missing cached values category, `deferred`; Phase 20 validation work
+  must use a recalculation oracle or select cached outputs with usable workbook values.
+
+Phase 19 conclusion:
+
+The 2020 FABLE benchmark is no longer blocked by unresolved named ranges, graph circularity, formula
+translation, structured-reference semantics, or volatile-function translation semantics. Phase 19 does not
+prove full generated-model equivalence because full generation and validation are intentionally deferred
+to Phase 20. It does prove that remaining blockers have explicit owners and dispositions instead of
+being vague conversion failures.
+
+Local ignored evidence:
+
+```text
+tmp/logs/p19-closeout-2020-conversion-plan.log
+tmp/conversion-plans/p19-closeout-fable-2020.json
+tmp/logs/p19-policy-full-verification.log
+```
+
 ## Non-Goals
 
 - Do not build broad validation report polish before blocker ownership is explicit.
