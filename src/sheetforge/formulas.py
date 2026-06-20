@@ -21,7 +21,20 @@ JsonValue = str | int | float | bool | None | list[Any] | dict[str, Any]
 ExpressionKind = Literal["literal", "reference", "unary", "binary", "comparison", "function_call"]
 DiagnosticSeverity = Literal["info", "warning", "error"]
 FormulaReferenceIndex = dict[tuple[str, str], WorkbookReference]
-SUPPORTED_FUNCTIONS = frozenset({"ROUND", "IF"})
+SUPPORTED_FUNCTIONS = frozenset(
+    {
+        "AND",
+        "AVERAGE",
+        "CONCATENATE",
+        "IF",
+        "IFERROR",
+        "MAX",
+        "MIN",
+        "OR",
+        "ROUND",
+        "SUM",
+    }
+)
 SUPPORTED_OPERATORS = frozenset({"+", "-", "*", "/", "^", "&", ">", ">=", "<", "<=", "=", "<>", "(", ")", ","})
 
 
@@ -351,9 +364,19 @@ class _FormulaParser:
             return FormulaExpressionNode.function_call(function_name, tuple(arguments))
 
     def _resolved_reference(self, raw_reference: str) -> WorkbookReference:
+        semantic_reference = normalize_reference(raw_reference, current_sheet=_sheet_name(self.cell.cell_ref))
+        if semantic_reference.kind == "range":
+            return semantic_reference
+
         if self.reference_index is not None:
             source = self.reference_index.get((self.cell.cell_ref, raw_reference))
             if source is not None:
+                if source.kind == "structured":
+                    raise FormulaTranslationError(
+                        "unsupported_structured_reference",
+                        "structured references are not supported",
+                        raw_reference,
+                    )
                 return source
 
         for edge in self.graph.execution_edges:
@@ -366,7 +389,6 @@ class _FormulaParser:
                     )
                 return edge.source
 
-        semantic_reference = normalize_reference(raw_reference, current_sheet=_sheet_name(self.cell.cell_ref))
         if semantic_reference.kind == "structured":
             raise FormulaTranslationError(
                 "unsupported_structured_reference",

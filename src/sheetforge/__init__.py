@@ -6,6 +6,7 @@ from sheetforge.extraction import (
     FormulaRecord,
     NamedRangeRecord,
     SheetRecord,
+    TableRecord,
     WorkbookRecord,
     extract_workbook,
 )
@@ -84,6 +85,7 @@ __all__ = [
     "ScenarioInput",
     "ScenarioOutput",
     "SheetRecord",
+    "TableRecord",
     "ValidationReport",
     "ValidationScenario",
     "WorkbookOracle",

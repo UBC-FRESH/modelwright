@@ -77,6 +77,7 @@ This file records completed project work in chronological order.
 - Codified the Phase 17 blocker-find-resolve-rerun loop for private-workbook formula semantics and validation evidence.
 - Added explicit Phase 17 convergence metrics, pass/fail rules, and implementation priority order for private-workbook import progress.
 - Added P17.3 pass-one support for boolean literals, unary minus, `^`, `&`, and `#REF!` diagnostics, plus a tracked supported-semantics fixture harness and sanitized convergence note.
+- Added P17.3 pass-two support for scalar/range functions, supported table structured references, table metadata extraction, unresolved structured-reference fast-fail behavior, and expanded supported-semantics fixture coverage; the sanitized private pass increased translated formulas to 72,437 and kept cached generated validation at 10 outputs with 0 mismatches.
 
 ## 2026-06-19
 

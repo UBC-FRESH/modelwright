@@ -14,6 +14,7 @@ from typing import Any, Literal
 
 from openpyxl import load_workbook
 from openpyxl.formula.tokenizer import Tokenizer
+from openpyxl.utils.cell import get_column_letter, range_boundaries
 
 
 JsonValue = str | int | float | bool | None | list[Any] | dict[str, Any]
@@ -155,6 +156,33 @@ class NamedRangeRecord:
 
 
 @dataclass(frozen=True)
+class TableRecord:
+    """Worksheet table metadata needed to resolve structured references."""
+
+    name: str
+    sheet: str
+    ref: str
+    columns: tuple[str, ...] = field(default_factory=tuple)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "TableRecord":
+        return cls(
+            name=data["name"],
+            sheet=data["sheet"],
+            ref=data["ref"],
+            columns=tuple(data.get("columns", [])),
+        )
+
+    def to_dict(self) -> dict[str, JsonValue]:
+        return {
+            "name": self.name,
+            "sheet": self.sheet,
+            "ref": self.ref,
+            "columns": list(self.columns),
+        }
+
+
+@dataclass(frozen=True)
 class SheetRecord:
     """Worksheet identity and ordering facts."""
 
@@ -190,6 +218,7 @@ class WorkbookRecord:
     sheets: tuple[SheetRecord, ...] = field(default_factory=tuple)
     cells: tuple[CellRecord, ...] = field(default_factory=tuple)
     named_ranges: tuple[NamedRangeRecord, ...] = field(default_factory=tuple)
+    tables: tuple[TableRecord, ...] = field(default_factory=tuple)
     diagnostics: tuple[ExtractionDiagnostic, ...] = field(default_factory=tuple)
 
     @classmethod
@@ -200,6 +229,7 @@ class WorkbookRecord:
             sheets=tuple(SheetRecord.from_dict(item) for item in data.get("sheets", [])),
             cells=tuple(CellRecord.from_dict(item) for item in data.get("cells", [])),
             named_ranges=tuple(NamedRangeRecord.from_dict(item) for item in data.get("named_ranges", [])),
+            tables=tuple(TableRecord.from_dict(item) for item in data.get("tables", [])),
             diagnostics=tuple(ExtractionDiagnostic.from_dict(item) for item in data.get("diagnostics", [])),
         )
 
@@ -210,6 +240,7 @@ class WorkbookRecord:
             "sheets": [sheet.to_dict() for sheet in self.sheets],
             "cells": [cell.to_dict() for cell in self.cells],
             "named_ranges": [named_range.to_dict() for named_range in self.named_ranges],
+            "tables": [table.to_dict() for table in self.tables],
             "diagnostics": [diagnostic.to_dict() for diagnostic in self.diagnostics],
         }
 
@@ -241,6 +272,9 @@ def extract_workbook(path: str | Path, progress: Callable[[str], None] | None = 
     _progress(progress, "named ranges start")
     named_ranges = tuple(_extract_named_range(name, defined_name) for name, defined_name in workbook.defined_names.items())
     _progress(progress, f"named ranges done count={len(named_ranges)}")
+    _progress(progress, "tables start")
+    tables = tuple(table for worksheet in workbook.worksheets for table in _extract_tables(worksheet))
+    _progress(progress, f"tables done count={len(tables)}")
 
     cell_records: list[CellRecord] = []
     for index, worksheet in enumerate(workbook.worksheets, start=1):
@@ -268,6 +302,7 @@ def extract_workbook(path: str | Path, progress: Callable[[str], None] | None = 
         sheets=sheets,
         cells=cells,
         named_ranges=named_ranges,
+        tables=tables,
         diagnostics=diagnostics,
     )
 
@@ -326,6 +361,29 @@ def _extract_named_range(name: str, defined_name: Any) -> NamedRangeRecord:
         status=status,
         diagnostics=diagnostics,
     )
+
+
+def _extract_tables(worksheet: Any) -> tuple[TableRecord, ...]:
+    records: list[TableRecord] = []
+    for table in worksheet.tables.values():
+        try:
+            min_col, header_row, max_col, _max_row = range_boundaries(table.ref)
+        except ValueError:
+            continue
+
+        columns = tuple(
+            str(worksheet[f"{get_column_letter(column)}{header_row}"].value)
+            for column in range(min_col, max_col + 1)
+        )
+        records.append(
+            TableRecord(
+                name=table.displayName,
+                sheet=worksheet.title,
+                ref=table.ref.replace("$", ""),
+                columns=columns,
+            )
+        )
+    return tuple(records)
 
 
 def _extract_sheet_cells(
@@ -494,7 +552,7 @@ def _json_value(value: Any) -> JsonValue:
 
 
 def _is_external_reference(reference: str) -> bool:
-    return "[" in reference and "]" in reference and "." in reference.split("]", 1)[0]
+    return "[" in reference and "]" in reference and ("." in reference.split("]", 1)[0] or "!" in reference)
 
 
 def _is_structured_reference(reference: str) -> bool:

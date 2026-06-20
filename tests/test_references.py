@@ -57,6 +57,16 @@ def test_normalize_external_reference() -> None:
     assert reference.diagnostic_code == "external_reference"
 
 
+def test_normalize_indexed_external_reference() -> None:
+    reference = normalize_reference("[0]Inputs!A1", current_sheet="Calc")
+
+    assert reference.kind == "external"
+    assert reference.original == "[0]Inputs!A1"
+    assert reference.normalized == "[0]Inputs!A1"
+    assert reference.workbook == "0"
+    assert reference.diagnostic_code == "external_reference"
+
+
 def test_normalize_structured_reference() -> None:
     reference = normalize_reference("Table1[Amount]", current_sheet="Calc")
 

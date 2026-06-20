@@ -8,6 +8,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal
 
+from openpyxl.utils.cell import get_column_letter, range_boundaries
+
 from sheetforge.formulas import FormulaExpression, FormulaExpressionNode
 
 
@@ -220,6 +222,26 @@ def _render_module(
         '"""',
         "",
         "",
+        "def _sf_flatten(values):",
+        "    for value in values:",
+        "        if isinstance(value, (list, tuple)):",
+        "            yield from _sf_flatten(value)",
+        "        else:",
+        "            yield value",
+        "",
+        "",
+        "def _sf_average(values):",
+        "    values = list(values)",
+        "    return sum(values) / len(values)",
+        "",
+        "",
+        "def _sf_iferror(value_fn, fallback):",
+        "    try:",
+        "        return value_fn()",
+        "    except Exception:",
+        "        return fallback",
+        "",
+        "",
         f"def {contract.entrypoint}(inputs=None):",
         "    inputs = {} if inputs is None else dict(inputs)",
     ]
@@ -255,6 +277,8 @@ def _render_expression(node: FormulaExpressionNode | None) -> str:
     if node.kind == "reference":
         if node.reference is None:
             raise ValueError("cannot render reference expression without reference")
+        if node.reference.kind == "range":
+            return _render_range_reference(node.reference)
         return symbol_name_for_cell_ref(node.reference.normalized)
     if node.kind == "unary":
         (operand,) = node.operands
@@ -288,7 +312,46 @@ def _render_function_call(node: FormulaExpressionNode) -> str:
             raise ValueError("IF requires three operands")
         condition, true_value, false_value = node.operands
         return f"({_render_expression(true_value)} if {_render_expression(condition)} else {_render_expression(false_value)})"
+    if node.function_name == "IFERROR":
+        if len(node.operands) != 2:
+            raise ValueError("IFERROR requires two operands")
+        value, fallback = node.operands
+        return f"_sf_iferror(lambda: {_render_expression(value)}, {_render_expression(fallback)})"
+    if node.function_name == "AND":
+        return f"all(_sf_flatten({_render_argument_tuple(node.operands)}))"
+    if node.function_name == "OR":
+        return f"any(_sf_flatten({_render_argument_tuple(node.operands)}))"
+    if node.function_name == "SUM":
+        return f"sum(_sf_flatten({_render_argument_tuple(node.operands)}))"
+    if node.function_name == "MIN":
+        return f"min(_sf_flatten({_render_argument_tuple(node.operands)}))"
+    if node.function_name == "MAX":
+        return f"max(_sf_flatten({_render_argument_tuple(node.operands)}))"
+    if node.function_name == "AVERAGE":
+        return f"_sf_average(_sf_flatten({_render_argument_tuple(node.operands)}))"
+    if node.function_name == "CONCATENATE":
+        return f"''.join(str(value) for value in _sf_flatten({_render_argument_tuple(node.operands)}))"
     raise ValueError(f"unsupported function call: {node.function_name}")
+
+
+def _render_argument_tuple(operands: tuple[FormulaExpressionNode, ...]) -> str:
+    rendered = ", ".join(_render_expression(operand) for operand in operands)
+    if len(operands) == 1:
+        rendered = f"{rendered},"
+    return f"({rendered})"
+
+
+def _render_range_reference(reference) -> str:
+    if reference.sheet is None or reference.start_cell is None or reference.end_cell is None:
+        raise ValueError(f"cannot render incomplete range reference: {reference.normalized}")
+
+    min_col, min_row, max_col, max_row = range_boundaries(f"{reference.start_cell}:{reference.end_cell}")
+    rendered_cells = [
+        symbol_name_for_cell_ref(f"{reference.sheet}!{get_column_letter(column)}{row}")
+        for row in range(min_row, max_row + 1)
+        for column in range(min_col, max_col + 1)
+    ]
+    return f"({', '.join(rendered_cells)}{',' if len(rendered_cells) == 1 else ''})"
 
 
 def _python_comparison_operator(operator: str | None) -> str:

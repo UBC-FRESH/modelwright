@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from openpyxl import Workbook
+from openpyxl.worksheet.table import Table
 
 from sheetforge.extraction import extract_workbook
 from sheetforge.graph import DependencyGraph, build_dependency_graph
@@ -87,6 +88,47 @@ def test_dependency_graph_reports_structured_reference(tmp_path: Path) -> None:
     assert graph.semantic_edges[0].diagnostic_code == "unsupported_structured_reference"
     assert graph.execution_edges[0].source.kind == "structured"
     assert graph.execution_edges[0].diagnostic_code == "unsupported_structured_reference"
+
+
+def test_dependency_graph_resolves_current_row_structured_reference(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "current-row-structured-reference.xlsx"
+    source = Workbook()
+    sheet = source.active
+    sheet.title = "Data"
+    sheet.append(["Amount", "Result"])
+    sheet.append([10, "=InputTable[[#This Row],[Amount]]"])
+    sheet.append([20, "=InputTable[[#This Row],[Amount]]"])
+    sheet.add_table(Table(displayName="InputTable", ref="A1:B3"))
+    source.save(workbook_path)
+
+    graph = build_dependency_graph(extract_workbook(workbook_path))
+    execution_edges = [edge for edge in graph.execution_edges if edge.target.normalized == "Data!B2"]
+
+    assert graph.diagnostics == ()
+    assert [(edge.source.normalized, edge.resolved_from.normalized) for edge in execution_edges if edge.resolved_from] == [
+        ("Data!A2", "InputTable[[#This Row],[Amount]]")
+    ]
+
+
+def test_dependency_graph_resolves_column_structured_reference_as_range(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "column-structured-reference.xlsx"
+    source = Workbook()
+    sheet = source.active
+    sheet.title = "Data"
+    sheet.append(["Amount", "Rate"])
+    sheet.append([10, 0.1])
+    sheet.append([20, 0.2])
+    sheet["D1"] = "=SUM(InputTable[Amount])"
+    sheet.add_table(Table(displayName="InputTable", ref="A1:B3"))
+    source.save(workbook_path)
+
+    graph = build_dependency_graph(extract_workbook(workbook_path))
+    execution_edges = [edge for edge in graph.execution_edges if edge.target.normalized == "Data!D1"]
+
+    assert graph.diagnostics == ()
+    assert [(edge.source.kind, edge.source.normalized, edge.resolved_from.normalized) for edge in execution_edges if edge.resolved_from] == [
+        ("range", "Data!A2:A3", "InputTable[Amount]")
+    ]
 
 
 def test_dependency_graph_expands_range_execution_edges(tmp_path: Path) -> None:

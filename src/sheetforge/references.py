@@ -174,11 +174,15 @@ def _is_named_range(reference: str) -> bool:
 
 
 def _is_external_reference(reference: str) -> bool:
-    return bool(_EXTERNAL_WORKBOOK_RE.search(reference))
+    return bool(_EXTERNAL_WORKBOOK_RE.search(reference)) or _looks_like_external_reference(reference)
 
 
 def _is_structured_reference(reference: str) -> bool:
     return "[" in reference and "]" in reference
+
+
+def _looks_like_external_reference(reference: str) -> bool:
+    return "[" in reference and "]" in reference and "!" in reference
 
 
 def _external_workbook(reference: str) -> str | None:

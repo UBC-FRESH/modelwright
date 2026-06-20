@@ -6,6 +6,7 @@ from sheetforge.extraction import (
     FormulaRecord,
     NamedRangeRecord,
     SheetRecord,
+    TableRecord,
     WorkbookRecord,
 )
 
@@ -50,6 +51,14 @@ def test_workbook_record_serializes_extracted_facts() -> None:
                 raw_definition="'Inputs'!$B$2",
                 destinations=("Inputs!B2",),
                 status="resolved",
+            ),
+        ),
+        tables=(
+            TableRecord(
+                name="InputsTable",
+                sheet="Inputs",
+                ref="A1:B2",
+                columns=("Label", "Value"),
             ),
         ),
         diagnostics=(),
@@ -99,6 +108,14 @@ def test_workbook_record_serializes_extracted_facts() -> None:
                 "diagnostics": [],
             }
         ],
+        "tables": [
+            {
+                "name": "InputsTable",
+                "sheet": "Inputs",
+                "ref": "A1:B2",
+                "columns": ["Label", "Value"],
+            }
+        ],
         "diagnostics": [],
     }
     json.dumps(payload)
@@ -127,6 +144,7 @@ def test_workbook_record_round_trips_from_dict() -> None:
             }
         ],
         "named_ranges": [],
+        "tables": [],
         "diagnostics": [
             {
                 "code": "unsupported_array_formula",

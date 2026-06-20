@@ -16,9 +16,9 @@ def test_supported_semantics_fixture_translates_and_generates(tmp_path: Path) ->
     constants = {
         cell.cell_ref: cell.raw_value
         for cell in workbook.cells
-        if cell.formula is None and cell.cell_ref in {"Inputs!B2", "Inputs!B3", "Inputs!B4"}
+        if cell.formula is None and (cell.cell_ref.startswith("Inputs!B") or cell.cell_ref in {"TableData!A2", "TableData!A3"})
     }
-    formula_order = tuple(f"Calc!B{index}" for index in range(1, 18))
+    formula_order = tuple(f"Calc!B{index}" for index in range(1, 27)) + ("TableData!B2", "TableData!B3")
     contract = GeneratedModuleContract(
         workbook_id=workbook.workbook_id,
         module_name="supported_semantics",
