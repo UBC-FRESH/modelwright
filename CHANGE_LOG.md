@@ -44,6 +44,7 @@ This file records completed project work in chronological order.
 - Added oracle-backed validation report assembly for generated synthetic model outputs and recorded Phase 13 private-workbook evaluation inputs.
 - Opened Phase 12 PR #84 from `feature/p12-oracle-backed-validation` back to `main`.
 - Merged Phase 12 PR #84 and closed parent issue #54.
+- Activated Phase 13 on `feature/p13-real-workbook-evaluation-lane`.
 
 ## 2026-06-19
 
