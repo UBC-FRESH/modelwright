@@ -20,6 +20,7 @@ from sheetforge.references import normalize_reference
 JsonValue = str | int | float | bool | None | list[Any] | dict[str, Any]
 ExpressionKind = Literal["literal", "reference", "binary", "comparison", "function_call"]
 DiagnosticSeverity = Literal["info", "warning", "error"]
+FormulaReferenceIndex = dict[tuple[str, str], WorkbookReference]
 SUPPORTED_FUNCTIONS = frozenset({"ROUND", "IF"})
 SUPPORTED_OPERATORS = frozenset({"+", "-", "*", "/", ">", ">=", "<", "<=", "=", "<>", "(", ")", ","})
 
@@ -157,7 +158,11 @@ class FormulaExpression:
         }
 
 
-def translate_formula_cell(cell: CellRecord, graph: DependencyGraph) -> FormulaExpression:
+def translate_formula_cell(
+    cell: CellRecord,
+    graph: DependencyGraph,
+    reference_index: FormulaReferenceIndex | None = None,
+) -> FormulaExpression:
     """Translate one supported formula cell into an expression tree."""
 
     if cell.formula is None:
@@ -178,7 +183,12 @@ def translate_formula_cell(cell: CellRecord, graph: DependencyGraph) -> FormulaE
     raw_formula = cell.formula.raw_formula
     try:
         tokens = _formula_tokens(raw_formula)
-        parser = _FormulaParser(tokens=tokens, cell=cell, graph=graph)
+        parser = _FormulaParser(
+            tokens=tokens,
+            cell=cell,
+            graph=graph,
+            reference_index=reference_index,
+        )
         root = parser.parse()
     except FormulaTranslationError as error:
         return FormulaExpression(
@@ -198,6 +208,15 @@ def translate_formula_cell(cell: CellRecord, graph: DependencyGraph) -> FormulaE
     return FormulaExpression(source_cell=cell.cell_ref, raw_formula=raw_formula, root=root)
 
 
+def build_formula_reference_index(graph: DependencyGraph) -> FormulaReferenceIndex:
+    """Build fast lookup for formula raw references by target cell."""
+
+    index: FormulaReferenceIndex = {}
+    for edge in graph.execution_edges:
+        index.setdefault((edge.target.normalized, edge.raw_reference), edge.source)
+    return index
+
+
 @dataclass(frozen=True)
 class _FormulaToken:
     kind: str
@@ -213,10 +232,18 @@ class FormulaTranslationError(Exception):
 
 
 class _FormulaParser:
-    def __init__(self, *, tokens: tuple[_FormulaToken, ...], cell: CellRecord, graph: DependencyGraph) -> None:
+    def __init__(
+        self,
+        *,
+        tokens: tuple[_FormulaToken, ...],
+        cell: CellRecord,
+        graph: DependencyGraph,
+        reference_index: FormulaReferenceIndex | None,
+    ) -> None:
         self.tokens = tokens
         self.cell = cell
         self.graph = graph
+        self.reference_index = reference_index
         self.index = 0
 
     def parse(self) -> FormulaExpressionNode:
@@ -290,6 +317,11 @@ class _FormulaParser:
             return FormulaExpressionNode.function_call(function_name, tuple(arguments))
 
     def _resolved_reference(self, raw_reference: str) -> WorkbookReference:
+        if self.reference_index is not None:
+            source = self.reference_index.get((self.cell.cell_ref, raw_reference))
+            if source is not None:
+                return source
+
         for edge in self.graph.execution_edges:
             if edge.target.normalized == self.cell.cell_ref and edge.raw_reference == raw_reference:
                 return edge.source

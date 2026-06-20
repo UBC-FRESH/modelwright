@@ -6,6 +6,7 @@ files themselves.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import date, datetime, time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -213,14 +214,20 @@ class WorkbookRecord:
         }
 
 
-def extract_workbook(path: str | Path) -> WorkbookRecord:
+def extract_workbook(path: str | Path, progress: Callable[[str], None] | None = None) -> WorkbookRecord:
     """Extract workbook facts with openpyxl into Sheetforge records."""
 
     workbook_path = Path(path)
+    _progress(progress, "load_workbook formulas start")
     workbook = load_workbook(workbook_path, data_only=False)
+    _progress(progress, "load_workbook formulas done")
+    _progress(progress, "load_workbook cached_values start")
     cached_workbook = load_workbook(workbook_path, data_only=True)
+    _progress(progress, "load_workbook cached_values done")
 
+    _progress(progress, "workbook diagnostics start")
     diagnostics = _workbook_diagnostics(workbook)
+    _progress(progress, "workbook diagnostics done")
     sheets = tuple(
         SheetRecord(
             sheet_id=worksheet.title,
@@ -230,12 +237,30 @@ def extract_workbook(path: str | Path) -> WorkbookRecord:
         )
         for index, worksheet in enumerate(workbook.worksheets)
     )
+    _progress(progress, f"sheets extracted count={len(sheets)}")
+    _progress(progress, "named ranges start")
     named_ranges = tuple(_extract_named_range(name, defined_name) for name, defined_name in workbook.defined_names.items())
-    cells = tuple(
-        cell_record
-        for worksheet in workbook.worksheets
-        for cell_record in _extract_sheet_cells(worksheet, cached_workbook[worksheet.title])
-    )
+    _progress(progress, f"named ranges done count={len(named_ranges)}")
+
+    cell_records: list[CellRecord] = []
+    for index, worksheet in enumerate(workbook.worksheets, start=1):
+        populated_cells = _populated_cells(worksheet)
+        _progress(
+            progress,
+            f"sheet cells start index={index}/{len(workbook.worksheets)} populated={len(populated_cells)}",
+        )
+        sheet_cells = _extract_sheet_cells(
+            worksheet,
+            cached_workbook[worksheet.title],
+            populated_cells=populated_cells,
+        )
+        cell_records.extend(sheet_cells)
+        _progress(
+            progress,
+            f"sheet cells done index={index}/{len(workbook.worksheets)} extracted={len(sheet_cells)} total={len(cell_records)}",
+        )
+    cells = tuple(cell_records)
+    _progress(progress, f"workbook extraction done cells={len(cells)}")
 
     return WorkbookRecord(
         workbook_id=workbook_path.name,
@@ -303,41 +328,57 @@ def _extract_named_range(name: str, defined_name: Any) -> NamedRangeRecord:
     )
 
 
-def _extract_sheet_cells(worksheet: Any, cached_worksheet: Any) -> tuple[CellRecord, ...]:
+def _extract_sheet_cells(
+    worksheet: Any,
+    cached_worksheet: Any,
+    *,
+    populated_cells: tuple[Any, ...] | None = None,
+) -> tuple[CellRecord, ...]:
     records: list[CellRecord] = []
-    for row in worksheet.iter_rows():
-        for cell in row:
-            if cell.value is None:
-                continue
+    for cell in populated_cells if populated_cells is not None else _populated_cells(worksheet):
+        if cell.value is None:
+            continue
 
-            cell_ref = _cell_ref(worksheet.title, cell.coordinate)
-            cached_value = cached_worksheet[cell.coordinate].value
-            if cell.data_type == "f":
-                formula = _extract_formula(cell_ref, str(cell.value), cached_value)
-                records.append(
-                    CellRecord(
-                        cell_ref=cell_ref,
-                        kind="formula",
-                        raw_value=_json_value(cell.value),
-                        data_type=cell.data_type,
-                        cached_value=_json_value(cached_value),
-                        formula=formula,
-                    )
-                )
-                continue
-
+        cell_ref = _cell_ref(worksheet.title, cell.coordinate)
+        cached_value = cached_worksheet[cell.coordinate].value
+        if cell.data_type == "f":
+            formula = _extract_formula(cell_ref, str(cell.value), cached_value)
             records.append(
                 CellRecord(
                     cell_ref=cell_ref,
-                    kind="value",
+                    kind="formula",
                     raw_value=_json_value(cell.value),
                     data_type=cell.data_type,
                     cached_value=_json_value(cached_value),
-                    formula=None,
+                    formula=formula,
                 )
             )
+            continue
+
+        records.append(
+            CellRecord(
+                cell_ref=cell_ref,
+                kind="value",
+                raw_value=_json_value(cell.value),
+                data_type=cell.data_type,
+                cached_value=_json_value(cached_value),
+                formula=None,
+            )
+        )
     return tuple(records)
 
+
+def _populated_cells(worksheet: Any) -> tuple[Any, ...]:
+    cells = getattr(worksheet, "_cells", None)
+    if isinstance(cells, dict):
+        return tuple(cell for _, cell in sorted(cells.items()))
+
+    return tuple(cell for row in worksheet.iter_rows() for cell in row)
+
+
+def _progress(progress: Callable[[str], None] | None, message: str) -> None:
+    if progress is not None:
+        progress(message)
 
 def _extract_formula(cell_ref: str, raw_formula: str, cached_value: JsonValue) -> FormulaRecord:
     try:

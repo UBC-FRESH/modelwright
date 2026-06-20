@@ -12,7 +12,9 @@ from sheetforge.extraction import (
 from sheetforge.formulas import (
     FormulaExpression,
     FormulaExpressionNode,
+    FormulaReferenceIndex,
     FormulaTranslationDiagnostic,
+    build_formula_reference_index,
     translate_formula_cell,
 )
 from sheetforge.formulas_oracle import FormulasWorkbookOracle
@@ -70,6 +72,7 @@ __all__ = [
     "ExtractionDiagnostic",
     "FormulaExpression",
     "FormulaExpressionNode",
+    "FormulaReferenceIndex",
     "FormulaRecord",
     "FormulaTranslationDiagnostic",
     "FormulasWorkbookOracle",
@@ -94,6 +97,7 @@ __all__ = [
     "WorkbookRecord",
     "__version__",
     "build_dependency_graph",
+    "build_formula_reference_index",
     "build_oracle_validation_report",
     "build_validation_report",
     "compare_scalar_output",

@@ -3,7 +3,7 @@ from pathlib import Path
 from openpyxl import Workbook
 
 from sheetforge.extraction import CellRecord, extract_workbook
-from sheetforge.formulas import translate_formula_cell
+from sheetforge.formulas import build_formula_reference_index, translate_formula_cell
 from sheetforge.graph import build_dependency_graph
 from tests.fixtures.synthetic_model.build_workbook import build_workbook
 
@@ -30,6 +30,18 @@ def test_translate_named_range_arithmetic_formula(tmp_path: Path) -> None:
     assert expression.root.operands[1].operands[0].value == 1
     assert expression.root.operands[1].operands[1].reference is not None
     assert expression.root.operands[1].operands[1].reference.normalized == "Inputs!B3"
+
+
+def test_translate_formula_uses_reference_index(tmp_path: Path) -> None:
+    cells, graph = synthetic_formula_cells(tmp_path)
+    reference_index = build_formula_reference_index(graph)
+
+    expression = translate_formula_cell(cells["Calc!B2"], graph, reference_index=reference_index)
+
+    assert expression.translated is True
+    assert expression.root is not None
+    assert expression.root.operands[0].reference is not None
+    assert expression.root.operands[0].reference.normalized == "Inputs!B2"
 
 
 def test_translate_sheet_relative_arithmetic_formula(tmp_path: Path) -> None:
