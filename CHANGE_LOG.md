@@ -95,6 +95,7 @@ This file records completed project work in chronological order.
 - Standardized the Sphinx documentation build on the Read the Docs theme used by the other FRESH lab packages.
 - Expanded conversion-plan residual-blocker classification across extraction, named ranges, formula extraction, graphing, validation, and generation diagnostics.
 - Closed Phase 18 with synthetic and 2020 FABLE conversion-plan workflow evidence and recorded Phase 19 validation automation inputs.
+- Re-scoped Phase 19 around residual blocker resolution for the 2020 FABLE benchmark and moved broad validation/evaluation automation to Phase 20.
 
 ## 2026-06-19
 

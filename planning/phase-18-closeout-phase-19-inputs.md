@@ -97,20 +97,27 @@ Full repository verification should be run before the Phase 18 PR is opened.
 
 ## Phase 19 Inputs
 
-Phase 19 should automate validation and evaluation reports rather than adding more formula semantics by
-default.
+Phase 19 should resolve or explicitly scope the residual blockers exposed by conversion planning before
+automating validation reports. Automated validation is not credible if it only packages unresolved
+named-range, circular dependency, external link, volatile-function, structured-reference, or cached-value
+blockers into nicer JSON.
 
 Highest-priority inputs:
 
-- generated model execution API for selected outputs;
-- cached-value validation orchestration from generated model outputs;
-- oracle orchestration that reports backend blockers explicitly;
-- evaluation report CLI that combines conversion plan, generation, execution, cached validation, and
-  oracle validation results;
+- unresolved named-range resolution or explicit out-of-scope classification;
+- circular dependency semantics and generated-model policy;
+- external workbook dependency policy;
+- volatile-function policy beyond currently constrained static translations;
+- structured-reference extraction diagnostic policy so supported table references are not counted as
+  unresolved conversion blockers;
+- cached-value validation policy tied to generated output selection;
 - native verbose progress output for long-running conversion-plan and evaluation commands so workbook
   runs can be monitored without waiting for final JSON output;
 - persisted local logs under `tmp/logs/` for every real-workbook benchmark pass;
-- repeated 2020 FABLE primary benchmark run as the first Phase 19 acceptance target.
+- repeated 2020 FABLE primary benchmark run as the Phase 19 acceptance target.
 
 Phase 19 should treat the 2020 benchmark as the primary convergence target, the 2019 benchmark as a
 broken-reference regression case, and the 2021 benchmark as a later stress benchmark.
+
+Generated-model execution, oracle orchestration, cached-value comparison, and evaluation report CLI work
+should move to Phase 20 unless a narrow slice is needed to prove a Phase 19 blocker resolution.

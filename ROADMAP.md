@@ -290,18 +290,33 @@ Goal: turn extraction, graphing, translation, generation, and validation pieces 
 
 Status: complete pending PR.
 
-## Phase 19: Automated Validation And Evaluation Reports
+## Phase 19: Residual Blocker Resolution For Full Benchmark Import
 
 GitHub parent issue: #103
 
-Planned branch: `feature/p19-automated-validation-reports`
+Planned branch: `feature/p19-residual-blocker-resolution`
 
-Goal: make generated-model execution, oracle execution where available, cached-value comparisons, and private evaluation reports repeatable through APIs and CLI commands.
+Goal: resolve or explicitly scope the residual blockers exposed by the 2020 FABLE conversion plan before treating validation automation as meaningful evidence.
 
-- [ ] P19.1 Add generated model execution API. Child issue: #107.
-- [ ] P19.2 Orchestrate oracle and cached-value validation. Child issue: #105.
-- [ ] P19.3 Add evaluation report CLI and JSON outputs. Child issue: #106.
-- [ ] P19.4 Run repeatable evaluation and closeout. Child issue: #104.
+- [ ] P19.1 Resolve or scope unresolved named ranges. Child issue: #107.
+- [ ] P19.2 Define circular dependency semantics and policy. Child issue: #105.
+- [ ] P19.3 Resolve deferred workbook dependency and volatile/cache blockers. Child issue: #106.
+- [ ] P19.4 Rerun 2020 benchmark to convergence and closeout. Child issue: #104.
+
+Status: planned backlog.
+
+## Phase 20: Automated Validation And Evaluation Reports
+
+GitHub parent issue: TBD
+
+Planned branch: `feature/p20-automated-validation-reports`
+
+Goal: after residual blockers have concrete resolution or scope decisions, make generated-model execution, oracle execution where available, cached-value comparisons, and benchmark evaluation reports repeatable through APIs and CLI commands.
+
+- [ ] P20.1 Add generated model execution API. Child issue: TBD.
+- [ ] P20.2 Orchestrate oracle and cached-value validation. Child issue: TBD.
+- [ ] P20.3 Add evaluation report CLI and JSON outputs. Child issue: TBD.
+- [ ] P20.4 Run repeatable evaluation and closeout. Child issue: TBD.
 
 Status: planned backlog.
 
@@ -309,5 +324,5 @@ Status: planned backlog.
 
 1. Open the Phase 18 PR from `feature/p18-conversion-planning-pipeline` back to `main`.
 2. Verify PR checks.
-3. Merge the Phase 18 PR, close parent issue #87, and only then activate Phase 19.
-4. Use `planning/phase-18-closeout-phase-19-inputs.md` as the Phase 19 starting note.
+3. Activate Phase 19 as the residual-blocker resolution phase before validation automation.
+4. Use `planning/phase-18-closeout-phase-19-inputs.md` and `planning/phase-19-residual-blocker-resolution-plan.md` as the Phase 19 starting notes.

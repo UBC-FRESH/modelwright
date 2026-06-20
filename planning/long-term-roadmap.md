@@ -194,9 +194,22 @@ Expected outputs:
 
 The conversion plan should make unsupported cells visible rather than hiding them behind a broad `convert` command.
 
-## Phase 19: Automated Validation And Evaluation Reports
+## Phase 19: Residual Blocker Resolution For Full Benchmark Import
 
-Goal: make generated-model execution, oracle execution where available, cached-value comparisons, and private evaluation reports repeatable.
+Goal: resolve or explicitly scope the residual blockers exposed by the 2020 FABLE conversion plan before treating validation automation as proof that the system works.
+
+Expected outputs:
+
+- named-range resolution or explicit out-of-scope classification;
+- circular dependency semantics and generated-model policy;
+- workbook dependency, volatile-function, structured-reference diagnostic, and cached-value policies;
+- repeated 2020 FABLE conversion-plan run showing no unowned residual blocker categories.
+
+This phase is about convergence. Validation automation should not become a polished report over unresolved structural blockers.
+
+## Phase 20: Automated Validation And Evaluation Reports
+
+Goal: make generated-model execution, oracle execution where available, cached-value comparisons, and private evaluation reports repeatable after residual blockers have concrete owners or scope decisions.
 
 Expected outputs:
 
