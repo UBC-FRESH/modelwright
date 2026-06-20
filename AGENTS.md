@@ -126,8 +126,10 @@ Use these phases as orientation, not as permission to add large systems prematur
 Current default verification commands:
 
 ```bash
-python -m pip install -e ".[test]"
-python -m pytest
+scripts/bootstrap_dev_env.sh
+.venv/bin/python -m ruff check .
+.venv/bin/python -m pytest
+.venv/bin/sphinx-build -b html docs _build/html -W
 ```
 
 When adding tooling:

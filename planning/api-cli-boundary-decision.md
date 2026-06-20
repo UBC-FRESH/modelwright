@@ -81,14 +81,13 @@ Code generation should rely on the standard library unless a concrete need appea
 
 Do not implement a CLI in the first durable package slice.
 
-Define likely future command groups only:
+Phase 16 established the grouped Typer surface:
 
 ```text
-sheetforge inspect
-sheetforge emit-ir
-sheetforge generate
-sheetforge validate
-sheetforge report
+sheetforge workbook extract
+sheetforge workbook graph
+sheetforge model generate
+sheetforge validation report
 ```
 
 CLI commands should be thin wrappers over the Python API. They should not reimplement extraction, generation, or validation logic.

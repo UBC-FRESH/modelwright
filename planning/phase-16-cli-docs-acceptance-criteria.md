@@ -30,12 +30,12 @@ P16.2 should leave Sheetforge with a CLI that feels like a FRESH lab package:
 - user errors use Typer-style parameter errors and exits instead of raw tracebacks;
 - every command stays a thin wrapper over package APIs.
 
-The current commands can be reorganized, but their JSON automation capability must not regress:
+These JSON automation capabilities must not regress:
 
-- `extract`;
-- `graph`;
-- `generate`;
-- `validate-report`.
+- workbook extraction;
+- dependency graph building;
+- generated Python module creation;
+- validation report assembly.
 
 ## Documentation Acceptance Criteria
 
@@ -49,7 +49,7 @@ P16.3 should add full Sphinx documentation modeled on `fhops` and `femic`:
 - API reference page using autodoc/autosummary;
 - workflow boundaries page explaining extraction, graphing, formula translation, generation, validation, and private workbook handling;
 - limitations page covering unsupported spreadsheet semantics and pre-release status;
-- local build command documented as `sphinx-build -b html docs _build/html -W`.
+- local build command documented as `.venv/bin/sphinx-build -b html docs _build/html -W`.
 
 The docs should be warning-clean before Phase 16 closeout.
 
@@ -71,7 +71,8 @@ P16.4 should verify:
 - `sheetforge --help`;
 - representative command help output for each command group;
 - JSON command behavior for existing synthetic workflows;
-- `python -m ruff check .`;
-- `python -m pytest`;
-- `sphinx-build -b html docs _build/html -W`;
+- `scripts/bootstrap_dev_env.sh`;
+- `.venv/bin/python -m ruff check .`;
+- `.venv/bin/python -m pytest`;
+- `.venv/bin/sphinx-build -b html docs _build/html -W`;
 - GitHub Actions quality, test, and docs checks on the Phase 16 PR.

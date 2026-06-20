@@ -22,6 +22,10 @@ dependencies = [
 sheetforge = "sheetforge.cli:app"
 
 [project.optional-dependencies]
+docs = [
+  "sphinx>=7",
+  "sphinx-rtd-theme>=2"
+]
 oracle = [
   "formulas"
 ]

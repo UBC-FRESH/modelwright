@@ -24,20 +24,13 @@ Public workflow groups:
 - `sheetforge model generate`
 - `sheetforge validation report`
 
-Compatibility aliases remain callable but are hidden from top-level help:
-
-- `sheetforge extract`
-- `sheetforge graph`
-- `sheetforge generate`
-- `sheetforge validate-report`
-
 ## Behavior Preserved
 
 - Successful command payloads remain JSON on stdout.
-- `model generate --out` and the compatibility `generate --output` path both write generated Python source.
+- `model generate --out` writes generated Python source.
 - Commands remain thin wrappers over package APIs.
 - JSON input files are still validated as JSON objects.
-- Existing extraction, graph, generation, and validation-report automation paths remain covered by tests.
+- Extraction, graph, generation, and validation-report automation paths remain covered by tests.
 
 ## Dependency Boundary
 

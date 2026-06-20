@@ -53,100 +53,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     return 0
 
 
-@app.command("extract", hidden=True)
-def extract_alias(
-    workbook: Path = typer.Argument(..., exists=True, dir_okay=False, readable=True, help="Source workbook path."),
-) -> None:
-    """Extract workbook facts as JSON."""
-
-    _emit_json(_extract_payload(workbook))
-
-
-@app.command("graph", hidden=True)
-def graph_alias(
-    workbook: Path = typer.Argument(..., exists=True, dir_okay=False, readable=True, help="Source workbook path."),
-) -> None:
-    """Build dependency graph JSON from a workbook."""
-
-    _emit_json(_graph_payload(workbook))
-
-
-@app.command("generate", hidden=True)
-def generate_alias(
-    contract: Path = typer.Option(
-        ...,
-        "--contract",
-        exists=True,
-        dir_okay=False,
-        readable=True,
-        help="Generated module contract JSON file.",
-    ),
-    expressions: Path = typer.Option(
-        ...,
-        "--expressions",
-        exists=True,
-        dir_okay=False,
-        readable=True,
-        help="Formula expressions JSON object.",
-    ),
-    constants: Path | None = typer.Option(
-        None,
-        "--constants",
-        exists=True,
-        dir_okay=False,
-        readable=True,
-        help="Optional input constants JSON object.",
-    ),
-    output: Path | None = typer.Option(
-        None,
-        "--out",
-        "--output",
-        help="Optional path for generated Python source.",
-    ),
-) -> None:
-    """Generate Python from explicit JSON contracts."""
-
-    _emit_json(_generate_payload(contract=contract, expressions=expressions, constants=constants, output=output))
-
-
-@app.command("validate-report", hidden=True)
-def validate_report_alias(
-    scenario: Path = typer.Option(
-        ...,
-        "--scenario",
-        exists=True,
-        dir_okay=False,
-        readable=True,
-        help="Validation scenario JSON file.",
-    ),
-    generated_values: Path = typer.Option(
-        ...,
-        "--generated-values",
-        exists=True,
-        dir_okay=False,
-        readable=True,
-        help="Generated model output values JSON object.",
-    ),
-    oracle_values: Path = typer.Option(
-        ...,
-        "--oracle-values",
-        exists=True,
-        dir_okay=False,
-        readable=True,
-        help="Oracle output values JSON object.",
-    ),
-) -> None:
-    """Build validation report JSON."""
-
-    _emit_json(
-        _validate_report_payload(
-            scenario=scenario,
-            generated_values=generated_values,
-            oracle_values=oracle_values,
-        )
-    )
-
-
 @workbook_app.command("extract")
 def workbook_extract(
     workbook: Path = typer.Argument(..., exists=True, dir_okay=False, readable=True, help="Source workbook path."),
@@ -194,7 +100,6 @@ def model_generate(
     output: Path | None = typer.Option(
         None,
         "--out",
-        "--output",
         help="Optional path for generated Python source.",
     ),
 ) -> None:

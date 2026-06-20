@@ -248,7 +248,7 @@ Goal: align Sheetforge's CLI feel, command organization, help text, and document
 
 - [x] P16.1 Audit `fhops`/`femic` CLI and docs conventions. Child issue: #92.
 - [x] P16.2 Refactor CLI toward FRESH Typer/Rich conventions. Child issue: #90.
-- [ ] P16.3 Add full Sphinx docs and GitHub Pages workflow. Child issue: #93.
+- [x] P16.3 Add full Sphinx docs and GitHub Pages workflow. Child issue: #93.
 - [ ] P16.4 Verify CLI/docs surface and closeout. Child issue: #91.
 
 Status: active.
@@ -300,6 +300,6 @@ Status: planned backlog.
 
 ## Current Next Steps
 
-1. Work P16.3 in child issue #93 on branch `feature/p16-cli-docs-public-surface`.
-2. Add full Sphinx documentation and a GitHub Pages workflow modeled on `femic`.
-3. Keep issue #93, parent issue #89, this roadmap, and `CHANGE_LOG.md` synchronized before Phase 16 closeout verification.
+1. Work P16.4 in child issue #91 on branch `feature/p16-cli-docs-public-surface`.
+2. Verify the CLI/docs surface, open the Phase 16 PR, and check GitHub Actions behavior.
+3. Keep issue #91, parent issue #89, this roadmap, and `CHANGE_LOG.md` synchronized before merging Phase 16.

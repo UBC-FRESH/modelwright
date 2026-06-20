@@ -10,10 +10,10 @@ The CLI does not introduce a one-step workbook converter. It exposes the current
 
 ## Commands
 
-Install the package in editable mode before using the console script:
+Bootstrap the repo-local virtual environment before using the console script:
 
 ```bash
-python -m pip install -e ".[test]"
+scripts/bootstrap_dev_env.sh
 ```
 
 Extract workbook facts:
@@ -98,7 +98,6 @@ Minimal generated/oracle values shape for validation-report input:
 ## Stabilization Decisions
 
 - The public CLI command groups are workflow-oriented: `workbook`, `model`, and `validation`.
-- The top-level `extract`, `graph`, `generate`, and `validate-report` commands remain compatibility aliases for JSON automation scripts.
 - All successful command payloads are JSON printed to stdout.
 - Generated Python source is written only when `sheetforge model generate --out` is provided.
 - The CLI does not duplicate extraction, graphing, generation, or validation logic.

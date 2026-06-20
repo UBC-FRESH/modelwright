@@ -46,16 +46,6 @@ def test_workbook_extract_command_outputs_workbook_json(tmp_path: Path) -> None:
     assert any(cell["cell_ref"] == "Summary!B3" and cell["formula"] for cell in payload["cells"])
 
 
-def test_top_level_extract_alias_preserves_json_automation_path(tmp_path: Path) -> None:
-    workbook_path = build_workbook(tmp_path / "synthetic_model.xlsx")
-
-    result = runner.invoke(app, ["extract", str(workbook_path)])
-
-    assert result.exit_code == 0
-    payload = json.loads(result.stdout)
-    assert payload["workbook_id"] == "synthetic_model.xlsx"
-
-
 def test_workbook_graph_command_outputs_dependency_json(tmp_path: Path) -> None:
     workbook_path = build_workbook(tmp_path / "synthetic_model.xlsx")
 
@@ -103,34 +93,12 @@ def test_model_generate_command_outputs_result_json_and_writes_model(tmp_path: P
     assert "def calculate(inputs=None):" in output_path.read_text(encoding="utf-8")
 
 
-def test_top_level_generate_alias_preserves_output_option(tmp_path: Path) -> None:
-    contract, expressions, constants = _synthetic_generation_inputs(tmp_path)
-    contract_path = tmp_path / "contract.json"
-    expressions_path = tmp_path / "expressions.json"
-    constants_path = tmp_path / "constants.json"
-    output_path = tmp_path / "generated_model.py"
-    _write_json(contract_path, contract.to_dict())
-    _write_json(expressions_path, {cell_ref: expression.to_dict() for cell_ref, expression in expressions.items()})
-    _write_json(constants_path, constants)
-
-    result = runner.invoke(
-        app,
-        [
-            "generate",
-            "--contract",
-            str(contract_path),
-            "--expressions",
-            str(expressions_path),
-            "--constants",
-            str(constants_path),
-            "--output",
-            str(output_path),
-        ],
-    )
+def test_model_generate_help_has_single_output_path_option() -> None:
+    result = runner.invoke(app, ["model", "generate", "--help"])
 
     assert result.exit_code == 0
-    assert json.loads(result.stdout)["generated"] is True
-    assert output_path.exists()
+    assert "--out" in result.stdout
+    assert "--output" not in result.stdout
 
 
 def test_validation_report_command_outputs_report_json(tmp_path: Path) -> None:
@@ -161,28 +129,6 @@ def test_validation_report_command_outputs_report_json(tmp_path: Path) -> None:
     assert payload["scenario_id"] == "synthetic_model_baseline"
     assert payload["status"] == "pass"
     assert payload["mismatches"] == []
-
-
-def test_top_level_validate_report_alias_preserves_json_automation_path(tmp_path: Path) -> None:
-    fixture_root = Path(__file__).parent / "fixtures" / "synthetic_model"
-    values_path = tmp_path / "values.json"
-    _write_json(values_path, {"Summary!B2": 70.2, "Summary!B3": "ok"})
-
-    result = runner.invoke(
-        app,
-        [
-            "validate-report",
-            "--scenario",
-            str(fixture_root / "baseline_scenario.json"),
-            "--generated-values",
-            str(values_path),
-            "--oracle-values",
-            str(values_path),
-        ],
-    )
-
-    assert result.exit_code == 0
-    assert json.loads(result.stdout)["status"] == "pass"
 
 
 def _synthetic_generation_inputs(tmp_path: Path):
