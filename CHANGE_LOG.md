@@ -35,6 +35,7 @@ This file records completed project work in chronological order.
 - Started P27.4 memory-stage profiling and identified graph/inference residency as the dominant remaining full-process memory source: graph hydration holds about 10,182,548 KiB RSS for 3,543,800 edges, inference hydration pushes current RSS to about 11,850,248 KiB, while generated execution and comparison add comparatively little and still produce 281,741 matches with zero mismatches.
 - Prototyped a P27.4 slim-oracle validation path under ignored local artifacts: a 23.66 MB oracle file plus the expression-source generated model reran the full 281,741-output FABLE comparison with zero mismatches, dropping recurring validation peak RSS from about 12,981,284 KiB in the all-in-one debug process to about 1,564,740 KiB.
 - Closed P27.4 by deciding not to add a separate public slim-oracle CLI/API contract before the compact runtime IR backend; the slim validation prototype is retained as benchmark-artifact evidence for future runtime IR design.
+- Activated P27.5 to evaluate multicore and sharded execution options only where the P27 measurements still justify them, with caution around duplicating large graph/inference memory or breaking generated-model lazy evaluation semantics.
 
 ## 2026-06-20
 

@@ -647,6 +647,7 @@ Planning note: `planning/phase-27-performance-memory-hardening.md`.
   - [x] Explain why runtime memory can be much larger than the original workbook file size.
   - [x] Decide whether the slim oracle validation artifact should become tracked package/CLI behavior in P27 or feed the compact runtime IR backend.
 - [ ] P27.5 Evaluate multicore and sharded execution options. Child issue: #156.
+  - Status: active.
   - [ ] Prototype parallel contract inference over output/dependency-closure shards and merge diagnostics deterministically.
   - [ ] Evaluate parallel formula translation and generated-source rendering where records are independent.
   - [ ] Evaluate sharded generated-output validation across independent output groups or separate worker processes.
