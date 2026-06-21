@@ -643,8 +643,9 @@ Planning note: `planning/phase-27-performance-memory-hardening.md`.
   - [x] Measure import time and generated-code object memory before and after each change.
 - [ ] P27.4 Reduce pipeline cache and validation memory footprint. Child issue: #157.
   - [x] Measure workbook, graph, expression, inference, generated-module, and output-map memory costs separately.
-  - [ ] Evaluate streaming, SQLite/shelve-style local caches, compact record encoding, or selective loading for validation.
-  - [ ] Explain why runtime memory can be much larger than the original workbook file size.
+  - [x] Evaluate streaming, SQLite/shelve-style local caches, compact record encoding, or selective loading for validation.
+  - [x] Explain why runtime memory can be much larger than the original workbook file size.
+  - [ ] Decide whether the slim oracle validation artifact should become tracked package/CLI behavior in P27 or feed the compact runtime IR backend.
 - [ ] P27.5 Evaluate multicore and sharded execution options. Child issue: #156.
   - [ ] Prototype parallel contract inference over output/dependency-closure shards and merge diagnostics deterministically.
   - [ ] Evaluate parallel formula translation and generated-source rendering where records are independent.
@@ -666,7 +667,6 @@ Acceptance criteria:
 
 ## Current Next Steps
 
-1. Continue P27.4 by reducing pipeline cache and validation-process memory after the first stage profile.
-2. Use the P27.4 stage profile result as the current memory target: graph hydration keeps current RSS near 10.18 GiB for 3,543,800 edges, inference hydration pushes current RSS to about 11.85 GiB, and generated execution/comparison are not the dominant remaining full-process memory costs.
-3. Prototype a lower-memory validation path that avoids keeping full graph records and duplicate expression/inference records resident during generated-model execution and comparison.
-4. Preserve formula-template/vectorized-kernel work as a follow-on architecture target after P27 records current pipeline memory costs.
+1. Continue P27.4 by deciding whether the slim oracle validation artifact should be promoted into package/CLI behavior now or reserved for the compact runtime IR backend.
+2. Use the P27.4 slim validation result as the current memory baseline: recurring validation peak RSS dropped from about 12,981,284 KiB in the full debug process to about 1,564,740 KiB with the slim oracle path, while still matching 281,741 of 281,741 outputs.
+3. Preserve formula-template/vectorized-kernel work as a follow-on architecture target after P27 records current pipeline memory costs.

@@ -372,6 +372,56 @@ Next P27.4 target:
   or serializes generated execution and comparison into separate short-lived processes;
 - evaluate compact graph/inference stores before hydrating millions of edges into Python objects.
 
+## P27.4 Slim Oracle Validation Prototype
+
+Ignored raw artifacts:
+
+- `tmp/p27_slim_validation_profile.py`
+- `tmp/logs/p27-slim-oracle-build.log`
+- `tmp/logs/p27-slim-validation-profile.log`
+- `tmp/p27-profile/slim-fable-2020-oracle.json`
+- `tmp/p27-profile/slim-oracle-build-profile.json`
+- `tmp/p27-profile/slim-validation-profile.json`
+
+Prototype shape:
+
+- build a compact ignored oracle file containing only comparable output refs, output kinds, and cached
+  workbook values;
+- run generated-model import, generated-model calculation, and scalar comparison in a fresh process
+  using only the generated model and slim oracle file;
+- avoid workbook, graph, expression, and inference hydration in the recurring validation process.
+
+One-time slim oracle build:
+
+- inference contract output refs loaded: 281,741 refs;
+- workbook record hydrated: 395,482 cells;
+- slim oracle file size: 23,660,000 bytes;
+- current RSS at completion after cleanup: 227,820 KiB;
+- peak RSS during build: 3,596,580 KiB.
+
+Recurring slim validation run:
+
+- slim oracle loaded: 281,741 outputs and 281,741 oracle values;
+- current RSS after slim oracle load: 191,724 KiB;
+- generated model import elapsed time: 4.868 seconds;
+- current RSS after generated model import: 1,179,464 KiB;
+- generated execution elapsed time: 144.778 seconds;
+- current RSS after generated execution: 1,178,988 KiB;
+- comparison elapsed time: 1.446 seconds;
+- comparison result: 281,741 matches and 0 mismatches;
+- current RSS after comparison: 1,301,192 KiB;
+- peak RSS for the slim validation process: 1,564,740 KiB;
+- current RSS at process end: 1,048,104 KiB.
+
+Conclusion:
+
+- the recurring validation path does not need to hydrate workbook records, graph records, translated
+  expressions, or inference records once the generated model and slim oracle exist;
+- selective loading via a compact oracle artifact reduces the full validation process from roughly
+  12.98 GiB peak RSS to roughly 1.56 GiB peak RSS for the same 281,741-output comparison;
+- durable validation tooling should promote this idea into a first-class generated-output oracle or
+  benchmark-output artifact rather than relying on ad hoc full-pipeline debug scripts.
+
 ## Optimization Directions
 
 Prefer targeted changes supported by measurements:
