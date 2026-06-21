@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from sheetforge.validation import (
+from modelwright.validation import (
     ComparisonRules,
     OracleConfig,
     ScenarioOutput,

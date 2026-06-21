@@ -1,6 +1,6 @@
 # Synthetic Model Fixture
 
-This fixture is a compact synthetic workbook used for Sheetforge package tests.
+This fixture is a compact synthetic workbook used for Modelwright package tests.
 
 It covers:
 

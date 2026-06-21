@@ -1,4 +1,4 @@
-"""Execution helpers for generated Sheetforge Python models."""
+"""Execution helpers for generated Modelwright Python models."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any, Literal
 
-from sheetforge.generation import GeneratedModuleContract
+from modelwright.generation import GeneratedModuleContract
 
 
 JsonValue = str | int | float | bool | None | list[Any] | dict[str, Any]
@@ -189,7 +189,7 @@ def execute_generated_model(
 
 
 def _load_generated_module(path: Path) -> ModuleType | ExecutionDiagnostic:
-    module_name = f"_sheetforge_generated_{path.stem}_{uuid.uuid4().hex}"
+    module_name = f"_modelwright_generated_{path.stem}_{uuid.uuid4().hex}"
     try:
         spec = importlib.util.spec_from_file_location(module_name, path)
         if spec is None or spec.loader is None:

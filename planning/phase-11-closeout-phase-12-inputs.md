@@ -25,7 +25,7 @@ Tracked package code now supports:
 The generated synthetic model tests confirm:
 
 - generated files are written only to pytest temporary directories;
-- generated source has no runtime dependency on Excel, source workbooks, `openpyxl`, or Sheetforge;
+- generated source has no runtime dependency on Excel, source workbooks, `openpyxl`, or Modelwright;
 - generated `calculate()` returns `Summary!B2 == 70.2` and `Summary!B3 == "ok"` for the baseline;
 - generated `calculate({"Inputs!B2": 10})` returns a changed output and status from the same standalone module;
 - no generated Python model artifact is tracked in Git.

@@ -6,7 +6,7 @@ Date: 2026-06-20
 
 This note defines the Phase 18 conversion plan contract.
 
-The conversion plan is not the generated Python model. It is the inspectable decision record that explains what Sheetforge can currently do with a workbook:
+The conversion plan is not the generated Python model. It is the inspectable decision record that explains what Modelwright can currently do with a workbook:
 
 - what source workbook was inspected;
 - which benchmark role the workbook plays;
@@ -51,7 +51,7 @@ Prototype JSON shape:
 {
   "plan_id": "private-2020-baseline",
   "created_at": "2026-06-20T00:00:00Z",
-  "sheetforge_commit": "unknown",
+  "modelwright_commit": "unknown",
   "source": {},
   "workflow_status": {},
   "coverage": {},
@@ -72,7 +72,7 @@ Fields:
 
 - `plan_id`: stable local identifier for this plan.
 - `created_at`: ISO timestamp when the plan was created.
-- `sheetforge_commit`: Git commit used for the evaluation.
+- `modelwright_commit`: Git commit used for the evaluation.
 - `source`: `ConversionSource`.
 - `workflow_status`: `WorkflowStatus`.
 - `coverage`: `CoverageSummary`.
@@ -113,7 +113,7 @@ Fields:
 Rules:
 
 - `overall` is `complete` only when all target formulas needed by the declared conversion scope are translated, generated, and validated.
-- `overall` is `partial` when Sheetforge can produce useful generated output but still has residual blockers.
+- `overall` is `partial` when Modelwright can produce useful generated output but still has residual blockers.
 - `overall` is `blocked` when no generated output can be produced or a required early stage fails.
 
 ### CoverageSummary
@@ -173,7 +173,7 @@ Fields:
 Rules:
 
 - A blocker with `disposition=next_target` should be actionable enough to become a task or subtask issue.
-- Source workbook defects should not be treated as Sheetforge semantics gaps.
+- Source workbook defects should not be treated as Modelwright semantics gaps.
 - Validation oracle failures should be separated from formula translation failures.
 - Extraction, named-range, graph, cached-value, volatile-function, structured-reference, and external-link diagnostics should remain visible as residual blockers even when formula translation coverage is complete.
 
@@ -244,11 +244,11 @@ Rules:
 
 ## Partial-Conversion Semantics
 
-Sheetforge should use precise language:
+Modelwright should use precise language:
 
 - `extracted`: workbook facts were loaded into package records.
 - `graphed`: dependency graph records were built.
-- `translated`: formula text was converted into Sheetforge expression records.
+- `translated`: formula text was converted into Modelwright expression records.
 - `generated_subset`: a selected subset was emitted as Python and executed.
 - `validated_subset`: generated subset outputs matched cached or oracle values.
 - `full_model_generated`: all formulas in the declared conversion scope were emitted.

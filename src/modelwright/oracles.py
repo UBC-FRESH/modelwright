@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
-from sheetforge.validation import DiagnosticSeverity, JsonValue, ScenarioInput, ScenarioOutput
+from modelwright.validation import DiagnosticSeverity, JsonValue, ScenarioInput, ScenarioOutput
 
 
 OracleOutputs = dict[str, JsonValue]
@@ -126,7 +126,7 @@ def missing_optional_dependency_diagnostic(*, dependency: str, extra: str, backe
 
     return OracleDiagnostic(
         diagnostic_code="missing_optional_dependency",
-        message=f"Install sheetforge[{extra}] to use the {backend} oracle backend.",
+        message=f"Install modelwright[{extra}] to use the {backend} oracle backend.",
         severity="error",
         raw_value=dependency,
     )

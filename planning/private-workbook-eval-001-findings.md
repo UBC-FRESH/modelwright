@@ -10,7 +10,7 @@ The source was a private `.xlsx` workbook evaluated locally as `eval-001`.
 
 ## What Ran
 
-The local evaluation exercised the current Sheetforge pipeline against the private workbook:
+The local evaluation exercised the current Modelwright pipeline against the private workbook:
 
 - workbook extraction;
 - dependency graph construction;
@@ -43,7 +43,7 @@ The generated model subset validated successfully against cached workbook values
 - mismatches: 0;
 - status: pass.
 
-This proves that Sheetforge can extract this private workbook, build a dependency graph, translate a limited formula subset, generate Python for a direct-output subset, run that generated Python, and match cached workbook values for the selected outputs.
+This proves that Modelwright can extract this private workbook, build a dependency graph, translate a limited formula subset, generate Python for a direct-output subset, run that generated Python, and match cached workbook values for the selected outputs.
 
 It does not prove full workbook equivalence.
 
@@ -58,7 +58,7 @@ The current validation evidence therefore comes from cached workbook values, not
 The evaluation exposed these sanitized unsupported or incomplete categories:
 
 - structured table-reference formulas block the current `formulas` oracle;
-- many formula functions are outside Sheetforge's current translator subset;
+- many formula functions are outside Modelwright's current translator subset;
 - some formula token forms are outside the current parser;
 - some operators are outside the current parser;
 - external workbook references are present at scale;

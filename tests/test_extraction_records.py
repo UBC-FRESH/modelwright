@@ -1,6 +1,6 @@
 import json
 
-from sheetforge.extraction import (
+from modelwright.extraction import (
     CellRecord,
     ExtractionDiagnostic,
     FormulaRecord,

@@ -4,7 +4,7 @@ Date: 2026-06-21
 
 ## Purpose
 
-This note records the P22.1 release policy decision for Sheetforge's first package publication workflow.
+This note records the P22.1 release policy decision for Modelwright's first package publication workflow.
 
 GitHub task issue: #127
 
@@ -14,7 +14,7 @@ Decision: use `0.1.0a1` for the first external alpha.
 
 Rationale:
 
-- Sheetforge has a real package, CLI, docs, CI, and benchmark validation evidence.
+- Modelwright has a real package, CLI, docs, CI, and benchmark validation evidence.
 - The current proven benchmark claim is selected-output equivalence for a declared 2020 FABLE output slice.
 - Full-workbook generated-model materialization, full-workbook equivalence, oracle-backed recalculation equivalence, and external dependency behavior are not yet proven.
 - `1.0.0a1` would signal a stronger public-API and product-completeness posture than the evidence supports.

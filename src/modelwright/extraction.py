@@ -246,7 +246,7 @@ class WorkbookRecord:
 
 
 def extract_workbook(path: str | Path, progress: Callable[[str], None] | None = None) -> WorkbookRecord:
-    """Extract workbook facts with openpyxl into Sheetforge records."""
+    """Extract workbook facts with openpyxl into Modelwright records."""
 
     workbook_path = Path(path)
     _progress(progress, "load_workbook formulas start")

@@ -14,7 +14,7 @@ Use a standard `src/` layout:
 
 ```text
 src/
-  sheetforge/
+  modelwright/
     __init__.py
     ...
 tests/
@@ -111,7 +111,7 @@ P5.2 should define API boundaries first. P5.3 should define fixture and regressi
 
 ## Decisions Summary
 
-- Package layout: `src/sheetforge`.
+- Package layout: `src/modelwright`.
 - Build metadata: `pyproject.toml` with `setuptools`.
 - Test framework: `pytest`.
 - Fixture root: `tests/fixtures`.

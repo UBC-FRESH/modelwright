@@ -12,17 +12,17 @@ Local verification completed on branch `feature/p16-cli-docs-public-surface`:
 - `.venv/bin/python -m ruff check .`;
 - `.venv/bin/python -m pytest`;
 - `.venv/bin/sphinx-build -b html docs _build/html -W`;
-- `.venv/bin/sheetforge --help`;
-- `.venv/bin/sheetforge workbook --help`;
-- `.venv/bin/sheetforge model generate --help`;
+- `.venv/bin/modelwright --help`;
+- `.venv/bin/modelwright workbook --help`;
+- `.venv/bin/modelwright model generate --help`;
 - `git diff --check`.
 
 The CLI JSON smoke path also exercised:
 
-- `sheetforge workbook extract`;
-- `sheetforge workbook graph`;
-- `sheetforge model generate`;
-- `sheetforge validation report`.
+- `modelwright workbook extract`;
+- `modelwright workbook graph`;
+- `modelwright model generate`;
+- `modelwright validation report`.
 
 The smoke run used ignored synthetic artifacts under `tmp/p16-cli-smoke/` and confirmed JSON payloads for extraction, graphing, generation, and validation.
 

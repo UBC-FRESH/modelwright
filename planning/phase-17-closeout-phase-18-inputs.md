@@ -65,7 +65,7 @@ Resolved in P17:
 
 Blocked by design:
 
-- 306 formulas with explicit error references. Sheetforge should not silently turn workbook `#REF!` formulas into normal generated Python behavior. A conversion plan should classify these as repair, exclusion, error-preserving generated behavior, or out-of-scope workbook damage.
+- 306 formulas with explicit error references. Modelwright should not silently turn workbook `#REF!` formulas into normal generated Python behavior. A conversion plan should classify these as repair, exclusion, error-preserving generated behavior, or out-of-scope workbook damage.
 
 Deferred to structural design phases:
 
@@ -91,7 +91,7 @@ Benchmark policy:
 
 - use the 2020 workbook as the primary FABLE Calculator convergence benchmark;
 - use the 2021 workbook as a later stress benchmark once 2020 is stable;
-- keep the 2019 workbook as a broken-reference regression case that proves Sheetforge reports explicit source `#REF!` formulas sharply and does not silently generate normal behavior for them;
+- keep the 2019 workbook as a broken-reference regression case that proves Modelwright reports explicit source `#REF!` formulas sharply and does not silently generate normal behavior for them;
 - track only external benchmark metadata, source URL, and checksums under `benchmarks/fable-calculator/`; keep workbook binaries under ignored `tmp/private-workbooks/`.
 
 The 2020 baseline run used explicit local workbook selection and very-verbose logging under ignored `tmp/`.

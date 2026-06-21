@@ -4,7 +4,7 @@ Date: 2026-06-19
 
 ## Purpose
 
-This note defines the first fixture and regression-test strategy for Sheetforge.
+This note defines the first fixture and regression-test strategy for Modelwright.
 
 The decision is intentionally limited to test assets and regression shape. It does not add the package skeleton, pytest configuration, CI, CLI, or durable implementation code yet.
 
@@ -112,7 +112,7 @@ Do not create `tests/`, `tests/fixtures/`, or pytest configuration in this task.
 
 P5.5 should use this strategy with `planning/package-dependency-test-stack-decision.md` and `planning/api-cli-boundary-decision.md` to decide the first implementation bootstrap. The likely first code-bearing slice remains:
 
-1. add `src/sheetforge` and `tests`;
+1. add `src/modelwright` and `tests`;
 2. add minimal validation report and comparison objects;
 3. add synthetic fixture builder and baseline expected outputs;
 4. add one passing baseline validation test;

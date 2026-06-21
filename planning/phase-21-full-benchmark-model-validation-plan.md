@@ -6,7 +6,7 @@ Date: 2026-06-20
 
 Phase 21 turns clean benchmark conversion evidence into executable generated-model evidence.
 
-Phase 20 proved that Sheetforge can execute and validate a generated model when the generated-model
+Phase 20 proved that Modelwright can execute and validate a generated model when the generated-model
 contract is explicit. It also preserved clean 2020 FABLE benchmark extraction, dependency graphing, and
 formula translation evidence. Phase 21 owns the missing bridge: infer and materialize a generated Python
 model for selected benchmark outputs, then validate those outputs against cached or oracle values.
@@ -113,7 +113,7 @@ Local evidence:
 Result:
 
 - wrote a validation scenario for the same ten selected 2020 FABLE outputs materialized in P21.2;
-- ran `sheetforge validation evaluate` through the public CLI with `--workbook` and `--verbose`;
+- ran `modelwright validation evaluate` through the public CLI with `--workbook` and `--verbose`;
 - re-extracted the 2020 source workbook to obtain cached workbook values;
 - executed the generated model successfully with zero execution diagnostics;
 - compared ten generated outputs against cached workbook values;

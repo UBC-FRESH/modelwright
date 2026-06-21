@@ -4,7 +4,7 @@ Date: 2026-06-20
 
 ## Purpose
 
-This note records the local reference packages Sheetforge should use for CLI feel and Sphinx documentation scope.
+This note records the local reference packages Modelwright should use for CLI feel and Sphinx documentation scope.
 
 Reference repos inspected:
 
@@ -29,7 +29,7 @@ Observed style:
 - `typer.BadParameter` and `typer.Exit` for user-facing failures;
 - docstrings and help text that double as CLI/API reference material.
 
-Sheetforge's current argparse CLI is acceptable as a thin first wrapper, but it should be migrated toward this Typer/Rich style before the CLI becomes the primary public interface.
+Modelwright's current argparse CLI is acceptable as a thin first wrapper, but it should be migrated toward this Typer/Rich style before the CLI becomes the primary public interface.
 
 ## Documentation Pattern
 
@@ -52,9 +52,9 @@ FEMIC also has a GitHub Pages workflow:
 - uploads the built `_build/html` artifact;
 - deploys to GitHub Pages only on non-PR `main` builds.
 
-Sheetforge should follow that GitHub Pages model rather than Read the Docs for the next docs milestone.
+Modelwright should follow that GitHub Pages model rather than Read the Docs for the next docs milestone.
 
-## Sheetforge Implications
+## Modelwright Implications
 
 Phase 16 should add:
 
@@ -63,4 +63,4 @@ Phase 16 should add:
 - GitHub Pages workflow triggered by pull requests and pushes to `main`;
 - docs verification in CI with warnings as errors.
 
-The docs should remain honest: Sheetforge is still pre-release and does not yet perform full workbook conversion.
+The docs should remain honest: Modelwright is still pre-release and does not yet perform full workbook conversion.

@@ -4,7 +4,7 @@ Date: 2026-06-21
 
 ## Purpose
 
-Phase 22 prepares Sheetforge for professional package publication and deployment. The phase is about release infrastructure, release evidence, and maintainer-controlled gates. It should not publish to real PyPI until the package metadata, artifacts, documentation deployment, and TestPyPI rehearsal have been verified.
+Phase 22 prepares Modelwright for professional package publication and deployment. The phase is about release infrastructure, release evidence, and maintainer-controlled gates. It should not publish to real PyPI until the package metadata, artifacts, documentation deployment, and TestPyPI rehearsal have been verified.
 
 GitHub parent issue: #124
 

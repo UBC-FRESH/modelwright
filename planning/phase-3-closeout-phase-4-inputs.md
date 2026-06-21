@@ -6,7 +6,7 @@ Date: 2026-06-19
 
 This note closes the Phase 3 code-generation prototype work and defines inputs for Phase 4 regression validation.
 
-Phase 3 proved that the controlled Sheetforge IR can drive readable generated Python for the synthetic workbook and that the generated outputs match `formulas` for the controlled output cells.
+Phase 3 proved that the controlled Modelwright IR can drive readable generated Python for the synthetic workbook and that the generated outputs match `formulas` for the controlled output cells.
 
 ## What Worked
 

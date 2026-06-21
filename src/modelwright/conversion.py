@@ -8,11 +8,11 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any, Literal
 
-from sheetforge.extraction import WorkbookRecord
-from sheetforge.formulas import FormulaExpression
-from sheetforge.generation import GenerationResult
-from sheetforge.graph import DependencyGraph
-from sheetforge.validation import ValidationReport
+from modelwright.extraction import WorkbookRecord
+from modelwright.formulas import FormulaExpression
+from modelwright.generation import GenerationResult
+from modelwright.graph import DependencyGraph
+from modelwright.validation import ValidationReport
 
 
 JsonValue = str | int | float | bool | None | list[Any] | dict[str, Any]
@@ -371,7 +371,7 @@ class ConversionPlan:
 
     plan_id: str
     created_at: str
-    sheetforge_commit: str
+    modelwright_commit: str
     source: ConversionSource
     workflow_status: WorkflowStatus
     coverage: CoverageSummary
@@ -387,7 +387,7 @@ class ConversionPlan:
         return cls(
             plan_id=data["plan_id"],
             created_at=data["created_at"],
-            sheetforge_commit=data["sheetforge_commit"],
+            modelwright_commit=data["modelwright_commit"],
             source=ConversionSource.from_dict(data["source"]),
             workflow_status=WorkflowStatus.from_dict(data["workflow_status"]),
             coverage=CoverageSummary.from_dict(data["coverage"]),
@@ -407,7 +407,7 @@ class ConversionPlan:
         return {
             "plan_id": self.plan_id,
             "created_at": self.created_at,
-            "sheetforge_commit": self.sheetforge_commit,
+            "modelwright_commit": self.modelwright_commit,
             "source": self.source.to_dict(),
             "workflow_status": self.workflow_status.to_dict(),
             "coverage": self.coverage.to_dict(),
@@ -427,7 +427,7 @@ def build_conversion_plan(
     graph: DependencyGraph,
     expressions: Mapping[str, FormulaExpression],
     benchmark_role: BenchmarkRole,
-    sheetforge_commit: str = "unknown",
+    modelwright_commit: str = "unknown",
     generation_result: GenerationResult | None = None,
     cached_validation_report: ValidationReport | None = None,
     oracle_validation_report: ValidationReport | None = None,
@@ -474,7 +474,7 @@ def build_conversion_plan(
     return ConversionPlan(
         plan_id=plan_id,
         created_at=datetime.now(UTC).isoformat(),
-        sheetforge_commit=sheetforge_commit,
+        modelwright_commit=modelwright_commit,
         source=ConversionSource(
             workbook_id=workbook.workbook_id,
             file_type=_file_type(workbook.source_path),

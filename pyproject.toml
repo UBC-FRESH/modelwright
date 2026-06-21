@@ -3,7 +3,7 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "sheetforge"
+name = "modelwright"
 version = "0.1.0a1"
 description = "Tools for converting spreadsheet workbooks into transparent Python models."
 readme = "README.md"
@@ -39,14 +39,14 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/UBC-FRESH/sheetforge"
-Documentation = "https://ubc-fresh.github.io/sheetforge/"
-Repository = "https://github.com/UBC-FRESH/sheetforge"
-Issues = "https://github.com/UBC-FRESH/sheetforge/issues"
-Changelog = "https://github.com/UBC-FRESH/sheetforge/blob/main/CHANGE_LOG.md"
+Homepage = "https://github.com/UBC-FRESH/modelwright"
+Documentation = "https://ubc-fresh.github.io/modelwright/"
+Repository = "https://github.com/UBC-FRESH/modelwright"
+Issues = "https://github.com/UBC-FRESH/modelwright/issues"
+Changelog = "https://github.com/UBC-FRESH/modelwright/blob/main/CHANGE_LOG.md"
 
 [project.scripts]
-sheetforge = "sheetforge.cli:app"
+modelwright = "modelwright.cli:app"
 
 [project.optional-dependencies]
 docs = [

@@ -10,9 +10,9 @@ from typing import Any, Literal
 
 from openpyxl.utils.cell import get_column_letter, range_boundaries
 
-from sheetforge.extraction import WorkbookRecord
-from sheetforge.formulas import FormulaExpression, FormulaExpressionNode
-from sheetforge.graph import DependencyGraph
+from modelwright.extraction import WorkbookRecord
+from modelwright.formulas import FormulaExpression, FormulaExpressionNode
+from modelwright.graph import DependencyGraph
 
 
 JsonValue = str | int | float | bool | None | list[Any] | dict[str, Any]
@@ -378,7 +378,7 @@ def _render_module(
     constants: Mapping[str, JsonValue],
 ) -> str:
     lines = [
-        '"""Generated Sheetforge model.',
+        '"""Generated Modelwright model.',
         "",
         f"Source workbook: {contract.workbook_id}",
         '"""',

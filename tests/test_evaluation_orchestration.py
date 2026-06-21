@@ -1,11 +1,11 @@
 import json
 from pathlib import Path
 
-from sheetforge.evaluation import ValidationEvaluationResult, evaluate_generated_model
-from sheetforge.extraction import CellRecord, WorkbookRecord
-from sheetforge.generation import GeneratedModuleContract
-from sheetforge.oracles import OracleDiagnostic, OracleResult
-from sheetforge.validation import (
+from modelwright.evaluation import ValidationEvaluationResult, evaluate_generated_model
+from modelwright.extraction import CellRecord, WorkbookRecord
+from modelwright.generation import GeneratedModuleContract
+from modelwright.oracles import OracleDiagnostic, OracleResult
+from modelwright.validation import (
     ComparisonRules,
     OracleConfig,
     ScenarioOutput,

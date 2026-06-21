@@ -4,7 +4,7 @@ Date: 2026-06-19
 
 ## Purpose
 
-This note defines the first CI and documentation verification boundary for Sheetforge.
+This note defines the first CI and documentation verification boundary for Modelwright.
 
 The decision is intentionally conservative. It identifies what should become routine once package files exist, but it does not add GitHub Actions, pytest configuration, documentation tooling, or workflow files in this task.
 
@@ -47,7 +47,7 @@ Do not add formatting, linting, coverage, type checking, property-based tests, o
 The first GitHub Actions workflow should run only after the repository has:
 
 - `pyproject.toml`;
-- `src/sheetforge`;
+- `src/modelwright`;
 - `tests`;
 - at least one package-backed pytest test.
 

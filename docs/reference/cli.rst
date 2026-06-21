@@ -1,40 +1,40 @@
 CLI Reference
 =============
 
-Sheetforge exposes a Typer-based CLI:
+Modelwright exposes a Typer-based CLI:
 
 .. code-block:: bash
 
-   sheetforge --help
+   modelwright --help
 
 Workflow groups:
 
-- ``sheetforge workbook``: extraction and dependency graph commands;
-- ``sheetforge model``: generated Python model commands;
-- ``sheetforge validation``: validation report and evaluation commands;
-- ``sheetforge conversion``: conversion planning reports.
+- ``modelwright workbook``: extraction and dependency graph commands;
+- ``modelwright model``: generated Python model commands;
+- ``modelwright validation``: validation report and evaluation commands;
+- ``modelwright conversion``: conversion planning reports.
 
 Workbook Commands
 -----------------
 
 .. code-block:: bash
 
-   sheetforge workbook extract path/to/workbook.xlsx > tmp/extraction.json
-   sheetforge workbook graph path/to/workbook.xlsx > tmp/dependency-graph.json
+   modelwright workbook extract path/to/workbook.xlsx > tmp/extraction.json
+   modelwright workbook graph path/to/workbook.xlsx > tmp/dependency-graph.json
 
 Model Commands
 --------------
 
 .. code-block:: bash
 
-   sheetforge model generate \
+   modelwright model generate \
      --contract tmp/contract.json \
      --expressions tmp/expressions.json \
      --constants tmp/constants.json \
      --out tmp/generated_model.py \
      > tmp/generation-result.json
 
-   sheetforge model execute \
+   modelwright model execute \
      --contract tmp/contract.json \
      --model tmp/generated_model.py \
      --inputs tmp/input-overrides.json \
@@ -45,13 +45,13 @@ Validation Commands
 
 .. code-block:: bash
 
-   sheetforge validation report \
+   modelwright validation report \
      --scenario tmp/scenario.json \
      --generated-values tmp/generated-values.json \
      --oracle-values tmp/oracle-values.json \
      > tmp/validation-report.json
 
-   sheetforge validation evaluate \
+   modelwright validation evaluate \
      --contract tmp/contract.json \
      --model tmp/generated_model.py \
      --scenario tmp/scenario.json \
@@ -69,7 +69,7 @@ Conversion Commands
 
 .. code-block:: bash
 
-   sheetforge conversion plan path/to/workbook.xlsx \
+   modelwright conversion plan path/to/workbook.xlsx \
      --plan-id conversion-plan:example \
      --benchmark-role ad_hoc_private \
      > tmp/conversion-plan.json

@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from sheetforge.validation import ComparisonResult, ValidationReport
+from modelwright.validation import ComparisonResult, ValidationReport
 
 
 FIXTURE_ROOT = Path(__file__).parent / "fixtures" / "synthetic_model"

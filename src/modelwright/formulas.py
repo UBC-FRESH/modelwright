@@ -12,10 +12,10 @@ from typing import Any, Literal
 from openpyxl.formula.tokenizer import Tokenizer
 from openpyxl.utils.cell import get_column_letter, range_boundaries
 
-from sheetforge.extraction import CellRecord
-from sheetforge.graph import DependencyEdge, DependencyGraph
-from sheetforge.references import WorkbookReference
-from sheetforge.references import normalize_reference
+from modelwright.extraction import CellRecord
+from modelwright.graph import DependencyEdge, DependencyGraph
+from modelwright.references import WorkbookReference
+from modelwright.references import normalize_reference
 
 
 JsonValue = str | int | float | bool | None | list[Any] | dict[str, Any]

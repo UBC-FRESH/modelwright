@@ -4,7 +4,7 @@ Date: 2026-06-19
 
 ## Purpose
 
-This note summarizes the Phase 5 decisions and defines the first real implementation phase for Sheetforge.
+This note summarizes the Phase 5 decisions and defines the first real implementation phase for Modelwright.
 
 The next phase should be the first code-bearing phase. It should introduce only enough package, fixture, validation, test, and CI structure to make the proven validation/report path durable.
 
@@ -12,7 +12,7 @@ The next phase should be the first code-bearing phase. It should introduce only 
 
 Package and test stack:
 
-- use a `src/sheetforge` package layout;
+- use a `src/modelwright` package layout;
 - use `pyproject.toml` with `setuptools`;
 - use `pytest`;
 - use tracked fixtures under `tests/fixtures`;

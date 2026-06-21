@@ -6,7 +6,7 @@ Date: 2026-06-20
 
 This note records the current planning horizon beyond the active Phase 7 work.
 
-The sequence is intentionally staged. Sheetforge should move from scenario/report mechanics to extraction, dependency analysis, formula translation, generated Python, oracle-backed validation, private workbook evaluation, API/CLI stabilization, and then hardening. The project should not jump directly to a broad conversion pipeline before the intermediate contracts are proven.
+The sequence is intentionally staged. Modelwright should move from scenario/report mechanics to extraction, dependency analysis, formula translation, generated Python, oracle-backed validation, private workbook evaluation, API/CLI stabilization, and then hardening. The project should not jump directly to a broad conversion pipeline before the intermediate contracts are proven.
 
 ## Direction Of Travel
 
@@ -151,7 +151,7 @@ Avoid tooling churn without demonstrated pain.
 
 ## Phase 16: CLI And Documentation Public Surface
 
-Goal: bring Sheetforge's public CLI and docs surface into the same family as the other FRESH lab software packages.
+Goal: bring Modelwright's public CLI and docs surface into the same family as the other FRESH lab software packages.
 
 Reference models:
 
@@ -161,7 +161,7 @@ Reference models:
 Expected outputs:
 
 - CLI conventions audit against local `~/projects/fhops` and `~/projects/femic` checkouts;
-- Sheetforge CLI refactor plan and implementation using the same Typer/Rich feel where it is justified;
+- Modelwright CLI refactor plan and implementation using the same Typer/Rich feel where it is justified;
 - full Sphinx docs skeleton with curated guide, CLI reference, API reference, workflow, limitations, and private-data handling pages;
 - GitHub Actions docs workflow that runs `sphinx-build -b html docs _build/html -W` and deploys to GitHub Pages on `main`;
 - README links and local docs build instructions.

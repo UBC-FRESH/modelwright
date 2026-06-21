@@ -13,7 +13,7 @@ Completed pieces:
 - package records and `build_conversion_plan`;
 - public external FABLE Calculator benchmark metadata, checksums, and canonical ignored local paths;
 - `scripts/materialize_fable_benchmarks.py` plus `scripts/bootstrap_dev_env.sh --benchmarks`;
-- `sheetforge conversion plan` CLI;
+- `modelwright conversion plan` CLI;
 - residual-blocker classification for extraction, named ranges, formula extraction, graphing,
   translation, generation, cached validation, and oracle validation diagnostics;
 - Read the Docs Sphinx theme configuration aligned with the other FRESH lab packages.

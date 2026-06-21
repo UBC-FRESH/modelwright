@@ -8,7 +8,7 @@ Phase 15 starts by deciding which hardening tools are justified by current proje
 
 ## Current Evidence
 
-- The package has a small but real implementation surface: 11 source modules under `src/sheetforge/`.
+- The package has a small but real implementation surface: 11 source modules under `src/modelwright/`.
 - The test suite has 74 tests covering extraction records, `openpyxl` extraction, references, graphing, formula translation, generated Python, validation reports, CLI wrappers, and optional `formulas` oracle behavior.
 - Default CI runs editable install plus `python -m pytest` on Python 3.12.
 - The repo has no formatter, linter, type checker, coverage threshold, or pre-commit hook yet.

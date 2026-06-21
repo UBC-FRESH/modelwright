@@ -4,7 +4,7 @@ Date: 2026-06-20
 
 ## Purpose
 
-Phase 13 uses private source workbooks to test whether Sheetforge's extraction, graph, generation, oracle, and validation path can handle real workbook structure.
+Phase 13 uses private source workbooks to test whether Modelwright's extraction, graph, generation, oracle, and validation path can handle real workbook structure.
 
 The evaluation lane is local by default. It should improve the public package without committing private workbooks, raw workbook facts, private generated clones, or full validation reports.
 

@@ -4,9 +4,9 @@ import sys
 from pathlib import Path
 from types import ModuleType
 
-from sheetforge.extraction import extract_workbook
-from sheetforge.formulas import FormulaExpression, FormulaExpressionNode, translate_formula_cell
-from sheetforge.generation import (
+from modelwright.extraction import extract_workbook
+from modelwright.formulas import FormulaExpression, FormulaExpressionNode, translate_formula_cell
+from modelwright.generation import (
     GeneratedModuleContract,
     GeneratedSymbol,
     GenerationResult,
@@ -14,8 +14,8 @@ from sheetforge.generation import (
     infer_generated_module_contract,
     symbol_name_for_cell_ref,
 )
-from sheetforge.graph import DependencyEdge, DependencyGraph, build_dependency_graph
-from sheetforge.references import normalize_reference
+from modelwright.graph import DependencyEdge, DependencyGraph, build_dependency_graph
+from modelwright.references import normalize_reference
 from tests.fixtures.synthetic_model.build_workbook import build_workbook
 
 

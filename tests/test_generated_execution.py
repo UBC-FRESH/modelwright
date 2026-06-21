@@ -1,16 +1,16 @@
 import json
 from pathlib import Path
 
-from sheetforge.execution import GeneratedExecutionResult, execute_generated_model
-from sheetforge.extraction import extract_workbook
-from sheetforge.formulas import translate_formula_cell
-from sheetforge.generation import (
+from modelwright.execution import GeneratedExecutionResult, execute_generated_model
+from modelwright.extraction import extract_workbook
+from modelwright.formulas import translate_formula_cell
+from modelwright.generation import (
     GeneratedModuleContract,
     GeneratedSymbol,
     generate_python_module,
     symbol_name_for_cell_ref,
 )
-from sheetforge.graph import build_dependency_graph
+from modelwright.graph import build_dependency_graph
 from tests.fixtures.synthetic_model.build_workbook import build_workbook
 
 

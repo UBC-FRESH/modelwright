@@ -3,19 +3,19 @@ import sys
 from pathlib import Path
 from types import ModuleType
 
-from sheetforge.extraction import extract_workbook
-from sheetforge.formulas import translate_formula_cell
-from sheetforge.formulas_oracle import FormulasWorkbookOracle
-from sheetforge.generation import (
+from modelwright.extraction import extract_workbook
+from modelwright.formulas import translate_formula_cell
+from modelwright.formulas_oracle import FormulasWorkbookOracle
+from modelwright.generation import (
     GeneratedModuleContract,
     GeneratedSymbol,
     generate_python_module,
     symbol_name_for_cell_ref,
 )
-from sheetforge.graph import build_dependency_graph
-from sheetforge.oracle_validation import build_oracle_validation_report
-from sheetforge.oracles import OracleDiagnostic, OracleRequest, OracleResult
-from sheetforge.validation import (
+from modelwright.graph import build_dependency_graph
+from modelwright.oracle_validation import build_oracle_validation_report
+from modelwright.oracles import OracleDiagnostic, OracleRequest, OracleResult
+from modelwright.validation import (
     ComparisonRules,
     OracleConfig,
     ScenarioOutput,

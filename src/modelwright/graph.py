@@ -7,8 +7,8 @@ from typing import Any, Literal
 
 from openpyxl.utils.cell import get_column_letter, range_boundaries
 
-from sheetforge.extraction import CellRecord, TableRecord, WorkbookRecord
-from sheetforge.references import WorkbookReference, normalize_reference
+from modelwright.extraction import CellRecord, TableRecord, WorkbookRecord
+from modelwright.references import WorkbookReference, normalize_reference
 
 
 JsonValue = str | int | float | bool | None | list[Any] | dict[str, Any]

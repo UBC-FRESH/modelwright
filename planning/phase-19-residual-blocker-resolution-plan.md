@@ -84,7 +84,7 @@ Acceptance criteria:
 
 - inspect the 2020 circular dependency diagnostic;
 - determine whether it affects selected/generated outputs;
-- decide whether Sheetforge should support fixed-point/iterative calculation, preserve a blocking
+- decide whether Modelwright should support fixed-point/iterative calculation, preserve a blocking
   diagnostic, or explicitly exclude the cycle from generated scope;
 - update graph or conversion-plan policy so circular dependencies become actionable;
 - rerun the 2020 conversion plan and show circular dependency status is resolved, scoped, or retained as

@@ -7,65 +7,65 @@ convenience facade for the main records and functions.
 Extraction
 ----------
 
-.. automodule:: sheetforge.extraction
+.. automodule:: modelwright.extraction
    :members:
 
 References
 ----------
 
-.. automodule:: sheetforge.references
+.. automodule:: modelwright.references
    :members:
 
 Dependency Graph
 ----------------
 
-.. automodule:: sheetforge.graph
+.. automodule:: modelwright.graph
    :members:
 
 Formula Translation
 -------------------
 
-.. automodule:: sheetforge.formulas
+.. automodule:: modelwright.formulas
    :members:
 
 Generation
 ----------
 
-.. automodule:: sheetforge.generation
+.. automodule:: modelwright.generation
    :members:
 
 Generated Model Execution
 -------------------------
 
-.. automodule:: sheetforge.execution
+.. automodule:: modelwright.execution
    :members:
 
 Evaluation Orchestration
 ------------------------
 
-.. automodule:: sheetforge.evaluation
+.. automodule:: modelwright.evaluation
    :members:
 
 Conversion Planning
 -------------------
 
-.. automodule:: sheetforge.conversion
+.. automodule:: modelwright.conversion
    :members:
 
 Validation
 ----------
 
-.. automodule:: sheetforge.validation
+.. automodule:: modelwright.validation
    :members:
 
 Oracle Interfaces
 -----------------
 
-.. automodule:: sheetforge.oracles
+.. automodule:: modelwright.oracles
    :members:
 
-.. automodule:: sheetforge.formulas_oracle
+.. automodule:: modelwright.formulas_oracle
    :members:
 
-.. automodule:: sheetforge.oracle_validation
+.. automodule:: modelwright.oracle_validation
    :members:

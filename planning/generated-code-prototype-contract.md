@@ -4,7 +4,7 @@ Date: 2026-06-19
 
 ## Purpose
 
-This note defines the first Sheetforge generated-code experiment for Phase 3.
+This note defines the first Modelwright generated-code experiment for Phase 3.
 
 The experiment should prove whether the prototype IR can drive readable Python generation for the controlled synthetic workbook. It is not a public API, package layout, CLI, or durable source tree.
 

@@ -4,7 +4,7 @@ Date: 2026-06-19
 
 ## Question
 
-Can Sheetforge run a validation scenario that compares generated Python outputs against a workbook oracle and reports mismatches in a reusable shape?
+Can Modelwright run a validation scenario that compares generated Python outputs against a workbook oracle and reports mismatches in a reusable shape?
 
 ## Prototype Setup
 

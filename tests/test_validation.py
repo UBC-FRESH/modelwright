@@ -1,6 +1,6 @@
 import json
 
-from sheetforge.validation import ComparisonResult, Diagnostic, ValidationReport
+from modelwright.validation import ComparisonResult, Diagnostic, ValidationReport
 
 
 def test_validation_report_serializes_passing_comparisons() -> None:

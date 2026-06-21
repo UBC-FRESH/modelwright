@@ -47,7 +47,7 @@ jobs:
       - name: Upload release artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: sheetforge-release-artifacts
+          name: modelwright-release-artifacts
           path: tmp/release-checks/current/dist/*
           if-no-files-found: error
 
@@ -62,7 +62,7 @@ jobs:
       - name: Download release artifacts
         uses: actions/download-artifact@v4
         with:
-          name: sheetforge-release-artifacts
+          name: modelwright-release-artifacts
           path: dist
 
       - name: Publish to TestPyPI
@@ -84,7 +84,7 @@ jobs:
       - name: Download release artifacts
         uses: actions/download-artifact@v4
         with:
-          name: sheetforge-release-artifacts
+          name: modelwright-release-artifacts
           path: dist
 
       - name: Publish to PyPI

@@ -9,7 +9,7 @@ Official External Benchmarks
 ----------------------------
 
 Some real workbooks are public benchmark inputs but still should not be committed as binary files. For
-those cases, Sheetforge tracks benchmark metadata, source URLs, expected filenames, roles, and checksums
+those cases, Modelwright tracks benchmark metadata, source URLs, expected filenames, roles, and checksums
 under ``benchmarks/`` while keeping the downloaded workbooks under ignored ``tmp/`` paths.
 
 The FABLE Calculator benchmark set is tracked this way:

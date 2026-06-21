@@ -10,7 +10,7 @@ usage() {
   cat <<EOF
 Usage: scripts/bootstrap_dev_env.sh [--benchmarks]
 
-Creates or updates a repo-local .venv and installs Sheetforge in editable
+Creates or updates a repo-local .venv and installs Modelwright in editable
 development mode with the [dev] extra.
 
 Options:
@@ -43,6 +43,11 @@ if [[ ! -d "$VENV_DIR" ]]; then
 fi
 
 "$VENV_DIR/bin/python" -m pip install --upgrade pip
+rm -rf "$ROOT_DIR/src/sheetforge.egg-info"
+if "$VENV_DIR/bin/python" -m pip show sheetforge >/dev/null 2>&1; then
+  echo "Removing stale pre-rebrand sheetforge editable install."
+  "$VENV_DIR/bin/python" -m pip uninstall -y sheetforge
+fi
 "$VENV_DIR/bin/python" -m pip install -e "${ROOT_DIR}[dev]"
 
 if [[ "$MATERIALIZE_BENCHMARKS" -eq 1 ]]; then
@@ -50,7 +55,7 @@ if [[ "$MATERIALIZE_BENCHMARKS" -eq 1 ]]; then
 fi
 
 cat <<EOF
-Sheetforge development environment is ready.
+Modelwright development environment is ready.
 
 Python: $VENV_DIR/bin/python
 

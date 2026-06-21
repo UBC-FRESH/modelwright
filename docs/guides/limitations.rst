@@ -1,7 +1,7 @@
 Limitations And Boundaries
 ==========================
 
-Sheetforge is pre-release software. It is suitable for controlled research and package-backed workflow
+Modelwright is pre-release software. It is suitable for controlled research and package-backed workflow
 experiments, not for unsupervised conversion of arbitrary workbooks.
 
 Known limitations include:

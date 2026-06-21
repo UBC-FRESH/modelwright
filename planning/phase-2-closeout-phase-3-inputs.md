@@ -6,11 +6,11 @@ Date: 2026-06-19
 
 This note closes the Phase 2 extraction-contract work and defines the inputs for Phase 3 code-generation prototyping.
 
-Phase 2 established that a small Sheetforge-owned IR is needed between raw workbook extraction and generated Python. The IR can represent the controlled synthetic workbook well enough to support the first generated-code experiment.
+Phase 2 established that a small Modelwright-owned IR is needed between raw workbook extraction and generated Python. The IR can represent the controlled synthetic workbook well enough to support the first generated-code experiment.
 
 ## Extraction Contract Decisions
 
-Sheetforge should keep its own normalized IR instead of treating either `openpyxl` or `formulas` as the project model.
+Modelwright should keep its own normalized IR instead of treating either `openpyxl` or `formulas` as the project model.
 
 Confirmed decisions:
 

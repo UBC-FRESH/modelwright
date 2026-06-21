@@ -5,14 +5,14 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from sheetforge.oracles import (
+from modelwright.oracles import (
     OracleDiagnostic,
     OracleRequest,
     OracleResult,
     WorkbookOracle,
     missing_optional_dependency_diagnostic,
 )
-from sheetforge.validation import JsonValue
+from modelwright.validation import JsonValue
 
 
 class FormulasWorkbookOracle(WorkbookOracle):

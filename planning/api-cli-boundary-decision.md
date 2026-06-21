@@ -4,7 +4,7 @@ Date: 2026-06-19
 
 ## Purpose
 
-This note defines the first public API and CLI boundaries for Sheetforge.
+This note defines the first public API and CLI boundaries for Modelwright.
 
 The decision is intentionally conservative: Phase 5 should prepare a small Python package API first, and defer CLI implementation until package responsibilities and fixtures are stable.
 
@@ -27,7 +27,7 @@ The first durable package should expose small, explicit functions or classes aro
 Candidate module layout:
 
 ```text
-sheetforge/
+modelwright/
   __init__.py
   ir.py
   extract.py
@@ -84,10 +84,10 @@ Do not implement a CLI in the first durable package slice.
 Phase 16 established the grouped Typer surface:
 
 ```text
-sheetforge workbook extract
-sheetforge workbook graph
-sheetforge model generate
-sheetforge validation report
+modelwright workbook extract
+modelwright workbook graph
+modelwright model generate
+modelwright validation report
 ```
 
 CLI commands should be thin wrappers over the Python API. They should not reimplement extraction, generation, or validation logic.
@@ -107,7 +107,7 @@ It should not implement all candidate entrypoints at once.
 
 Recommended first durable slice:
 
-1. Add `src/sheetforge` and `tests`.
+1. Add `src/modelwright` and `tests`.
 2. Add minimal validation data/report objects.
 3. Add a fixture-backed validation test for the synthetic baseline.
 4. Add one intentional mismatch test.

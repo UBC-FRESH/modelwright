@@ -5,7 +5,7 @@ from openpyxl import Workbook
 from openpyxl.worksheet.table import Table
 from openpyxl.workbook.defined_name import DefinedName
 
-from sheetforge.extraction import extract_workbook
+from modelwright.extraction import extract_workbook
 from tests.fixtures.synthetic_model.build_workbook import build_workbook
 
 
