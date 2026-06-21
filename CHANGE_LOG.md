@@ -25,6 +25,7 @@ This file records completed project work in chronological order.
 - Resolved the targeted FABLE `3_calc_crops!AO29` semantic mismatch by switching generated models to lazy runtime evaluation for static-cycle tolerance, fixing Excel-style case-insensitive and numeric-text criteria matching, ignoring text/blank `SUMIF(S)` sum values, and verifying a cached AO29 smoke run that matched `27844.896576581647` exactly with matching upstream probes.
 - Achieved the Phase 26 full comparable-output validation pass for the 2020 FABLE Calculator benchmark: the generated Modelwright Python model matched 281,741 of 281,741 comparable cached workbook outputs with zero mismatches, while 15,235 cached blank formula outputs were recorded as non-comparable validation-boundary evidence rather than blockers.
 - Prepared the `0.1.0a2` release candidate with updated package/import version, release-boundary documentation, repeatable release artifact cleanup, local Ruff, 145-test pytest, Sphinx warning-as-error docs, Read the Docs theme verification, and clean sdist/wheel artifact checks.
+- Published `modelwright==0.1.0a2` to PyPI from annotated tag `v0.1.0a2`, created the matching GitHub release, verified PyPI JSON lists the release, and confirmed a clean ignored PyPI install imports version `0.1.0a2` and runs `modelwright --help`.
 
 ## 2026-06-20
 

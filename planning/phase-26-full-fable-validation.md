@@ -126,18 +126,19 @@ Targeted AO29 evidence:
   `3_calc_crops!AT29`, `3_calc_crops!AS29`, `3_calc_crops!AU29`, `3_calc_crops!AV29`,
   `1_calc_human_demand!V32`, `1_calc_human_demand!X32`, and `2_calc_livestock!BD34`.
 
-Current blocker:
+Release closeout:
 
 - No Phase 26 comparable-output blocker remains.
-- P26 release closeout remains: run full local verification, publish `v0.1.0a2`, and verify the
-  clean PyPI install claim.
+- `modelwright==0.1.0a2` was published to PyPI from annotated tag `v0.1.0a2`.
+- The matching GitHub release was created.
+- PyPI JSON listed `0.1.0a2` after propagation.
+- A clean ignored virtual environment installed `modelwright==0.1.0a2` from PyPI, imported
+  `modelwright.__version__ == "0.1.0a2"`, confirmed the old `sheetforge` import was absent, and ran
+  `modelwright --help`.
 
 Next convergence target:
 
-1. Run full local verification for the release candidate.
-2. Tag and publish `v0.1.0a2` through the existing release workflow.
-3. Verify clean install from PyPI.
-4. Defer performance, memory, and generated-output architecture refactoring to Phase 27 and the
+1. Defer performance, memory, and generated-output architecture refactoring to Phase 27 and the
    `0.1.0a3` release line.
 
 ## Logs And Raw Artifacts

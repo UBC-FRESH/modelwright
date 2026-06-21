@@ -582,13 +582,13 @@ comparable-output pass statement or a precise blocker taxonomy.
   - [x] Update changelog and planning note with sanitized counts.
   - [x] Keep raw workbooks, generated models, and raw reports ignored.
   - [x] State release implications for the next alpha.
-- [ ] P26.7 Publish `v0.1.0a2` after full FABLE validation. Child issue: #153.
+- [x] P26.7 Publish `v0.1.0a2` after full FABLE validation. Child issue: #153.
   - [x] Confirm P26 full validation status is `pass` with zero comparable-output mismatches.
   - [x] Record sanitized validation evidence and release claim boundaries.
   - [x] Run full local verification and release artifact checks.
-  - [ ] Tag `v0.1.0a2` and publish matching GitHub and PyPI releases through the existing release workflow.
-  - [ ] Verify clean install from PyPI.
-  - [ ] Defer P27 performance, memory, and generated-output architecture refactoring to the `0.1.0a3` release line.
+  - [x] Tag `v0.1.0a2` and publish matching GitHub and PyPI releases through the existing release workflow.
+  - [x] Verify clean install from PyPI.
+  - [x] Defer P27 performance, memory, and generated-output architecture refactoring to the `0.1.0a3` release line.
 
 Full comparable-output validation evidence:
 
@@ -601,7 +601,16 @@ Full comparable-output validation evidence:
 - Non-comparable cached blank formula outputs: 15,235, recorded as validation-boundary evidence rather than blockers.
 - Raw local evidence remains ignored under `tmp/p26-fable-full-validation/` and `tmp/logs/p26-full-validation.log`.
 
-Status: active pending `v0.1.0a2` release task.
+Release evidence:
+
+- Annotated tag: `v0.1.0a2`.
+- GitHub release: `modelwright 0.1.0a2`.
+- PyPI package: `modelwright==0.1.0a2`.
+- Clean PyPI install verified in ignored `tmp/pypi-install/modelwright-0.1.0a2/.venv`.
+- Import verified `modelwright.__version__ == "0.1.0a2"`.
+- CLI smoke verified `modelwright --help`.
+
+Status: complete.
 
 ## Phase 27: Generated Runtime Performance And Memory Hardening
 
@@ -653,8 +662,6 @@ Acceptance criteria:
 
 ## Current Next Steps
 
-1. Complete P26.7 release closeout for `v0.1.0a2`.
-2. Run full local verification: Ruff, pytest, Sphinx docs, and release artifact checks.
-3. Update package version and release notes with the precise 2020 FABLE comparable-output validation claim.
-4. Publish `v0.1.0a2` through the existing GitHub/PyPI release workflow and verify clean install from PyPI.
-5. After P26 and `v0.1.0a2` are closed, activate P27 for performance, memory, and generated-output architecture work targeting `0.1.0a3`.
+1. Close Phase 26 parent issue after release evidence is synchronized.
+2. Activate P27 for performance, memory, and generated-output architecture work targeting `0.1.0a3`.
+3. Start with profiling generated-model runtime hotspots before changing architecture.
