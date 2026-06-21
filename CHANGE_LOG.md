@@ -37,6 +37,7 @@ This file records completed project work in chronological order.
 - Closed P27.4 by deciding not to add a separate public slim-oracle CLI/API contract before the compact runtime IR backend; the slim validation prototype is retained as benchmark-artifact evidence for future runtime IR design.
 - Activated P27.5 to evaluate multicore and sharded execution options only where the P27 measurements still justify them, with caution around duplicating large graph/inference memory or breaking generated-model lazy evaluation semantics.
 - Added P27.5 production inference fixes after profiling the real bottleneck: ordered membership tracking and non-eager range-dependency expansion caching reduced uncached full 2020 FABLE contract inference from 224.001 seconds after the first fix to 46.237 seconds after the range-cache fix, while preserving 373,410 inferred symbols, 289,951 expressions, 83,459 constants/inputs, and 1,808 static-cycle diagnostics.
+- Closed P27.5 with a no-new-parallelism decision for this phase: formula rendering and scalar comparison were too small to shard, naive generated-output sharding duplicated broad dependency work and memory, and the remaining costs are better assigned to full P27.6 validation evidence plus compact runtime IR and benchmark-artifact design.
 
 ## 2026-06-20
 

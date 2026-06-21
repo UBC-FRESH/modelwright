@@ -617,6 +617,28 @@ Interpretation:
 - remaining dominant P27 costs are cache hydration/object memory and generated-model execution, not
   contract inference membership or range expansion.
 
+### P27.5 Decision
+
+Do not add more parallel execution or inference machinery in P27.5.
+
+Measured reasons:
+
+- formula rendering and scalar comparison are too small to justify thread/process complexity;
+- naive generated-output sharding duplicates broad dependency closures and per-worker memory;
+- contract inference had serial algorithmic defects, and fixing those defects reduced uncached full
+  2020 FABLE contract inference to 46.237 seconds;
+- the remaining larger costs are cache hydration/object residency, generated-model execution, and the
+  source backend architecture, which are better addressed by compact runtime IR and benchmark artifact
+  work than by process-level sharding over the current object graph.
+
+Practical conclusion:
+
+- keep the production inference fixes;
+- keep the ignored experiment scripts/logs as local evidence only;
+- move to P27.6 for a full verbose FABLE validation run using the current P27 production changes;
+- preserve dependency-closure partitioning, template/vectorized kernels, and compact runtime IR as
+  follow-on architecture work where they can avoid duplicated work rather than merely parallelize it.
+
 ## Optimization Directions
 
 Prefer targeted changes supported by measurements:

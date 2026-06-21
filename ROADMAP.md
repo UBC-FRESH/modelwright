@@ -646,14 +646,14 @@ Planning note: `planning/phase-27-performance-memory-hardening.md`.
   - [x] Evaluate streaming, SQLite/shelve-style local caches, compact record encoding, or selective loading for validation.
   - [x] Explain why runtime memory can be much larger than the original workbook file size.
   - [x] Decide whether the slim oracle validation artifact should become tracked package/CLI behavior in P27 or feed the compact runtime IR backend.
-- [ ] P27.5 Evaluate multicore and sharded execution options. Child issue: #156.
-  - Status: active.
+- [x] P27.5 Evaluate multicore and sharded execution options. Child issue: #156.
+  - Status: complete.
   - [x] Evaluate parallel formula rendering and validation comparison where records are independent; do not productionize because measured serial costs are already small.
   - [x] Evaluate sharded generated-output execution across separate worker processes; do not productionize naive output sharding because broad dependency closures duplicate work and memory.
   - [x] Reprofile contract inference before parallelizing it, and fix measured serial bottlenecks first.
   - [x] Add production inference fixes for ordered membership tracking and cached range-dependency expansion.
-  - [ ] Decide whether further parallel contract inference remains warranted after the serial fixes.
-  - [ ] Document CPU, memory, process startup, serialization, and determinism tradeoffs for high-core-count hosts.
+  - [x] Decide whether further parallel contract inference remains warranted after the serial fixes.
+  - [x] Document CPU, memory, process startup, serialization, and determinism tradeoffs for high-core-count hosts.
 - [ ] P27.6 Rerun FABLE validation with performance evidence. Child issue: #160.
   - [ ] Always run verbose with stdout piped to `tmp/logs/` and print the tail command first.
   - [ ] Record runtime, peak memory, cache-hit behavior, and correctness comparison results.
@@ -669,7 +669,7 @@ Acceptance criteria:
 
 ## Current Next Steps
 
-1. Finish P27.5 by deciding whether further parallel inference is still worth prototyping now that uncached full-contract inference is down to 46.237 seconds.
-2. Document the final P27.5 CPU, memory, startup, serialization, and determinism tradeoffs in the roadmap, planning note, and GitHub issue comments.
-3. Move to P27.6 only after P27.5 is closed with evidence, then rerun the full FABLE validation in verbose mode with logs and performance measurements.
+1. Start P27.6 by rerunning full FABLE validation in verbose mode with stdout piped to `tmp/logs/`.
+2. Record runtime, peak memory, cache-hit behavior, and correctness comparison results from the P27.6 run.
+3. Confirm P27 production changes preserve the Phase 26 full comparable-output correctness evidence.
 4. Preserve formula-template/vectorized-kernel work as a follow-on architecture target after P27 records current pipeline memory costs.
