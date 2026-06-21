@@ -8,6 +8,7 @@ This file records completed project work in chronological order.
 - Drafted the P22.1 alpha release policy: recommend `0.1.0a1`, require local artifact checks and TestPyPI rehearsal before real PyPI, preserve benchmark-claim limits, and keep license selection gated on explicit maintainer approval.
 - Approved MIT licensing and the `0.1.0a1` alpha release target, then started P22.2 package metadata and artifact-check hardening.
 - Completed P22.2 package metadata hardening with an MIT `LICENSE`, `0.1.0a1` package/import version, release metadata, local artifact checker, clean sdist/wheel metadata checks, artifact privacy inspection, clean wheel install smoke test, and full local ruff/pytest/docs verification.
+- Started P22.3 release automation by adding a gated GitHub Actions release workflow and a Sphinx Read the Docs theme artifact verifier for documentation deployment checks.
 
 ## 2026-06-20
 

@@ -75,6 +75,7 @@ Build docs locally:
 
 ```bash
 .venv/bin/sphinx-build -b html docs _build/html -W
+.venv/bin/python scripts/verify_docs_theme.py _build/html
 ```
 
 Restore the public external FABLE benchmark workbooks into ignored local paths:

@@ -410,6 +410,8 @@ Goal: establish a professional deployment and publication workflow before any re
   - [x] Add local release artifact check script.
   - [x] Verify sdist/wheel metadata, artifact contents, clean wheel install, package import, and installed CLI smoke test.
 - [ ] P22.3 Add release automation for GitHub, TestPyPI, and PyPI gates. Child issue: #129.
+  - [x] Add CI release artifact build validation.
+  - [x] Add manually gated TestPyPI and tag/protected-environment gated PyPI publication workflow skeleton.
   - [ ] Verify GitHub Pages serves the built Sphinx Read the Docs themed artifact, not a fallback Jekyll/minima site.
 - [ ] P22.4 Document deployment runbook and developer release onboarding. Child issue: #128.
 - [ ] P22.5 Rehearse release artifacts and close publication readiness. Child issue: #126.
