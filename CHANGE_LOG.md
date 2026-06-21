@@ -12,6 +12,7 @@ This file records completed project work in chronological order.
 - Added the P22.4 release and deployment runbook to the Sphinx docs and contributor onboarding notes.
 - Recorded P22.5 local release-readiness evidence: ruff, pytest, docs, local RTD theme verification, sdist/wheel build, `twine check`, artifact privacy inspection, and clean wheel install smoke test pass; TestPyPI, real PyPI, and deployed Pages verification remain gated after merge.
 - Merged Phase 22 PR #130, verified post-merge CI and release-artifact checks passed, confirmed the live GitHub Pages site serves the Sphinx Read the Docs themed artifact, and closed the Phase 22 publication/deployment workflow setup.
+- Attempted the TestPyPI `0.1.0a1` upload with the ignored local TestPyPI token; artifacts passed local checks, but TestPyPI rejected the upload with `403 Forbidden` while the `sheetforge` TestPyPI project returned `404`, so the next release operation is to create/authorize the TestPyPI project with an account-scoped token or trusted publishing setup.
 
 ## 2026-06-20
 

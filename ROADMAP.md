@@ -440,7 +440,7 @@ Status: complete.
 
 ## Current Next Steps
 
-1. Configure the `testpypi` GitHub environment and trusted publishing relationship.
-2. Run the `Release` workflow manually with `publish_target = testpypi`.
+1. Create or authorize the `sheetforge` project on TestPyPI. The first token-based upload attempt returned `403 Forbidden`, and `https://test.pypi.org/pypi/sheetforge/json` returned `404`, so the provided TestPyPI token cannot currently create or upload the project.
+2. Rehearse TestPyPI publication using an account-scoped TestPyPI token or a project-scoped token after the TestPyPI project exists.
 3. Install `sheetforge==0.1.0a1` from TestPyPI in a clean environment and run import/CLI smoke tests.
 4. Decide whether to proceed to real PyPI alpha publication from tag `v0.1.0a1`.

@@ -57,11 +57,24 @@ Not yet complete:
 
 ## TestPyPI Blocker
 
-TestPyPI rehearsal is intentionally blocked until after merge because the release workflow and GitHub environments must exist on the default branch before maintainers can configure and exercise trusted publishing cleanly.
+TestPyPI rehearsal was attempted after Phase 22 merge using the ignored local token file at
+`tmp/pypi-secrets`.
+
+Result:
+
+- the local release artifact check passed before upload;
+- the token labelled `test-pypi:` was confirmed to be a TestPyPI token without printing its value;
+- `twine upload` to `https://test.pypi.org/legacy/` failed with `403 Forbidden`;
+- `https://test.pypi.org/pypi/sheetforge/json` returned `404`, so the `sheetforge` project does not currently exist on TestPyPI.
+
+Interpretation:
+
+The provided TestPyPI token cannot currently create or upload the `sheetforge` project. The likely
+resolution is to use an account-scoped TestPyPI token for the first upload, or manually create/claim the
+project on TestPyPI and then use a project-scoped token for `sheetforge`.
 
 Required next steps:
 
-- merge Phase 22 PR;
 - configure the `testpypi` GitHub environment and trusted publishing relationship;
 - run the `Release` workflow manually with `publish_target = testpypi`;
 - install `sheetforge==0.1.0a1` from TestPyPI in a clean environment and run import/CLI smoke tests.
