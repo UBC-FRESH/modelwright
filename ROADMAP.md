@@ -642,7 +642,7 @@ Planning note: `planning/phase-27-performance-memory-hardening.md`.
   - [x] Keep `calculate(inputs=None) -> dict` behavior stable unless a later public API phase intentionally changes it.
   - [x] Measure import time and generated-code object memory before and after each change.
 - [ ] P27.4 Reduce pipeline cache and validation memory footprint. Child issue: #157.
-  - [ ] Measure workbook, graph, expression, inference, generated-module, and output-map memory costs separately.
+  - [x] Measure workbook, graph, expression, inference, generated-module, and output-map memory costs separately.
   - [ ] Evaluate streaming, SQLite/shelve-style local caches, compact record encoding, or selective loading for validation.
   - [ ] Explain why runtime memory can be much larger than the original workbook file size.
 - [ ] P27.5 Evaluate multicore and sharded execution options. Child issue: #156.
@@ -666,7 +666,7 @@ Acceptance criteria:
 
 ## Current Next Steps
 
-1. Start P27.4 by separating pipeline cache, generated-model execution, and comparison memory costs.
-2. Use the P27.3 expression-source generated-model profile as the source-backend baseline: cold import is 4.898 seconds and 1,381,648 KiB RSS; direct import plus `calculate()` is 151.616 seconds and 1,380,728 KiB RSS for 281,741 outputs.
-3. Investigate why the full cached comparison process still reaches about 13,100,240 KiB RSS when direct generated-model execution is about 1,380,728 KiB.
+1. Continue P27.4 by reducing pipeline cache and validation-process memory after the first stage profile.
+2. Use the P27.4 stage profile result as the current memory target: graph hydration keeps current RSS near 10.18 GiB for 3,543,800 edges, inference hydration pushes current RSS to about 11.85 GiB, and generated execution/comparison are not the dominant remaining full-process memory costs.
+3. Prototype a lower-memory validation path that avoids keeping full graph records and duplicate expression/inference records resident during generated-model execution and comparison.
 4. Preserve formula-template/vectorized-kernel work as a follow-on architecture target after P27 records current pipeline memory costs.

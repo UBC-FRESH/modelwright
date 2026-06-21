@@ -314,6 +314,64 @@ This is distinct from expression-source storage:
 - template/vectorized work should be planned as a follow-on architecture slice after P27 records the
   current performance boundary.
 
+## P27.4 Memory Stage Profile: First Pass
+
+Ignored raw artifacts:
+
+- `tmp/p27_memory_stage_profile.py`
+- `tmp/logs/p27-memory-stage-profile.log`
+- `tmp/p27-profile/memory-stage-profile.json`
+
+Scope:
+
+- loaded the cached 2020 FABLE workbook, graph, expressions, and inference artifacts in one process;
+- measured current RSS from `/proc/self/status`;
+- measured peak RSS from `resource.getrusage`;
+- generated and executed the expression-source source backend;
+- built oracle values and comparison reports in the same process.
+
+Stage measurements:
+
+- start: 35,192 KiB current RSS;
+- workbook JSON loaded: 1,908,292 KiB current RSS and 2,567,828 KiB peak RSS;
+- workbook record hydrated: 2,309,580 KiB current RSS;
+- graph JSON loaded: 8,462,292 KiB current RSS and 10,776,312 KiB peak RSS;
+- graph record hydrated: 10,182,548 KiB current RSS for 3,543,800 edges;
+- graph JSON deleted: 10,154,872 KiB current RSS;
+- expressions JSON loaded: 10,177,380 KiB current RSS and 11,612,668 KiB peak RSS;
+- expressions hydrated: 10,184,888 KiB current RSS for 296,976 expressions;
+- output universe built: 10,193,080 KiB current RSS for 281,741 comparable outputs;
+- inference JSON loaded: 11,114,632 KiB current RSS;
+- inference hydrated: 11,850,248 KiB current RSS for 373,410 symbols, 289,951 expressions, and
+  83,459 constants;
+- inference JSON deleted: 11,850,264 KiB current RSS;
+- generation done: 12,025,068 KiB current RSS and 12,139,032 KiB peak RSS;
+- generation result deleted: 11,905,616 KiB current RSS;
+- generated execution done: 12,670,648 KiB current RSS and 12,981,284 KiB peak RSS;
+- oracle values built: 12,670,648 KiB current RSS;
+- comparison done: 12,670,648 KiB current RSS with 281,741 matches and 0 mismatches;
+- validation outputs deleted: 12,435,240 KiB current RSS.
+
+Conclusions:
+
+- the graph cache/object model is the largest confirmed resident memory source;
+- the full dependency graph has 3,543,800 Python edge records, and hydrating it keeps the process near
+  10 GiB even after raw graph JSON is deleted;
+- inference loading adds a second large expression/symbol/constant representation and pushes current
+  RSS to about 11.85 GiB;
+- generation, generated execution, oracle-value construction, and comparison are not the dominant
+  remaining memory costs in the full-process validation path;
+- Python does not return most allocated memory to the OS after validation objects are deleted, so
+  long-lived all-in-one debug processes exaggerate steady RSS after high-water stages.
+
+Next P27.4 target:
+
+- avoid keeping the full graph and inference/expression duplicates resident during generated-model
+  execution and validation;
+- evaluate a validation path that loads only the inference artifact plus cached workbook scalar values,
+  or serializes generated execution and comparison into separate short-lived processes;
+- evaluate compact graph/inference stores before hydrating millions of edges into Python objects.
+
 ## Optimization Directions
 
 Prefer targeted changes supported by measurements:
