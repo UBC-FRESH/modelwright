@@ -44,6 +44,7 @@ def test_generated_module_contract_serializes_provenance() -> None:
     assert payload["entrypoint"] == "calculate"
     assert payload["output_refs"] == ["Summary!B2", "Summary!B3"]
     assert payload["include_provenance_comments"] is True
+    assert payload["formula_storage"] == "lambdas"
     assert payload["symbols"][0] == {
         "cell_ref": "Summary!B2",
         "symbol_name": "summary_b2",

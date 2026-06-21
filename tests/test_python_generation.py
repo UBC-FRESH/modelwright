@@ -165,6 +165,28 @@ def test_infer_generated_module_contract_disables_large_inline_provenance_commen
     assert any(symbol.raw_formula == "=BaseVolume*(1+GrowthRate)" for symbol in result.contract.symbols)
 
 
+def test_infer_generated_module_contract_uses_expression_sources_for_large_formula_sets(tmp_path: Path) -> None:
+    workbook = extract_workbook(build_workbook(tmp_path / "synthetic_model.xlsx"))
+    graph = build_dependency_graph(workbook)
+    formula_cells = {cell.cell_ref: cell for cell in workbook.cells if cell.formula is not None}
+    expressions = {
+        cell_ref: translate_formula_cell(cell, graph)
+        for cell_ref, cell in formula_cells.items()
+    }
+
+    result = infer_generated_module_contract(
+        workbook=workbook,
+        graph=graph,
+        expressions=expressions,
+        output_refs=("Summary!B2", "Summary!B3"),
+        module_name="synthetic_model",
+        inline_formula_lambda_limit=2,
+    )
+
+    assert result.inferred is True
+    assert result.contract.formula_storage == "expression_source"
+
+
 def test_generate_python_module_can_omit_inline_provenance_comments(tmp_path: Path) -> None:
     contract, expressions, constants = synthetic_generation_inputs(tmp_path)
     compact_contract = GeneratedModuleContract(
@@ -189,6 +211,36 @@ def test_generate_python_module_can_omit_inline_provenance_comments(tmp_path: Pa
     assert result.generated is True
     assert "# Calc!B2: =BaseVolume*(1+GrowthRate)" not in result.source_code
     assert module.calculate() == {"Summary!B2": 70.2, "Summary!B3": "ok"}
+
+
+def test_generate_python_module_can_store_formula_expression_sources(tmp_path: Path) -> None:
+    contract, expressions, constants = synthetic_generation_inputs(tmp_path)
+    compact_contract = GeneratedModuleContract(
+        workbook_id=contract.workbook_id,
+        module_name=contract.module_name,
+        entrypoint=contract.entrypoint,
+        input_refs=contract.input_refs,
+        output_refs=contract.output_refs,
+        symbols=contract.symbols,
+        formula_storage="expression_source",
+    )
+    output_path = tmp_path / "generated_expression_source_model.py"
+
+    result = generate_python_module(
+        contract=compact_contract,
+        expressions=expressions,
+        constants=constants,
+        output_path=output_path,
+    )
+    module = load_module(output_path)
+
+    assert result.generated is True
+    assert "    def _evaluate_formula(cell_ref, formula):" in result.source_code
+    assert "compile(formula, f'<modelwright formula {cell_ref}>', 'eval')" in result.source_code
+    assert "_formula_code_cache" not in result.source_code
+    assert "lambda: _sf_direct_reference" not in result.source_code
+    assert module.calculate() == {"Summary!B2": 70.2, "Summary!B3": "ok"}
+    assert module.calculate({"Inputs!B2": 10}) == {"Summary!B2": 7.02, "Summary!B3": "low"}
 
 
 def test_infer_generated_module_contract_ignores_unreached_dependency_diagnostics(tmp_path: Path) -> None:

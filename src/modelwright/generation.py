@@ -18,7 +18,9 @@ from modelwright.references import WorkbookReference
 
 JsonValue = str | int | float | bool | None | list[Any] | dict[str, Any]
 DEFAULT_INLINE_PROVENANCE_COMMENT_LIMIT = 50_000
+DEFAULT_INLINE_FORMULA_LAMBDA_LIMIT = 50_000
 DiagnosticSeverity = Literal["info", "warning", "error"]
+FormulaStorage = Literal["lambdas", "expression_source"]
 GeneratedSymbolKind = Literal["input", "intermediate", "output"]
 
 
@@ -90,6 +92,7 @@ class GeneratedModuleContract:
     output_refs: tuple[str, ...] = field(default_factory=tuple)
     symbols: tuple[GeneratedSymbol, ...] = field(default_factory=tuple)
     include_provenance_comments: bool = True
+    formula_storage: FormulaStorage = "lambdas"
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "GeneratedModuleContract":
@@ -101,6 +104,7 @@ class GeneratedModuleContract:
             output_refs=tuple(data.get("output_refs", [])),
             symbols=tuple(GeneratedSymbol.from_dict(item) for item in data.get("symbols", [])),
             include_provenance_comments=data.get("include_provenance_comments", True),
+            formula_storage=data.get("formula_storage", "lambdas"),
         )
 
     def to_dict(self) -> dict[str, JsonValue]:
@@ -112,6 +116,7 @@ class GeneratedModuleContract:
             "output_refs": list(self.output_refs),
             "symbols": [symbol.to_dict() for symbol in self.symbols],
             "include_provenance_comments": self.include_provenance_comments,
+            "formula_storage": self.formula_storage,
         }
 
 
@@ -188,6 +193,7 @@ def infer_generated_module_contract(
     input_refs: Sequence[str] = (),
     progress: Callable[[str], None] | None = None,
     inline_provenance_comment_limit: int | None = DEFAULT_INLINE_PROVENANCE_COMMENT_LIMIT,
+    inline_formula_lambda_limit: int | None = DEFAULT_INLINE_FORMULA_LAMBDA_LIMIT,
 ) -> GeneratedContractInferenceResult:
     """Infer a generated module contract by walking dependencies for selected outputs."""
 
@@ -373,6 +379,9 @@ def infer_generated_module_contract(
         include_provenance_comments=(
             inline_provenance_comment_limit is None or len(formula_order) <= inline_provenance_comment_limit
         ),
+        formula_storage="lambdas"
+        if inline_formula_lambda_limit is None or len(formula_order) <= inline_formula_lambda_limit
+        else "expression_source",
     )
     return GeneratedContractInferenceResult(
         contract=contract,
@@ -787,7 +796,7 @@ def _render_module(
             "            raise RuntimeError('circular dependency during generated model execution: ' + ' -> '.join(cycle))",
             "        _stack.append(cell_ref)",
             "        try:",
-            "            value = formula()",
+            "            value = _evaluate_formula(cell_ref, formula)",
             "        finally:",
             "            _stack.pop()",
             "        _cache[cell_ref] = value",
@@ -819,6 +828,36 @@ def _render_module(
             "            for row in range(min_row, max_row + 1)",
             "        )",
             "",
+        ]
+    )
+    if contract.formula_storage == "lambdas":
+        lines.extend(
+            [
+                "    def _evaluate_formula(_cell_ref, formula):",
+                "        return formula()",
+                "",
+            ]
+        )
+    elif contract.formula_storage == "expression_source":
+        lines.extend(
+            [
+                "    _formula_globals = dict(globals())",
+                "    _formula_globals.update({",
+                "        '_get': _get,",
+                "        '_range': _range,",
+                "        '_table': _table,",
+                "    })",
+                "",
+                "    def _evaluate_formula(cell_ref, formula):",
+                "        code = compile(formula, f'<modelwright formula {cell_ref}>', 'eval')",
+                "        return eval(code, _formula_globals)",
+                "",
+            ]
+        )
+    else:
+        raise ValueError(f"unsupported formula storage: {contract.formula_storage}")
+    lines.extend(
+        [
             "    _formulas = {",
         ]
     )
@@ -828,7 +867,11 @@ def _render_module(
             lines.append(f"        # {symbol.cell_ref}" + (f": {symbol.raw_formula}" if symbol.raw_formula else ""))
 
         expression = expressions[symbol.cell_ref]
-        lines.append(f"        {symbol.cell_ref!r}: lambda: {_render_formula_root(expression.root)},")
+        rendered_formula = _render_formula_root(expression.root)
+        if contract.formula_storage == "lambdas":
+            lines.append(f"        {symbol.cell_ref!r}: lambda: {rendered_formula},")
+        else:
+            lines.append(f"        {symbol.cell_ref!r}: {rendered_formula!r},")
 
         if index == 1 or index % 10000 == 0 or index == len(formula_symbols):
             _progress(

@@ -635,12 +635,12 @@ Planning note: `planning/phase-27-performance-memory-hardening.md`.
   - [x] Cache reusable range/table views where Excel semantics allow.
   - [x] Avoid rebuilding large Python lists for every `SUMIF`, `SUMIFS`, `COUNTIF`, and `COUNTIFS` call.
   - [x] Preserve lazy `IF`/`IFERROR`/`IFNA` branch behavior and runtime circular-dependency detection.
-- [ ] P27.3 Reduce generated module size and import overhead. Child issue: #158.
+- [x] P27.3 Reduce generated module size and import overhead. Child issue: #158.
   - [x] Disable inline formula provenance comments for large generated modules and verify full FABLE correctness is unchanged.
   - [x] Compact generated output maps while preserving `calculate(inputs=None) -> dict`.
-  - [ ] Evaluate compact generated-model layouts, shared expression helpers, or chunked modules for the remaining formula/output source.
-  - [ ] Keep `calculate(inputs=None) -> dict` behavior stable unless a later public API phase intentionally changes it.
-  - [ ] Measure import time and generated-code object memory before and after any change.
+  - [x] Use expression-source formula storage for large generated modules to reduce lambda/code-object import pressure.
+  - [x] Keep `calculate(inputs=None) -> dict` behavior stable unless a later public API phase intentionally changes it.
+  - [x] Measure import time and generated-code object memory before and after each change.
 - [ ] P27.4 Reduce pipeline cache and validation memory footprint. Child issue: #157.
   - [ ] Measure workbook, graph, expression, inference, generated-module, and output-map memory costs separately.
   - [ ] Evaluate streaming, SQLite/shelve-style local caches, compact record encoding, or selective loading for validation.
@@ -666,7 +666,7 @@ Acceptance criteria:
 
 ## Current Next Steps
 
-1. Continue P27.3 by attacking formula/output source layout and import overhead after the compact-provenance slice.
-2. Use the P27.2 result as the execution baseline: optimized full-validation generated execution is 183.463 seconds with 281,741/281,741 matches.
-3. Use the P27.3 compact-source result as the current source-size baseline: generated Python dropped from about 198.8 MB to 124.1 MB with 281,741/281,741 matches, but import still takes about 34 seconds and about 10.2 GiB max RSS.
-4. Preserve the current `calculate(inputs=None) -> dict` behavior until a later API phase intentionally changes it.
+1. Start P27.4 by separating pipeline cache, generated-model execution, and comparison memory costs.
+2. Use the P27.3 expression-source generated-model profile as the source-backend baseline: cold import is 4.898 seconds and 1,381,648 KiB RSS; direct import plus `calculate()` is 151.616 seconds and 1,380,728 KiB RSS for 281,741 outputs.
+3. Investigate why the full cached comparison process still reaches about 13,100,240 KiB RSS when direct generated-model execution is about 1,380,728 KiB.
+4. Preserve formula-template/vectorized-kernel work as a follow-on architecture target after P27 records current pipeline memory costs.

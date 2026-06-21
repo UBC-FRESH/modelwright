@@ -244,6 +244,76 @@ Conclusion:
 - the remaining P27.3 target is the formula function/lambda structure and generated code-object
   volume, which probably requires chunking, indexed runtime data, or a compact runtime IR backend.
 
+## P27.3 Expression-Source Formula Storage Evidence
+
+Implemented change:
+
+- generated-module contracts now include `formula_storage`, with `lambdas` retained for small/debug
+  models and `expression_source` selected by inferred large contracts;
+- expression-source generated modules store rendered formula expressions as strings rather than as
+  one lambda function per formula cell;
+- formula expressions are compiled and evaluated lazily when `_get(cell_ref)` reaches the cell;
+- compiled expression code is not retained because `_get()` already caches computed formula values;
+- the public generated API remains `calculate(inputs=None) -> dict[str, value]`.
+
+Cold import comparison against compact-lambda source:
+
+- compact lambda source: 124,057,782 bytes;
+- compact lambda cold import: 34.370 seconds;
+- compact lambda RSS after cold import: 10,518,600 KiB;
+- expression-source source: 122,318,322 bytes;
+- expression-source cold import: 4.898 seconds;
+- expression-source RSS after cold import: 1,381,648 KiB.
+
+Generated-model-only execution profile:
+
+- direct expression-source import plus `calculate()` elapsed time: 151.616 seconds;
+- direct expression-source `calculate()` elapsed time after import: 146.717 seconds;
+- outputs returned: 281,741;
+- RSS after direct generated-model execution: 1,380,728 KiB.
+
+Correctness evidence:
+
+- full cached 2020 FABLE comparison with expression-source storage still passed;
+- comparable outputs: 281,741;
+- matches: 281,741;
+- mismatches: 0;
+- full cached compare process RSS reached 13,100,240 KiB, but that process also held workbook,
+  graph, expression, inference, generated-output, and oracle comparison structures in memory.
+
+Conclusion:
+
+- the import/RSS bottleneck was primarily generated lambda/code-object pressure, not raw source text
+  length alone;
+- expression-source storage is a practical bridge for large source-backend models;
+- pipeline/cache memory is now clearly separate from generated-model import memory and belongs in
+  P27.4;
+- direct generated-model RSS is still much larger than the original workbook, but it is no longer in
+  the 10 GiB import range.
+
+## Formula Template And Vectorization Direction
+
+The next architectural improvement should stop representing every cell formula as a unique formula
+body when spreadsheet structure proves otherwise.
+
+Likely path:
+
+- normalize formulas into relative-reference templates, similar in spirit to R1C1 form;
+- group contiguous ranges, table columns, and rectangular regions that share the same template;
+- measure how much of the 2020 FABLE formula universe collapses into repeated templates;
+- compile one kernel per template and apply it over indexed cells, table columns, or rectangular
+  regions;
+- evaluate whether those kernels should run over plain Python arrays first, then NumPy, pandas, or
+  another array/table representation only if measurements justify the dependency.
+
+This is distinct from expression-source storage:
+
+- expression-source storage reduces Python import/code-object pressure while preserving the current
+  cell-by-cell lazy evaluator;
+- template/vectorized evaluation changes the intermediate representation and execution model;
+- template/vectorized work should be planned as a follow-on architecture slice after P27 records the
+  current performance boundary.
+
 ## Optimization Directions
 
 Prefer targeted changes supported by measurements:
