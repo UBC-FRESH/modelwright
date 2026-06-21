@@ -444,7 +444,7 @@ GitHub parent issue: #131
 
 Active branch: `feature/p23-modelwright-rebrand`
 
-Goal: complete the pre-publication rename from Modelwright to Modelwright across the GitHub repository,
+Goal: complete the pre-publication rename from Sheetforge to Modelwright across the GitHub repository,
 Python package, CLI, documentation, tests, and release workflow before resuming TestPyPI or PyPI
 publication. There are no external users yet, so this phase should not add compatibility aliases.
 
@@ -477,8 +477,42 @@ Merged PR: #136
 
 Status: complete.
 
+## Phase 24: TestPyPI Publication Rehearsal
+
+GitHub parent issue: #137
+
+Active branch: `feature/p24-testpypi-rehearsal`
+
+Goal: rehearse publication of `modelwright==0.1.0a1` to TestPyPI, then verify clean installation,
+import, and CLI behavior from TestPyPI before any real PyPI release.
+
+- [x] P24.1 Confirm TestPyPI target and credentials. Child issue: #141.
+  - [x] Check whether `modelwright` exists on TestPyPI.
+  - [x] Confirm local token file shape without printing token values.
+  - [x] Record whether the rehearsal will use token upload, trusted publishing, or a documented blocker.
+- [x] P24.2 Build and upload TestPyPI artifacts. Child issue: #139.
+  - [x] Run local release artifact check with verbose log.
+  - [x] Upload the checked artifacts to TestPyPI without exposing credentials.
+  - [x] Preserve upload logs under ignored `tmp/logs/`.
+  - [x] Record success or exact blocker.
+- [x] P24.3 Verify clean TestPyPI install. Child issue: #140.
+  - [x] Install `modelwright==0.1.0a1` from TestPyPI into a clean ignored virtual environment.
+  - [x] Verify import version.
+  - [x] Verify `modelwright --help`.
+  - [x] Verify old `sheetforge` import/CLI is absent.
+  - [x] Record pass/blocker evidence.
+- [x] P24.4 Record publication readiness decision. Child issue: #138.
+  - [x] Update roadmap current next steps.
+  - [x] Update changelog and planning note with sanitized evidence.
+  - [x] State whether real PyPI alpha publication is ready or still blocked.
+  - [x] Keep private token details out of tracked files.
+
+Status: ready for PR.
+
 ## Current Next Steps
 
-1. Rehearse TestPyPI publication for `modelwright==0.1.0a1` using an account-scoped TestPyPI token, a project-scoped token after the TestPyPI project exists, or trusted publishing.
-2. Install `modelwright==0.1.0a1` from TestPyPI in a clean environment and run import/CLI smoke tests.
-3. Decide whether to proceed to real PyPI alpha publication from tag `v0.1.0a1`.
+1. Open and merge the Phase 24 TestPyPI rehearsal PR.
+2. Configure the real PyPI trusted publisher for `UBC-FRESH/modelwright`, workflow `release.yml`, environment `pypi`.
+3. Create and push annotated tag `v0.1.0a1` after maintainer approval.
+4. Run or approve the `Release` workflow for real PyPI publication.
+5. Verify real PyPI install, import, CLI help, old-name absence, docs, and GitHub release notes.

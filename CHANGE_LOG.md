@@ -17,6 +17,8 @@ This file records completed project work in chronological order.
 - Completed the local Modelwright rebrand across package metadata, import package, CLI command, generated-code/runtime labels, release workflow artifacts, docs, tests, and planning notes; hardened bootstrap and release checks to remove stale pre-rebrand metadata and reject old package paths or console scripts.
 - Verified Phase 23 locally with repo-local bootstrap, ruff, 129 pytest tests, Sphinx warning-as-error docs build, Read the Docs theme verification, and a clean sdist/wheel release artifact check for `modelwright`.
 - Merged Phase 23 PR #136, closed the rebrand phase, confirmed post-merge CI and release-artifact checks passed, and verified the live renamed GitHub Pages site at `https://ubc-fresh.github.io/modelwright/` serves the Sphinx Read the Docs themed Modelwright docs.
+- Activated Phase 24 on `feature/p24-testpypi-rehearsal`, created GitHub parent issue #137 and child issues #141, #139, #140, and #138, and scoped TestPyPI target checks, artifact upload, clean install verification, and real-PyPI readiness decision evidence for `modelwright==0.1.0a1`.
+- Completed the TestPyPI rehearsal for `modelwright==0.1.0a1`: token upload was rejected with `403 Forbidden`, GitHub Actions trusted publishing succeeded, TestPyPI published the package, and a clean ignored virtual environment installed from TestPyPI, imported `modelwright`, ran `modelwright --help`, and confirmed old `sheetforge` import/CLI surfaces were absent.
 
 ## 2026-06-20
 
