@@ -74,3 +74,7 @@ Verification results:
 - `.venv/bin/sphinx-build -b html docs _build/html -W -v`: passed.
 - `.venv/bin/python scripts/verify_docs_theme.py _build/html`: passed.
 - `RELEASE_CHECK_DIR=tmp/release-checks/modelwright-final PYTHON=.venv/bin/python scripts/check_release_artifacts.sh`: passed.
+- PR #136 post-merge `Test` workflow: passed.
+- PR #136 post-merge `docs-pages` workflow: passed and deployed.
+- Live site `https://ubc-fresh.github.io/modelwright/`: contains `Modelwright`, `_static/css/theme.css`,
+  `wy-nav-side`, and `sphinx_rtd_theme`; does not contain `minima` or `jekyll-theme`.

@@ -473,11 +473,12 @@ publication. There are no external users yet, so this phase should not add compa
   - [x] Run local release artifact checks and installed CLI smoke tests for `modelwright`.
   - [x] Record closeout evidence and next publication steps.
 
-Status: ready for PR.
+Merged PR: #136
+
+Status: complete.
 
 ## Current Next Steps
 
-1. Open and merge the Phase 23 rebrand PR.
-2. Verify the renamed GitHub Pages site after the docs workflow deploys `https://ubc-fresh.github.io/modelwright/`.
-3. Rehearse TestPyPI publication for `modelwright==0.1.0a1` using an account-scoped TestPyPI token, a project-scoped token after the TestPyPI project exists, or trusted publishing.
-4. Decide whether to proceed to real PyPI alpha publication from tag `v0.1.0a1`.
+1. Rehearse TestPyPI publication for `modelwright==0.1.0a1` using an account-scoped TestPyPI token, a project-scoped token after the TestPyPI project exists, or trusted publishing.
+2. Install `modelwright==0.1.0a1` from TestPyPI in a clean environment and run import/CLI smoke tests.
+3. Decide whether to proceed to real PyPI alpha publication from tag `v0.1.0a1`.
