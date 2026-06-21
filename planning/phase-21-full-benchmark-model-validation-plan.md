@@ -132,6 +132,44 @@ Acceptance criteria:
 - record what equivalence has and has not been proven;
 - open the Phase 21 PR only after verification passes.
 
+Status: complete.
+
+Local evidence:
+
+- `tmp/p21-convergence-closeout/summary.json`;
+- `tmp/logs/p21-convergence-closeout.log`.
+
+Result:
+
+- summarized the post-P21 benchmark evidence from materialization and validation artifacts;
+- confirmed selected-output extraction, graphing, translation, contract inference, generation, execution,
+  and cached validation are complete for the selected 2020 FABLE scope;
+- classified residual blockers from the Phase 20 closeout:
+  - `unsupported_structured_reference`: resolved for the selected scope;
+  - `unsupported_volatile_function`: resolved for the selected scope;
+  - `missing_cached_formula_value`: deferred but avoided for the selected scope by choosing cached outputs;
+  - `named_range_source_error`: out of scope because it is an unreferenced source workbook defect;
+  - `unsupported_external_link`: deferred to explicit external dependency policy.
+
+Proven:
+
+- selected-output equivalence for the ten declared `SCENARIOS definition` outputs against cached workbook
+  values.
+
+Not proven:
+
+- full-workbook generated-model materialization;
+- full-workbook generated-output equivalence;
+- oracle-backed recalculation equivalence;
+- external workbook dependency behavior.
+
+Next targets:
+
+- expand selected-output coverage beyond the initial ten cached scenario-definition outputs;
+- define policy and tooling for external workbook dependencies;
+- add generated-model scope selection heuristics so users can choose meaningful output sets;
+- add cached-value availability reporting for candidate output selection.
+
 ## Convergence Rule
 
 Do not accept a planning-only result when a blocker is concrete enough to reproduce. The loop is:

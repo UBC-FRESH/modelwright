@@ -111,6 +111,7 @@ This file records completed project work in chronological order.
 - Added P21.1 generated-model contract inference from workbook records, dependency graphs, translated expressions, and selected output refs, with synthetic tests proving inferred contracts generate and execute the controlled fixture model.
 - Closed P21.2 by materializing a selected 2020 FABLE generated Python model under ignored local artifacts, using ten cached benchmark outputs, 20 inferred symbols, 10 input constants, no inference/generation diagnostics, and a successful generated-model execution smoke test.
 - Closed P21.3 by validating the selected 2020 FABLE generated model through the public CLI against cached workbook values, with ten passing comparisons, zero mismatches, and zero validation diagnostics.
+- Closed P21.4 by recording the convergence boundary: selected-output equivalence is proven for ten cached 2020 FABLE `SCENARIOS definition` outputs, while full-workbook equivalence, oracle-backed recalculation equivalence, and external dependency behavior remain unproven next targets.
 
 ## 2026-06-19
 
