@@ -94,6 +94,8 @@ scripts/check_release_artifacts.sh
 
 Release checks write build outputs under ignored `tmp/release-checks/`.
 
+See `docs/guides/release-deployment.rst` for the release and deployment runbook.
+
 ## Repository Conventions
 
 - `AGENTS.md` is the working contract for AI coding agents.

@@ -413,7 +413,10 @@ Goal: establish a professional deployment and publication workflow before any re
   - [x] Add CI release artifact build validation.
   - [x] Add manually gated TestPyPI and tag/protected-environment gated PyPI publication workflow skeleton.
   - [ ] Verify GitHub Pages serves the built Sphinx Read the Docs themed artifact, not a fallback Jekyll/minima site.
-- [ ] P22.4 Document deployment runbook and developer release onboarding. Child issue: #128.
+- [x] P22.4 Document deployment runbook and developer release onboarding. Child issue: #128.
+  - [x] Add Sphinx release and deployment runbook.
+  - [x] Mirror release onboarding essentials in `CONTRIBUTING.md`.
+  - [x] Verify docs build and local Read the Docs themed artifact.
 - [ ] P22.5 Rehearse release artifacts and close publication readiness. Child issue: #126.
 
 Publication gates:
@@ -429,6 +432,5 @@ Status: active.
 
 ## Current Next Steps
 
-1. Complete P22.3 by adding gated TestPyPI/PyPI release workflows and verifying the GitHub Pages RTD-themed Sphinx artifact.
-2. Complete P22.4 by documenting the deployment runbook and developer release onboarding path.
-3. Complete P22.5 by rehearsing artifacts, recording release readiness, opening the Phase 22 PR, and closing parent issue #124 only after merge.
+1. Complete P22.3 by verifying the GitHub Pages RTD-themed Sphinx artifact after deployment from `main`.
+2. Complete P22.5 by rehearsing artifacts, recording release readiness, opening the Phase 22 PR, and closing parent issue #124 only after merge.

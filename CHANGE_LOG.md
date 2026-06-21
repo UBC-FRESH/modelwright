@@ -9,6 +9,7 @@ This file records completed project work in chronological order.
 - Approved MIT licensing and the `0.1.0a1` alpha release target, then started P22.2 package metadata and artifact-check hardening.
 - Completed P22.2 package metadata hardening with an MIT `LICENSE`, `0.1.0a1` package/import version, release metadata, local artifact checker, clean sdist/wheel metadata checks, artifact privacy inspection, clean wheel install smoke test, and full local ruff/pytest/docs verification.
 - Started P22.3 release automation by adding a gated GitHub Actions release workflow and a Sphinx Read the Docs theme artifact verifier for documentation deployment checks.
+- Added the P22.4 release and deployment runbook to the Sphinx docs and contributor onboarding notes.
 
 ## 2026-06-20
 
