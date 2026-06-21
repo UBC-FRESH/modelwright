@@ -101,6 +101,26 @@ Acceptance criteria:
 - preserve missing cached values and oracle failures as validation blockers;
 - write ignored local validation reports and verbose logs.
 
+Status: complete.
+
+Local evidence:
+
+- `tmp/p21-fable-2020-validation/validation-scenario.json`;
+- `tmp/p21-fable-2020-validation/evaluation-result.json`;
+- `tmp/p21-fable-2020-validation/summary.json`;
+- `tmp/logs/p21-fable-2020-validation.log`.
+
+Result:
+
+- wrote a validation scenario for the same ten selected 2020 FABLE outputs materialized in P21.2;
+- ran `sheetforge validation evaluate` through the public CLI with `--workbook` and `--verbose`;
+- re-extracted the 2020 source workbook to obtain cached workbook values;
+- executed the generated model successfully with zero execution diagnostics;
+- compared ten generated outputs against cached workbook values;
+- cached-workbook validation status was `pass`;
+- mismatches were empty;
+- validation diagnostics were empty.
+
 ### P21.4 Rerun Benchmark Convergence Loop
 
 Goal: rerun the benchmark after P21 fixes and classify every remaining blocker.

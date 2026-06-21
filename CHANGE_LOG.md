@@ -110,6 +110,7 @@ This file records completed project work in chronological order.
 - Merged Phase 20 PR #117, closed parent issue #112, and activated Phase 21 on `feature/p21-full-benchmark-model-validation` with parent issue #118 and child issues #119 through #122.
 - Added P21.1 generated-model contract inference from workbook records, dependency graphs, translated expressions, and selected output refs, with synthetic tests proving inferred contracts generate and execute the controlled fixture model.
 - Closed P21.2 by materializing a selected 2020 FABLE generated Python model under ignored local artifacts, using ten cached benchmark outputs, 20 inferred symbols, 10 input constants, no inference/generation diagnostics, and a successful generated-model execution smoke test.
+- Closed P21.3 by validating the selected 2020 FABLE generated model through the public CLI against cached workbook values, with ten passing comparisons, zero mismatches, and zero validation diagnostics.
 
 ## 2026-06-19
 

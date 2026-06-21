@@ -353,14 +353,14 @@ until generated-model equivalence is either proven or sharply scoped.
 
 - [x] P21.1 Infer generated-model contracts from dependency graphs and selected outputs. Child issue: #122.
 - [x] P21.2 Materialize the 2020 FABLE generated model with topologically ordered symbols. Child issue: #121.
-- [ ] P21.3 Validate selected 2020 FABLE outputs against cached or oracle values. Child issue: #120.
+- [x] P21.3 Validate selected 2020 FABLE outputs against cached or oracle values. Child issue: #120.
 - [ ] P21.4 Rerun the blocker-find-resolve-continue loop until the benchmark result converges. Child issue: #119.
 
 Status: active.
 
 ## Current Next Steps
 
-1. Work P21.3 in child issue #120 on branch `feature/p21-full-benchmark-model-validation`.
-2. Define the selected 2020 FABLE benchmark validation scenario.
-3. Compare generated outputs against cached workbook values or an explicit oracle.
-4. Preserve missing cached values and oracle failures as explicit blockers.
+1. Work P21.4 in child issue #119 on branch `feature/p21-full-benchmark-model-validation`.
+2. Rerun and summarize the selected 2020 FABLE benchmark convergence evidence.
+3. Classify every remaining blocker as resolved, deferred, out of scope, or next target.
+4. Record what equivalence has and has not been proven before opening the Phase 21 PR.
