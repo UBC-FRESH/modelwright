@@ -400,6 +400,10 @@ Active branch: `feature/p22-pypi-publication-deployment`
 Goal: establish a professional deployment and publication workflow before any real PyPI release. This phase should make release metadata, artifact builds, TestPyPI rehearsal, documentation deployment checks, and maintainer publication gates explicit and reproducible.
 
 - [ ] P22.1 Decide alpha release target, license, and publication policy. Child issue: #127.
+  - [x] Recommend `0.1.0a1` as the first external alpha version line.
+  - [x] Define staged publication policy: local artifacts, TestPyPI rehearsal, then gated real PyPI.
+  - [x] Define benchmark evidence boundary for alpha release claims.
+  - [ ] Confirm maintainer-approved license before package metadata changes or real PyPI publication.
 - [ ] P22.2 Harden package metadata and artifact build checks. Child issue: #125.
 - [ ] P22.3 Add release automation for GitHub, TestPyPI, and PyPI gates. Child issue: #129.
   - [ ] Verify GitHub Pages serves the built Sphinx Read the Docs themed artifact, not a fallback Jekyll/minima site.
@@ -419,7 +423,7 @@ Status: active.
 
 ## Current Next Steps
 
-1. Complete P22.1 by deciding the first alpha version target, license, and publication policy.
+1. Complete P22.1 by confirming the maintainer-approved license; current recommendation is MIT.
 2. Complete P22.2 by hardening package metadata and adding local build/artifact checks.
 3. Complete P22.3 by adding gated TestPyPI/PyPI release workflows and verifying the GitHub Pages RTD-themed Sphinx artifact.
 4. Complete P22.4 by documenting the deployment runbook and developer release onboarding path.

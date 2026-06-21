@@ -5,6 +5,7 @@ This file records completed project work in chronological order.
 ## 2026-06-21
 
 - Activated Phase 22 on `feature/p22-pypi-publication-deployment`, created GitHub parent issue #124 and child issues #125 through #129, and scoped PyPI/TestPyPI publication, release artifact checks, maintainer gates, deployment docs, and GitHub Pages Read the Docs theme verification.
+- Drafted the P22.1 alpha release policy: recommend `0.1.0a1`, require local artifact checks and TestPyPI rehearsal before real PyPI, preserve benchmark-claim limits, and keep license selection gated on explicit maintainer approval.
 
 ## 2026-06-20
 
