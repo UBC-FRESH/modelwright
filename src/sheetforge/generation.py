@@ -191,11 +191,12 @@ def infer_generated_module_contract(
     selected_outputs = tuple(output_refs)
     cell_by_ref = {cell.cell_ref: cell for cell in workbook.cells}
     dependencies_by_target: dict[str, list[str]] = {}
+    edge_diagnostics_by_target: dict[str, list[GenerationDiagnostic]] = {}
     diagnostics: list[GenerationDiagnostic] = []
 
     for edge in graph.execution_edges:
         if edge.diagnostic_code is not None:
-            diagnostics.append(
+            edge_diagnostics_by_target.setdefault(edge.target.normalized, []).append(
                 GenerationDiagnostic(
                     code="unsupported_dependency_edge",
                     message="dependency edge has a diagnostic and cannot be inferred silently",
@@ -206,7 +207,7 @@ def infer_generated_module_contract(
             )
             continue
         if edge.source.kind != "cell":
-            diagnostics.append(
+            edge_diagnostics_by_target.setdefault(edge.target.normalized, []).append(
                 GenerationDiagnostic(
                     code="unsupported_dependency_source",
                     message="dependency source is not a concrete cell reference",
@@ -256,6 +257,7 @@ def infer_generated_module_contract(
             return
 
         visiting.add(cell_ref)
+        diagnostics.extend(edge_diagnostics_by_target.get(cell_ref, ()))
         for dependency_ref in dependencies_by_target.get(cell_ref, []):
             visit(dependency_ref)
         visiting.remove(cell_ref)

@@ -352,7 +352,7 @@ Python benchmark model, then validate selected benchmark outputs and keep iterat
 until generated-model equivalence is either proven or sharply scoped.
 
 - [x] P21.1 Infer generated-model contracts from dependency graphs and selected outputs. Child issue: #122.
-- [ ] P21.2 Materialize the 2020 FABLE generated model with topologically ordered symbols. Child issue: #121.
+- [x] P21.2 Materialize the 2020 FABLE generated model with topologically ordered symbols. Child issue: #121.
 - [ ] P21.3 Validate selected 2020 FABLE outputs against cached or oracle values. Child issue: #120.
 - [ ] P21.4 Rerun the blocker-find-resolve-continue loop until the benchmark result converges. Child issue: #119.
 
@@ -360,7 +360,7 @@ Status: active.
 
 ## Current Next Steps
 
-1. Work P21.2 in child issue #121 on branch `feature/p21-full-benchmark-model-validation`.
-2. Topologically order generated symbols for the selected benchmark scope.
-3. Emit the 2020 FABLE generated model to ignored local artifacts.
-4. Run materialization in verbose mode with a tail-able log and record generation diagnostics.
+1. Work P21.3 in child issue #120 on branch `feature/p21-full-benchmark-model-validation`.
+2. Define the selected 2020 FABLE benchmark validation scenario.
+3. Compare generated outputs against cached workbook values or an explicit oracle.
+4. Preserve missing cached values and oracle failures as explicit blockers.

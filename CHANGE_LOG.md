@@ -109,6 +109,7 @@ This file records completed project work in chronological order.
 - Closed P20.4 by running a verbose synthetic generated-model evaluation through the CLI and a verbose 2020 FABLE benchmark boundary run, proving synthetic generated-model validation and preserving the 2020 benchmark's clean extraction, graph, and translation status while explicitly deferring full workbook equivalence to Phase 21 generated-model materialization and validation.
 - Merged Phase 20 PR #117, closed parent issue #112, and activated Phase 21 on `feature/p21-full-benchmark-model-validation` with parent issue #118 and child issues #119 through #122.
 - Added P21.1 generated-model contract inference from workbook records, dependency graphs, translated expressions, and selected output refs, with synthetic tests proving inferred contracts generate and execute the controlled fixture model.
+- Closed P21.2 by materializing a selected 2020 FABLE generated Python model under ignored local artifacts, using ten cached benchmark outputs, 20 inferred symbols, 10 input constants, no inference/generation diagnostics, and a successful generated-model execution smoke test.
 
 ## 2026-06-19
 

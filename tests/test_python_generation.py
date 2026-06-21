@@ -14,7 +14,7 @@ from sheetforge.generation import (
     infer_generated_module_contract,
     symbol_name_for_cell_ref,
 )
-from sheetforge.graph import build_dependency_graph
+from sheetforge.graph import DependencyEdge, DependencyGraph, build_dependency_graph
 from sheetforge.references import normalize_reference
 from tests.fixtures.synthetic_model.build_workbook import build_workbook
 
@@ -137,6 +137,40 @@ def test_infer_generated_module_contract_for_synthetic_outputs(tmp_path: Path) -
         "output",
         "output",
     ]
+
+
+def test_infer_generated_module_contract_ignores_unreached_dependency_diagnostics(tmp_path: Path) -> None:
+    workbook = extract_workbook(build_workbook(tmp_path / "synthetic_model.xlsx"))
+    graph = build_dependency_graph(workbook)
+    graph = DependencyGraph(
+        workbook_id=graph.workbook_id,
+        edges=graph.edges
+        + (
+            DependencyEdge(
+                source=normalize_reference("Inputs!B2:B3"),
+                target=normalize_reference("Inputs!A1"),
+                edge_kind="execution",
+                raw_reference="Inputs!B2:B3",
+            ),
+        ),
+        diagnostics=graph.diagnostics,
+    )
+    formula_cells = {cell.cell_ref: cell for cell in workbook.cells if cell.formula is not None}
+    expressions = {
+        cell_ref: translate_formula_cell(cell, graph)
+        for cell_ref, cell in formula_cells.items()
+    }
+
+    result = infer_generated_module_contract(
+        workbook=workbook,
+        graph=graph,
+        expressions=expressions,
+        output_refs=("Summary!B2", "Summary!B3"),
+        module_name="synthetic_model",
+    )
+
+    assert result.inferred is True
+    assert result.diagnostics == ()
 
 
 def test_inferred_generated_module_runs_synthetic_model(tmp_path: Path) -> None:

@@ -64,6 +64,32 @@ Acceptance criteria:
 - run materialization in verbose mode with a tail-able log;
 - record generation diagnostics, model size, and runtime constraints.
 
+Status: complete.
+
+Local evidence:
+
+- `tmp/p21-fable-2020-materialization/generated_model.py`;
+- `tmp/p21-fable-2020-materialization/contract-inference.json`;
+- `tmp/p21-fable-2020-materialization/generation-result.json`;
+- `tmp/p21-fable-2020-materialization/summary.json`;
+- `tmp/logs/p21-fable-2020-materialization-rerun.log`.
+
+Result:
+
+- selected the ten cached benchmark outputs previously used for the 2020 IFNA evaluation:
+  `SCENARIOS definition!J29`, `K29`, `L29`, `M29`, `N29`, `O29`, `S29`, `T29`, `U29`, and `V29`;
+- reran 2020 FABLE extraction, graphing, and translation with verbose progress;
+- translated 296,976 of 296,976 formulas with zero translation diagnostics;
+- built a selected-output generated-model contract with 20 symbols, 10 input constants, and 10 outputs;
+- generated a 207-line Python model under ignored `tmp/`;
+- executed the generated model as a smoke test and observed ten outputs with no generation diagnostics.
+
+Implementation note:
+
+- tightened generated-contract inference so unsupported dependency edges outside the selected-output
+  dependency closure do not block selected-output materialization;
+- kept unsupported dependency edges inside the selected-output closure as explicit generation diagnostics.
+
 ### P21.3 Validate Selected 2020 FABLE Outputs
 
 Goal: compare selected generated 2020 FABLE outputs against cached workbook values or an explicit oracle.
