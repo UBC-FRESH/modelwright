@@ -2,6 +2,16 @@
 
 This file records completed project work in chronological order.
 
+## 2026-06-21
+
+- Activated Phase 22 on `feature/p22-pypi-publication-deployment`, created GitHub parent issue #124 and child issues #125 through #129, and scoped PyPI/TestPyPI publication, release artifact checks, maintainer gates, deployment docs, and GitHub Pages Read the Docs theme verification.
+- Drafted the P22.1 alpha release policy: recommend `0.1.0a1`, require local artifact checks and TestPyPI rehearsal before real PyPI, preserve benchmark-claim limits, and keep license selection gated on explicit maintainer approval.
+- Approved MIT licensing and the `0.1.0a1` alpha release target, then started P22.2 package metadata and artifact-check hardening.
+- Completed P22.2 package metadata hardening with an MIT `LICENSE`, `0.1.0a1` package/import version, release metadata, local artifact checker, clean sdist/wheel metadata checks, artifact privacy inspection, clean wheel install smoke test, and full local ruff/pytest/docs verification.
+- Started P22.3 release automation by adding a gated GitHub Actions release workflow and a Sphinx Read the Docs theme artifact verifier for documentation deployment checks.
+- Added the P22.4 release and deployment runbook to the Sphinx docs and contributor onboarding notes.
+- Recorded P22.5 local release-readiness evidence: ruff, pytest, docs, local RTD theme verification, sdist/wheel build, `twine check`, artifact privacy inspection, and clean wheel install smoke test pass; TestPyPI, real PyPI, and deployed Pages verification remain gated after merge.
+
 ## 2026-06-20
 
 - Added validation report core objects for comparison records, diagnostics, report status, mismatch extraction, and JSON-serializable boundaries.

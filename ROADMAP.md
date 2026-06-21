@@ -257,7 +257,9 @@ Status: complete.
 
 GitHub parent issue: #88
 
-Active branch: `feature/p17-real-workbook-formula-semantics`
+Completed branch: `feature/p17-real-workbook-formula-semantics`
+
+Merged PR: #109
 
 Goal: expand formula and reference semantics based on real workbook evidence, especially structured references, unsupported functions, parser token forms, operators, external references, volatile functions, named ranges, and cached-value gaps.
 
@@ -272,7 +274,7 @@ Goal: expand formula and reference semantics based on real workbook evidence, es
   - [x] Pass 6: constrained static `OFFSET` support.
 - [x] P17.4 Validate expanded semantics and closeout. Child issue: #94.
 
-Status: complete pending PR.
+Status: complete.
 
 ## Phase 18: Conversion Planning And Pipeline Orchestration
 
@@ -311,7 +313,9 @@ Status: complete.
 
 GitHub parent issue: #112
 
-Active branch: `feature/p20-automated-validation-reports`
+Completed branch: `feature/p20-automated-validation-reports`
+
+Merged PR: #117
 
 Goal: after residual blockers have concrete resolution or scope decisions, make generated-model execution, oracle execution where available, cached-value comparisons, and benchmark evaluation reports repeatable through APIs and CLI commands.
 
@@ -320,7 +324,7 @@ Goal: after residual blockers have concrete resolution or scope decisions, make 
 - [x] P20.3 Add evaluation report CLI and JSON outputs. Child issue: #115.
 - [x] P20.4 Run repeatable evaluation and closeout. Child issue: #116.
 
-Status: complete pending PR merge.
+Status: complete.
 
 Closeout evidence:
 
@@ -345,7 +349,9 @@ Ignored local evidence:
 
 GitHub parent issue: #118
 
-Active branch: `feature/p21-full-benchmark-model-validation`
+Completed branch: `feature/p21-full-benchmark-model-validation`
+
+Merged PR: #123
 
 Goal: turn the clean 2020 FABLE extraction, graph, and translation evidence into an executable generated
 Python benchmark model, then validate selected benchmark outputs and keep iterating on concrete blockers
@@ -356,7 +362,7 @@ until generated-model equivalence is either proven or sharply scoped.
 - [x] P21.3 Validate selected 2020 FABLE outputs against cached or oracle values. Child issue: #120.
 - [x] P21.4 Rerun the blocker-find-resolve-continue loop until the benchmark result converges. Child issue: #119.
 
-Status: complete pending PR merge.
+Status: complete.
 
 Closeout evidence:
 
@@ -385,9 +391,54 @@ Ignored local evidence:
 - `tmp/logs/p21-fable-2020-validation.log`
 - `tmp/logs/p21-convergence-closeout.log`
 
+## Phase 22: PyPI Publication And Deployment Workflow
+
+GitHub parent issue: #124
+
+Active branch: `feature/p22-pypi-publication-deployment`
+
+Goal: establish a professional deployment and publication workflow before any real PyPI release. This phase should make release metadata, artifact builds, TestPyPI rehearsal, documentation deployment checks, and maintainer publication gates explicit and reproducible.
+
+- [x] P22.1 Decide alpha release target, license, and publication policy. Child issue: #127.
+  - [x] Recommend `0.1.0a1` as the first external alpha version line.
+  - [x] Define staged publication policy: local artifacts, TestPyPI rehearsal, then gated real PyPI.
+  - [x] Define benchmark evidence boundary for alpha release claims.
+  - [x] Confirm maintainer-approved MIT license before package metadata changes or real PyPI publication.
+- [x] P22.2 Harden package metadata and artifact build checks. Child issue: #125.
+  - [x] Add MIT license file and package metadata.
+  - [x] Set package and import version to `0.1.0a1`.
+  - [x] Add local release artifact check script.
+  - [x] Verify sdist/wheel metadata, artifact contents, clean wheel install, package import, and installed CLI smoke test.
+- [ ] P22.3 Add release automation for GitHub, TestPyPI, and PyPI gates. Child issue: #129.
+  - [x] Add CI release artifact build validation.
+  - [x] Add manually gated TestPyPI and tag/protected-environment gated PyPI publication workflow skeleton.
+  - [ ] Verify GitHub Pages serves the built Sphinx Read the Docs themed artifact, not a fallback Jekyll/minima site.
+- [x] P22.4 Document deployment runbook and developer release onboarding. Child issue: #128.
+  - [x] Add Sphinx release and deployment runbook.
+  - [x] Mirror release onboarding essentials in `CONTRIBUTING.md`.
+  - [x] Verify docs build and local Read the Docs themed artifact.
+- [ ] P22.5 Rehearse release artifacts and close publication readiness. Child issue: #126.
+  - [x] Run full local verification with verbose logs.
+  - [x] Build sdist and wheel from a clean isolated build environment.
+  - [x] Run artifact inspection and clean install smoke tests.
+  - [x] Document TestPyPI rehearsal blocker: release workflow and trusted-publishing environments must be available after merge.
+  - [ ] Verify the published GitHub Pages site is the Sphinx Read the Docs themed documentation artifact.
+  - [x] Record real PyPI alpha publication as deferred until TestPyPI rehearsal and maintainer approval pass.
+
+Publication gates:
+
+- Local sdist/wheel builds must pass metadata checks and clean install smoke tests.
+- CI must validate release artifacts before any publication workflow can publish them.
+- TestPyPI publication must be rehearsed or blocked with a concrete documented reason.
+- Real PyPI publication must be protected by a maintainer-controlled gate.
+- The first published alpha version must use canonical Python packaging syntax such as `0.1.0a1` or `1.0.0a1`.
+- The project license must be selected explicitly by the maintainer before real PyPI publication.
+
+Status: active.
+
 ## Current Next Steps
 
-1. Run full verification on branch `feature/p21-full-benchmark-model-validation`.
-2. Commit and push the P21.4 closeout.
-3. Open the Phase 21 PR back to `main`.
-4. After merge, activate the next phase around broader benchmark coverage and remaining dependency policy.
+1. Open the Phase 22 PR and verify the PR checks, including release artifact validation and docs theme verification.
+2. After merge, verify the GitHub Pages deployment serves the Sphinx Read the Docs themed artifact.
+3. Rehearse TestPyPI publication from the merged release workflow once GitHub environments/trusted publishing are configured.
+4. Close P22.3, P22.5, and parent issue #124 only after the post-merge gates are resolved or explicitly deferred by the maintainer.

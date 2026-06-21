@@ -81,6 +81,32 @@ Build docs locally with warnings as errors:
 
 The GitHub Pages workflow builds docs on pull requests and deploys on pushes to `main`.
 
+## Release And Deployment
+
+Release work uses the repo-local `.venv` and the same artifact checks used in CI.
+
+Build and inspect release artifacts locally:
+
+```bash
+scripts/check_release_artifacts.sh
+```
+
+Verify the Sphinx Read the Docs themed docs artifact:
+
+```bash
+.venv/bin/sphinx-build -b html docs _build/html -W -v
+.venv/bin/python scripts/verify_docs_theme.py _build/html
+```
+
+Publication is maintainer-gated:
+
+- build artifacts locally and in CI first;
+- rehearse publication through TestPyPI;
+- publish to real PyPI only from the release workflow, with a tag such as `v0.1.0a1` and protected environment approval;
+- never commit credentials, benchmark workbook binaries, generated models, private reports, or local logs.
+
+See `docs/guides/release-deployment.rst` for the full runbook.
+
 ## Pull Requests
 
 Before opening a PR:
@@ -91,4 +117,4 @@ Before opening a PR:
 - close or update the corresponding child issue checklist;
 - keep the PR scoped to the active phase branch.
 
-Do not add broad conversion claims, compatibility guarantees, release automation, or publishing metadata until the roadmap phase explicitly calls for them.
+Do not add broad conversion claims or compatibility guarantees until the roadmap phase explicitly calls for them.

@@ -75,6 +75,7 @@ Build docs locally:
 
 ```bash
 .venv/bin/sphinx-build -b html docs _build/html -W
+.venv/bin/python scripts/verify_docs_theme.py _build/html
 ```
 
 Restore the public external FABLE benchmark workbooks into ignored local paths:
@@ -83,7 +84,17 @@ Restore the public external FABLE benchmark workbooks into ignored local paths:
 scripts/bootstrap_dev_env.sh --benchmarks
 ```
 
-`sheetforge` is pre-release. The package metadata is sufficient for local editable installs and CI, but publishing metadata, release artifacts, and compatibility guarantees are intentionally deferred until the conversion workflow is more proven.
+`sheetforge` is pre-release. The first planned alpha line is `0.1.0a1`; alpha releases must not be described as full-workbook conversion guarantees.
+
+Check release artifacts locally:
+
+```bash
+scripts/check_release_artifacts.sh
+```
+
+Release checks write build outputs under ignored `tmp/release-checks/`.
+
+See `docs/guides/release-deployment.rst` for the release and deployment runbook.
 
 ## Repository Conventions
 

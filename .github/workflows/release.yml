@@ -1,0 +1,93 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_target:
+        description: "Publication target"
+        required: true
+        type: choice
+        default: none
+        options:
+          - none
+          - testpypi
+          - pypi
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-artifacts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install release dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[release]"
+
+      - name: Build and inspect release artifacts
+        env:
+          PYTHON: python
+          RELEASE_CHECK_DIR: tmp/release-checks/current
+        run: scripts/check_release_artifacts.sh
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sheetforge-release-artifacts
+          path: tmp/release-checks/current/dist/*
+          if-no-files-found: error
+
+  publish-testpypi:
+    if: github.event_name == 'workflow_dispatch' && inputs.publish_target == 'testpypi'
+    needs: build-artifacts
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+
+    steps:
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: sheetforge-release-artifacts
+          path: dist
+
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          packages-dir: dist
+
+  publish-pypi:
+    if: >
+      (github.event_name == 'workflow_dispatch' && inputs.publish_target == 'pypi' && startsWith(github.ref, 'refs/tags/v'))
+      || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
+    needs: build-artifacts
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+
+    steps:
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: sheetforge-release-artifacts
+          path: dist
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist

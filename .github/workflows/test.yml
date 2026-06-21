@@ -42,3 +42,26 @@ jobs:
 
       - name: Run tests
         run: python -m pytest
+
+  release-artifacts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install release dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[release]"
+
+      - name: Build and inspect release artifacts
+        env:
+          PYTHON: python
+          RELEASE_CHECK_DIR: tmp/release-checks/ci
+        run: scripts/check_release_artifacts.sh

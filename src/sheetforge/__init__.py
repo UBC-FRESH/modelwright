@@ -81,7 +81,7 @@ from sheetforge.validation import (
     load_validation_scenario,
 )
 
-__version__ = "0.0.0"
+__version__ = "0.1.0a1"
 
 __all__ = [
     "CellRecord",

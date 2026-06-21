@@ -1,22 +1,49 @@
 [build-system]
-requires = ["setuptools>=69"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "sheetforge"
-version = "0.0.0"
+version = "0.1.0a1"
 description = "Tools for converting spreadsheet workbooks into transparent Python models."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "TBD" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
-  { name = "UBC FRESH" }
+  { name = "UBC FRESH Lab" }
+]
+keywords = [
+  "spreadsheets",
+  "excel",
+  "model-conversion",
+  "reproducible-models",
+  "validation"
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Office/Business",
+  "Topic :: Scientific/Engineering"
 ]
 dependencies = [
   "openpyxl>=3.1",
   "rich>=13",
   "typer>=0.9"
 ]
+
+[project.urls]
+Homepage = "https://github.com/UBC-FRESH/sheetforge"
+Documentation = "https://ubc-fresh.github.io/sheetforge/"
+Repository = "https://github.com/UBC-FRESH/sheetforge"
+Issues = "https://github.com/UBC-FRESH/sheetforge/issues"
+Changelog = "https://github.com/UBC-FRESH/sheetforge/blob/main/CHANGE_LOG.md"
 
 [project.scripts]
 sheetforge = "sheetforge.cli:app"
@@ -27,17 +54,23 @@ docs = [
   "sphinx-rtd-theme>=2"
 ]
 dev = [
+  "build>=1.2",
   "formulas",
   "pytest>=8",
   "ruff>=0.8",
   "sphinx>=7",
-  "sphinx-rtd-theme>=2"
+  "sphinx-rtd-theme>=2",
+  "twine>=5"
 ]
 oracle = [
   "formulas"
 ]
 quality = [
   "ruff>=0.8"
+]
+release = [
+  "build>=1.2",
+  "twine>=5"
 ]
 test = [
   "formulas",
