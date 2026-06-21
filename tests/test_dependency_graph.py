@@ -172,6 +172,55 @@ def test_dependency_graph_resolves_column_structured_reference_as_range(tmp_path
     ]
 
 
+def test_dependency_graph_resolves_structured_column_span_as_range(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "column-span-structured-reference.xlsx"
+    source = Workbook()
+    sheet = source.active
+    sheet.title = "Data"
+    sheet.append(["Selection", "Scenario", "Description"])
+    sheet.append(["x", "Current", "same"])
+    sheet.append([None, "Future", "changed"])
+    sheet["E1"] = '=VLOOKUP("X",InputTable[[Selection]:[Scenario]],2,FALSE)'
+    sheet.add_table(Table(displayName="InputTable", ref="A1:C3"))
+    source.save(workbook_path)
+
+    graph = build_dependency_graph(extract_workbook(workbook_path))
+    execution_edges = [edge for edge in graph.execution_edges if edge.target.normalized == "Data!E1"]
+
+    assert graph.diagnostics == ()
+    assert [(edge.source.kind, edge.source.normalized, edge.resolved_from.normalized) for edge in execution_edges if edge.resolved_from] == [
+        ("range", "Data!A2:B3", "InputTable[[Selection]:[Scenario]]")
+    ]
+
+
+def test_dependency_graph_resolves_current_row_structured_column_span_as_range(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "current-row-column-span-structured-reference.xlsx"
+    source = Workbook()
+    sheet = source.active
+    sheet.title = "Data"
+    sheet.append(["Start", "End", "Total"])
+    sheet.append([10, 2, '=SUM(InputTable[[#This Row],[Start]:[End]])'])
+    sheet.append([20, 3, '=SUM(InputTable[[#This Row],[Start]:[End]])'])
+    sheet.add_table(Table(displayName="InputTable", ref="A1:C3"))
+    source.save(workbook_path)
+
+    graph = build_dependency_graph(extract_workbook(workbook_path))
+    first_row_edges = [edge for edge in graph.execution_edges if edge.target.normalized == "Data!C2"]
+    second_row_edges = [edge for edge in graph.execution_edges if edge.target.normalized == "Data!C3"]
+
+    assert graph.diagnostics == ()
+    assert [
+        (edge.source.kind, edge.source.normalized, edge.resolved_from.normalized)
+        for edge in first_row_edges
+        if edge.resolved_from
+    ] == [("range", "Data!A2:B2", "InputTable[[#This Row],[Start]:[End]]")]
+    assert [
+        (edge.source.kind, edge.source.normalized, edge.resolved_from.normalized)
+        for edge in second_row_edges
+        if edge.resolved_from
+    ] == [("range", "Data!A3:B3", "InputTable[[#This Row],[Start]:[End]]")]
+
+
 def test_dependency_graph_resolves_whole_table_structured_references_as_ranges(tmp_path: Path) -> None:
     workbook_path = tmp_path / "whole-table-structured-reference.xlsx"
     source = Workbook()

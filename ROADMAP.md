@@ -540,8 +540,121 @@ approval, then verify clean installation, import, and CLI behavior from PyPI.
 
 Status: active pending closeout PR.
 
+## Phase 26: Full FABLE Benchmark Validation
+
+GitHub parent issue: #144
+
+Active branch: `feature/p26-full-fable-validation`
+
+Goal: validate generated Modelwright Python output against cached workbook oracle values for the full
+2020 FABLE benchmark scope, not only selected outputs. The phase must end with either a full
+comparable-output pass statement or a precise blocker taxonomy.
+
+- [x] P26.1 Define full FABLE validation contract. Child issue: #150.
+  - [x] Define primary workbook and canonical local path.
+  - [x] Define generated output universe and comparable-output universe.
+  - [x] Define pass/fail/blocker language.
+  - [x] Define required raw and sanitized artifacts.
+- [x] P26.2 Run verbose FABLE extraction graph translation. Child issue: #149.
+  - [x] Materialize or verify the 2020 FABLE workbook at the canonical ignored path.
+  - [x] Extract workbook records with verbose progress.
+  - [x] Build dependency graph with verbose progress.
+  - [x] Translate formulas with verbose progress.
+  - [x] Persist ignored raw artifacts and summary counts.
+- [x] P26.3 Generate and execute widest FABLE Python model. Child issue: #148.
+  - [x] Infer the widest generated-model contract possible from the full output universe.
+  - [x] Generate standalone Python under ignored `tmp/`.
+  - [x] Execute generated model with verbose progress.
+  - [x] Record generation and execution blockers.
+  - [x] Resolve or explicitly scope cyclic workbook dependency semantics before generation. Implementation issue: #151.
+- [x] P26.4 Compare generated outputs to cached oracle values. Child issue: #147.
+  - [x] Build cached workbook oracle values for comparable outputs.
+  - [x] Compare generated outputs with declared tolerance.
+  - [x] Persist raw validation report under ignored `tmp/`.
+  - [x] Record mismatch counts and samples in sanitized summary.
+- [x] P26.5 Resolve FABLE full-validation blockers to convergence. Child issue: #146.
+  - [x] Classify each blocker as extraction, graph, translation, generation, execution, comparison, performance, or source-workbook limitation.
+  - [x] Fix Modelwright blockers in priority order.
+  - [x] Rerun verbose validation after each fix.
+  - [x] Stop only when validation passes or remaining blockers are explicitly non-Modelwright/accepted.
+- [x] P26.6 Record full FABLE validation evidence. Child issue: #145.
+  - [x] Update roadmap with exact pass/blocker statement.
+  - [x] Update changelog and planning note with sanitized counts.
+  - [x] Keep raw workbooks, generated models, and raw reports ignored.
+  - [x] State release implications for the next alpha.
+- [ ] P26.7 Publish `v0.1.0a2` after full FABLE validation. Child issue: #153.
+  - [x] Confirm P26 full validation status is `pass` with zero comparable-output mismatches.
+  - [x] Record sanitized validation evidence and release claim boundaries.
+  - [x] Run full local verification and release artifact checks.
+  - [ ] Tag `v0.1.0a2` and publish matching GitHub and PyPI releases through the existing release workflow.
+  - [ ] Verify clean install from PyPI.
+  - [ ] Defer P27 performance, memory, and generated-output architecture refactoring to the `0.1.0a3` release line.
+
+Full comparable-output validation evidence:
+
+- Status: `pass`.
+- Comparable cached output universe: 281,741 formula outputs.
+- Matches: 281,741.
+- Mismatches: 0.
+- Numeric comparable outputs: 239,943.
+- Text comparable outputs: 41,798.
+- Non-comparable cached blank formula outputs: 15,235, recorded as validation-boundary evidence rather than blockers.
+- Raw local evidence remains ignored under `tmp/p26-fable-full-validation/` and `tmp/logs/p26-full-validation.log`.
+
+Status: active pending `v0.1.0a2` release task.
+
+## Phase 27: Generated Runtime Performance And Memory Hardening
+
+GitHub parent issue: #152
+
+Status: planned backlog.
+
+Goal: make full-workbook generated-model validation practical by profiling and reducing generated
+runtime, cache-load, and memory costs exposed by the 2020 FABLE benchmark. This phase should start
+after Phase 26 records a clear correctness pass/blocker statement, because performance work must not
+hide validation defects.
+
+Planning note: `planning/phase-27-performance-memory-hardening.md`.
+
+- [ ] P27.1 Profile generated-model runtime hotspots.
+  - [ ] Add high-frequency timing around generated helper functions, formula execution, range/table materialization, and criteria functions.
+  - [ ] Determine whether runtime is dominated by repeated formula evaluation, repeated range scans, Python import/code-object overhead, output materialization, or cache loading.
+  - [ ] Record profiler output and sanitized conclusions under `planning/`.
+- [ ] P27.2 Reduce repeated range and criteria work.
+  - [ ] Cache reusable range/table views where Excel semantics allow.
+  - [ ] Avoid rebuilding large Python lists for every `SUMIF`, `SUMIFS`, `COUNTIF`, and `COUNTIFS` call.
+  - [ ] Preserve lazy `IF`/`IFERROR`/`IFNA` branch behavior and runtime circular-dependency detection.
+- [ ] P27.3 Reduce generated module size and import overhead.
+  - [ ] Evaluate compact generated-model layouts, shared expression helpers, or chunked modules.
+  - [ ] Keep `calculate(inputs=None) -> dict` behavior stable unless a later public API phase intentionally changes it.
+  - [ ] Measure import time and generated-code object memory before and after any change.
+- [ ] P27.4 Reduce pipeline cache and validation memory footprint.
+  - [ ] Measure workbook, graph, expression, inference, generated-module, and output-map memory costs separately.
+  - [ ] Evaluate streaming, SQLite/shelve-style local caches, compact record encoding, or selective loading for validation.
+  - [ ] Explain why runtime memory can be much larger than the original workbook file size.
+- [ ] P27.5 Evaluate multicore and sharded execution options.
+  - [ ] Prototype parallel contract inference over output/dependency-closure shards and merge diagnostics deterministically.
+  - [ ] Evaluate parallel formula translation and generated-source rendering where records are independent.
+  - [ ] Evaluate sharded generated-output validation across independent output groups or separate worker processes.
+  - [ ] Treat shared-cache generated formula execution as a harder case; parallelize only if runtime semantics, cache consistency, and cycle detection remain correct.
+  - [ ] Document CPU, memory, process startup, serialization, and determinism tradeoffs for high-core-count hosts.
+- [ ] P27.6 Rerun FABLE validation with performance evidence.
+  - [ ] Always run verbose with stdout piped to `tmp/logs/` and print the tail command first.
+  - [ ] Record runtime, peak memory, cache-hit behavior, and correctness comparison results.
+  - [ ] Confirm performance changes do not regress Phase 26 correctness evidence.
+
+Acceptance criteria:
+
+- Performance claims are backed by logged timings and memory observations, not guesses.
+- The phase states whether formulas are being recomputed unnecessarily or whether the cost is dominated
+  by range scans, generated-module import, cache materialization, output materialization, or another
+  measured source.
+- Any optimization keeps full FABLE validation correctness evidence at least as good as before.
+
 ## Current Next Steps
 
-1. Open and merge the Phase 25 real PyPI publication closeout PR.
-2. Verify the GitHub release record for tag `v0.1.0a1`.
-3. Plan the next alpha patch line, likely `0.1.0a2`, for any post-publication fixes.
+1. Complete P26.7 release closeout for `v0.1.0a2`.
+2. Run full local verification: Ruff, pytest, Sphinx docs, and release artifact checks.
+3. Update package version and release notes with the precise 2020 FABLE comparable-output validation claim.
+4. Publish `v0.1.0a2` through the existing GitHub/PyPI release workflow and verify clean install from PyPI.
+5. After P26 and `v0.1.0a2` are closed, activate P27 for performance, memory, and generated-output architecture work targeting `0.1.0a3`.

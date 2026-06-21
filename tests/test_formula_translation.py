@@ -235,6 +235,56 @@ def test_translate_column_structured_reference_as_range(tmp_path: Path) -> None:
     assert expression.root.operands[0].reference.normalized == "Data!A2:A3"
 
 
+def test_translate_structured_column_span_as_range(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "column-span-structured-reference.xlsx"
+    source = Workbook()
+    sheet = source.active
+    sheet.title = "Data"
+    sheet.append(["Selection", "Scenario", "Description"])
+    sheet.append(["x", "Current", "same"])
+    sheet.append([None, "Future", "changed"])
+    sheet["E1"] = '=VLOOKUP("X",InputTable[[Selection]:[Scenario]],2,FALSE)'
+    sheet.add_table(Table(displayName="InputTable", ref="A1:C3"))
+    source.save(workbook_path)
+    workbook = extract_workbook(workbook_path)
+    graph = build_dependency_graph(workbook)
+    formula_cell = next(cell for cell in workbook.cells if cell.cell_ref == "Data!E1")
+
+    expression = translate_formula_cell(formula_cell, graph, reference_index=build_formula_reference_index(graph))
+
+    assert expression.translated is True
+    assert expression.root is not None
+    assert expression.root.kind == "function_call"
+    assert expression.root.function_name == "VLOOKUP"
+    assert expression.root.operands[1].reference is not None
+    assert expression.root.operands[1].reference.kind == "range"
+    assert expression.root.operands[1].reference.normalized == "Data!A2:B3"
+
+
+def test_translate_current_row_structured_column_span_as_range(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "current-row-column-span-structured-reference.xlsx"
+    source = Workbook()
+    sheet = source.active
+    sheet.title = "Data"
+    sheet.append(["Start", "End", "Total"])
+    sheet.append([10, 2, '=SUM(InputTable[[#This Row],[Start]:[End]])'])
+    sheet.add_table(Table(displayName="InputTable", ref="A1:C2"))
+    source.save(workbook_path)
+    workbook = extract_workbook(workbook_path)
+    graph = build_dependency_graph(workbook)
+    formula_cell = next(cell for cell in workbook.cells if cell.cell_ref == "Data!C2")
+
+    expression = translate_formula_cell(formula_cell, graph, reference_index=build_formula_reference_index(graph))
+
+    assert expression.translated is True
+    assert expression.root is not None
+    assert expression.root.kind == "function_call"
+    assert expression.root.function_name == "SUM"
+    assert expression.root.operands[0].reference is not None
+    assert expression.root.operands[0].reference.kind == "range"
+    assert expression.root.operands[0].reference.normalized == "Data!A2:B2"
+
+
 def test_translate_boolean_literal(tmp_path: Path) -> None:
     workbook_path = tmp_path / "boolean-literal.xlsx"
     source = Workbook()

@@ -18,12 +18,15 @@ if [[ ! -x "$PYTHON_BIN" ]]; then
   fi
 fi
 
-mkdir -p "$DIST_DIR" "$INSTALL_DIR"
+mkdir -p "$RUN_DIR"
 
 echo "[release-check] run directory: $RUN_DIR"
 echo "[release-check] removing stale build outputs"
 rm -rf "$ROOT_DIR/build"
 rm -rf "$ROOT_DIR/src/sheetforge.egg-info"
+rm -rf "$DIST_DIR"
+rm -rf "$INSTALL_DIR"
+mkdir -p "$DIST_DIR" "$INSTALL_DIR"
 echo "[release-check] building sdist and wheel"
 "$PYTHON_BIN" -m build --sdist --wheel --outdir "$DIST_DIR" "$ROOT_DIR"
 
@@ -95,7 +98,7 @@ from __future__ import annotations
 import modelwright
 import importlib.util
 
-assert modelwright.__version__ == "0.1.0a1", modelwright.__version__
+assert modelwright.__version__ == "0.1.0a2", modelwright.__version__
 assert importlib.util.find_spec("sheetforge") is None
 print(f"[release-check] imported modelwright {modelwright.__version__}")
 PY

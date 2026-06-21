@@ -105,6 +105,7 @@ class ComparisonRules:
     """Default comparison rules declared by a validation scenario."""
 
     default_numeric_tolerance: float = 1e-9
+    default_numeric_relative_tolerance: float = 0.0
     text: TextComparisonMode = "exact"
     boolean: BooleanComparisonMode = "exact"
 
@@ -112,16 +113,20 @@ class ComparisonRules:
     def from_dict(cls, data: dict[str, Any]) -> "ComparisonRules":
         return cls(
             default_numeric_tolerance=data.get("default_numeric_tolerance", 1e-9),
+            default_numeric_relative_tolerance=data.get("default_numeric_relative_tolerance", 0.0),
             text=data.get("text", "exact"),
             boolean=data.get("boolean", "exact"),
         )
 
     def to_dict(self) -> dict[str, JsonValue]:
-        return {
+        payload: dict[str, JsonValue] = {
             "default_numeric_tolerance": self.default_numeric_tolerance,
             "text": self.text,
             "boolean": self.boolean,
         }
+        if self.default_numeric_relative_tolerance:
+            payload["default_numeric_relative_tolerance"] = self.default_numeric_relative_tolerance
+        return payload
 
 
 @dataclass(frozen=True)
@@ -254,6 +259,7 @@ def compare_scalar_output(
     oracle: JsonValue | _MissingValue,
     oracle_backend: str,
     default_numeric_tolerance: float = 1e-9,
+    default_numeric_relative_tolerance: float = 0.0,
 ) -> ComparisonResult:
     """Compare one observed generated value against one oracle value."""
 
@@ -308,9 +314,18 @@ def compare_scalar_output(
             oracle=oracle,
             oracle_backend=oracle_backend,
             default_numeric_tolerance=default_numeric_tolerance,
+            default_numeric_relative_tolerance=default_numeric_relative_tolerance,
         )
     if output.kind == "text":
         return _compare_text(
+            scenario_id=scenario_id,
+            output=output,
+            generated=generated,
+            oracle=oracle,
+            oracle_backend=oracle_backend,
+        )
+    if output.kind == "boolean":
+        return _compare_boolean(
             scenario_id=scenario_id,
             output=output,
             generated=generated,
@@ -347,6 +362,7 @@ def _compare_number(
     oracle: JsonValue,
     oracle_backend: str,
     default_numeric_tolerance: float,
+    default_numeric_relative_tolerance: float,
 ) -> ComparisonResult:
     tolerance = _tolerance_for(output, default_numeric_tolerance)
     if not _is_number(generated) or not _is_number(oracle):
@@ -365,7 +381,8 @@ def _compare_number(
         )
 
     difference = abs(float(generated) - float(oracle))
-    matches = difference <= float(tolerance)
+    relative_difference = difference / max(abs(float(oracle)), 1.0)
+    matches = difference <= float(tolerance) or relative_difference <= default_numeric_relative_tolerance
     return ComparisonResult(
         scenario_id=scenario_id,
         cell_ref=output.cell_ref,
@@ -401,6 +418,30 @@ def _compare_text(
         difference=None,
         diagnostic_code=None if matches else "text_mismatch",
         message="values match" if matches else "generated text differs from oracle text",
+        oracle_backend=oracle_backend,
+    )
+
+
+def _compare_boolean(
+    *,
+    scenario_id: str,
+    output: ScenarioOutput,
+    generated: JsonValue,
+    oracle: JsonValue,
+    oracle_backend: str,
+) -> ComparisonResult:
+    matches = isinstance(generated, bool) and isinstance(oracle, bool) and generated is oracle
+    return ComparisonResult(
+        scenario_id=scenario_id,
+        cell_ref=output.cell_ref,
+        kind=output.kind,
+        generated=generated,
+        oracle=oracle,
+        matches=matches,
+        tolerance=None,
+        difference=None,
+        diagnostic_code=None if matches else "boolean_mismatch",
+        message="values match" if matches else "generated boolean differs from oracle boolean",
         oracle_backend=oracle_backend,
     )
 
@@ -464,6 +505,7 @@ def build_validation_report(
             oracle=oracle_values.get(output.cell_ref, MISSING_VALUE),
             oracle_backend=scenario.oracle.backend,
             default_numeric_tolerance=scenario.comparison.default_numeric_tolerance,
+            default_numeric_relative_tolerance=scenario.comparison.default_numeric_relative_tolerance,
         )
         for output in scenario.outputs
     )

@@ -5,7 +5,7 @@ from openpyxl import Workbook
 from openpyxl.worksheet.table import Table
 from openpyxl.workbook.defined_name import DefinedName
 
-from modelwright.extraction import extract_workbook
+from modelwright.extraction import _extract_sheet_cells, _populated_cells, extract_workbook
 from tests.fixtures.synthetic_model.build_workbook import build_workbook
 
 
@@ -66,6 +66,30 @@ def test_extract_workbook_emits_missing_cached_formula_diagnostics(tmp_path: Pat
     assert len(diagnostics) == 5
     assert {diagnostic.code for diagnostic in diagnostics} == {"missing_cached_formula_value"}
     assert diagnostics[0].severity == "warning"
+
+
+def test_extract_sheet_cells_preserves_cached_only_zero_values() -> None:
+    formula_workbook = Workbook()
+    formula_sheet = formula_workbook.active
+    formula_sheet.title = "Data"
+    formula_sheet["A1"] = "present"
+
+    cached_workbook = Workbook()
+    cached_sheet = cached_workbook.active
+    cached_sheet.title = "Data"
+    cached_sheet["A1"] = "present"
+    cached_sheet["C5"] = 0
+
+    records = _extract_sheet_cells(
+        formula_sheet,
+        cached_sheet,
+        populated_cells=_populated_cells(formula_sheet, cached_sheet),
+    )
+    cells = {cell.cell_ref: cell for cell in records}
+
+    assert cells["Data!C5"].kind == "value"
+    assert cells["Data!C5"].raw_value == 0
+    assert cells["Data!C5"].cached_value == 0
 
 
 def test_extract_workbook_payload_round_trips(tmp_path: Path) -> None:
