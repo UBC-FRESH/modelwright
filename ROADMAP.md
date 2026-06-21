@@ -655,6 +655,7 @@ Planning note: `planning/phase-27-performance-memory-hardening.md`.
   - [x] Decide whether further parallel contract inference remains warranted after the serial fixes.
   - [x] Document CPU, memory, process startup, serialization, and determinism tradeoffs for high-core-count hosts.
 - [ ] P27.6 Rerun FABLE validation with performance evidence. Child issue: #160.
+  - Status: active.
   - [ ] Always run verbose with stdout piped to `tmp/logs/` and print the tail command first.
   - [ ] Record runtime, peak memory, cache-hit behavior, and correctness comparison results.
   - [ ] Confirm performance changes do not regress Phase 26 correctness evidence.
@@ -669,7 +670,7 @@ Acceptance criteria:
 
 ## Current Next Steps
 
-1. Start P27.6 by rerunning full FABLE validation in verbose mode with stdout piped to `tmp/logs/`.
-2. Record runtime, peak memory, cache-hit behavior, and correctness comparison results from the P27.6 run.
-3. Confirm P27 production changes preserve the Phase 26 full comparable-output correctness evidence.
+1. Run P27.6 full FABLE validation in verbose mode with stdout piped to `tmp/logs/p27-full-validation.log`.
+2. Force inference-cache refresh while preserving the pipeline cache so current P27 inference and expression-source generation changes are tested.
+3. Record runtime, peak memory, cache-hit behavior, and correctness comparison results from the P27.6 run.
 4. Preserve formula-template/vectorized-kernel work as a follow-on architecture target after P27 records current pipeline memory costs.
