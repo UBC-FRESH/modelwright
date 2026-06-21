@@ -507,12 +507,41 @@ import, and CLI behavior from TestPyPI before any real PyPI release.
   - [x] State whether real PyPI alpha publication is ready or still blocked.
   - [x] Keep private token details out of tracked files.
 
-Status: ready for PR.
+Merged PR: #142
+
+Status: complete.
+
+## Phase 25: Real PyPI Alpha Publication
+
+GitHub parent issue: #143
+
+Goal: publish `modelwright==0.1.0a1` to real PyPI after successful TestPyPI rehearsal and maintainer
+approval, then verify clean installation, import, and CLI behavior from PyPI.
+
+- [x] P25.1 Confirm PyPI target and release tag readiness.
+  - [x] Confirm `modelwright` returned `404` from real PyPI before publication.
+  - [x] Confirm local working tree was clean on `main`.
+  - [x] Confirm release tag `v0.1.0a1` did not already exist.
+- [x] P25.2 Build and publish real PyPI artifacts.
+  - [x] Run fresh local release artifact check with verbose log.
+  - [x] Create annotated tag `v0.1.0a1`.
+  - [x] Push tag and watch GitHub Actions `Release` workflow.
+  - [x] Verify trusted-publishing `publish-pypi` job passed.
+- [x] P25.3 Verify real PyPI install.
+  - [x] Confirm PyPI JSON lists `modelwright` version `0.1.0a1`.
+  - [x] Install `modelwright==0.1.0a1` from real PyPI into a clean ignored virtual environment.
+  - [x] Verify import version.
+  - [x] Verify `modelwright --help`.
+  - [x] Verify old `sheetforge` import/CLI is absent.
+- [x] P25.4 Record release closeout.
+  - [x] Update roadmap, changelog, and planning note with sanitized evidence.
+  - [x] Keep token values out of tracked files.
+  - [x] State next release path.
+
+Status: active pending closeout PR.
 
 ## Current Next Steps
 
-1. Open and merge the Phase 24 TestPyPI rehearsal PR.
-2. Configure the real PyPI trusted publisher for `UBC-FRESH/modelwright`, workflow `release.yml`, environment `pypi`.
-3. Create and push annotated tag `v0.1.0a1` after maintainer approval.
-4. Run or approve the `Release` workflow for real PyPI publication.
-5. Verify real PyPI install, import, CLI help, old-name absence, docs, and GitHub release notes.
+1. Open and merge the Phase 25 real PyPI publication closeout PR.
+2. Verify the GitHub release record for tag `v0.1.0a1`.
+3. Plan the next alpha patch line, likely `0.1.0a2`, for any post-publication fixes.
