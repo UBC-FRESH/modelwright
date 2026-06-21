@@ -82,7 +82,7 @@ def download_dropbox_zip(source_url: str, download_dir: Path) -> Path:
     zip_path = download_dir / "fable-calculator-dropbox.zip"
     request = urllib.request.Request(
         dropbox_download_url(source_url),
-        headers={"User-Agent": "sheetforge-benchmark-materializer/1.0"},
+        headers={"User-Agent": "modelwright-benchmark-materializer/1.0"},
     )
     print(f"Downloading FABLE benchmark folder to {zip_path}")
     with urllib.request.urlopen(request, timeout=120) as response:
@@ -169,7 +169,7 @@ def materialize_from_zip(
     *,
     force: bool = False,
 ) -> list[Path]:
-    with tempfile.TemporaryDirectory(prefix="sheetforge-fable-benchmarks-") as temp_dir:
+    with tempfile.TemporaryDirectory(prefix="modelwright-fable-benchmarks-") as temp_dir:
         extract_dir = Path(temp_dir) / "extracted"
         extract_dir.mkdir()
         print(f"Extracting {zip_path}")

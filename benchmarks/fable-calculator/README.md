@@ -50,7 +50,7 @@ tmp/private-workbooks/2021_Open_FABLECalculator.xlsx
 
 ## Benchmark Roles
 
-- `2019_Open_FABLECalculator.xlsx`: broken-reference regression. This file contains explicit source `#REF!` references and should verify that Sheetforge reports source workbook defects without silently generating normal Python behavior.
+- `2019_Open_FABLECalculator.xlsx`: broken-reference regression. This file contains explicit source `#REF!` references and should verify that Modelwright reports source workbook defects without silently generating normal Python behavior.
 - `2020_Open_FABLECalculator.xlsx`: primary benchmark. This is the current main real-workbook benchmark for conversion planning and generated-model scope work.
 - `2021_Open_FABLECalculator.xlsx`: stress benchmark. Use after the 2020 benchmark is stable.
 

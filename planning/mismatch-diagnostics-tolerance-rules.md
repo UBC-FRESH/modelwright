@@ -4,7 +4,7 @@ Date: 2026-06-19
 
 ## Purpose
 
-This note defines comparison behavior and mismatch diagnostics for Sheetforge validation reports.
+This note defines comparison behavior and mismatch diagnostics for Modelwright validation reports.
 
 The goal is to make validation failures stable, explainable, and tied back to workbook output cells before any durable validation API or test framework is introduced.
 

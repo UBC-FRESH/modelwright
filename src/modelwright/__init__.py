@@ -1,6 +1,6 @@
-"""Sheetforge package skeleton."""
+"""Modelwright package skeleton."""
 
-from sheetforge.extraction import (
+from modelwright.extraction import (
     CellRecord,
     ExtractionDiagnostic,
     FormulaRecord,
@@ -10,16 +10,16 @@ from sheetforge.extraction import (
     WorkbookRecord,
     extract_workbook,
 )
-from sheetforge.execution import (
+from modelwright.execution import (
     ExecutionDiagnostic,
     GeneratedExecutionResult,
     execute_generated_model,
 )
-from sheetforge.evaluation import (
+from modelwright.evaluation import (
     ValidationEvaluationResult,
     evaluate_generated_model,
 )
-from sheetforge.conversion import (
+from modelwright.conversion import (
     ConversionPlan,
     ConversionSource,
     CoverageSummary,
@@ -32,15 +32,15 @@ from sheetforge.conversion import (
     WorkflowStatus,
     build_conversion_plan,
 )
-from sheetforge.formulas import (
+from modelwright.formulas import (
     FormulaExpression,
     FormulaExpressionNode,
     FormulaTranslationDiagnostic,
     build_formula_reference_index,
     translate_formula_cell,
 )
-from sheetforge.formulas_oracle import FormulasWorkbookOracle
-from sheetforge.generation import (
+from modelwright.formulas_oracle import FormulasWorkbookOracle
+from modelwright.generation import (
     GeneratedContractInferenceResult,
     GeneratedModuleContract,
     GeneratedSymbol,
@@ -49,24 +49,24 @@ from sheetforge.generation import (
     generate_python_module,
     infer_generated_module_contract,
 )
-from sheetforge.graph import (
+from modelwright.graph import (
     DependencyEdge,
     DependencyGraph,
     build_dependency_graph,
 )
-from sheetforge.oracles import (
+from modelwright.oracles import (
     OracleDiagnostic,
     OracleRequest,
     OracleResult,
     WorkbookOracle,
 )
-from sheetforge.oracle_validation import build_oracle_validation_report
-from sheetforge.references import (
+from modelwright.oracle_validation import build_oracle_validation_report
+from modelwright.references import (
     WorkbookReference,
     normalize_cell_reference,
     normalize_reference,
 )
-from sheetforge.validation import (
+from modelwright.validation import (
     ComparisonResult,
     ComparisonRules,
     Diagnostic,

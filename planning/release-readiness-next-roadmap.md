@@ -4,7 +4,7 @@ Date: 2026-06-20
 
 ## Current Readiness
 
-Sheetforge is ready as an early, package-backed research and workflow skeleton for controlled spreadsheet-to-Python experiments.
+Modelwright is ready as an early, package-backed research and workflow skeleton for controlled spreadsheet-to-Python experiments.
 
 Ready now:
 
@@ -35,7 +35,7 @@ The highest-priority gaps remain evidence from the first private workbook evalua
 - formula cells without cached values;
 - full-workbook recalculation oracle failures.
 
-These gaps should drive the next implementation horizon. Sheetforge should not claim workbook equivalence until generated outputs are validated against a credible oracle or explicitly scoped cached-value comparisons.
+These gaps should drive the next implementation horizon. Modelwright should not claim workbook equivalence until generated outputs are validated against a credible oracle or explicitly scoped cached-value comparisons.
 
 ## Next Roadmap Horizon
 

@@ -4,28 +4,28 @@ Date: 2026-06-20
 
 ## Purpose
 
-Phase 14 starts by reviewing Sheetforge's Python API before adding command-line wrappers. The goal is to make the current API boundaries explicit and avoid turning accidental helpers into public commitments.
+Phase 14 starts by reviewing Modelwright's Python API before adding command-line wrappers. The goal is to make the current API boundaries explicit and avoid turning accidental helpers into public commitments.
 
-Sheetforge is still pre-release. This review stabilizes the package shape enough for a thin CLI, but it does not create a long-term compatibility guarantee.
+Modelwright is still pre-release. This review stabilizes the package shape enough for a thin CLI, but it does not create a long-term compatibility guarantee.
 
 ## Primary Module Boundaries
 
 The package should stay organized by responsibility:
 
-- `sheetforge.extraction`: workbook, sheet, cell, formula, named-range, and extraction diagnostics; `extract_workbook`.
-- `sheetforge.graph`: dependency edge and graph records; `build_dependency_graph`.
-- `sheetforge.formulas`: formula expression records, translation diagnostics, formula translation, and reference-index construction.
-- `sheetforge.generation`: generated-module contracts, generated symbols, generation diagnostics, and Python source generation.
-- `sheetforge.validation`: scenario, comparison, diagnostic, and report records; scenario loading; scalar comparison; report assembly.
-- `sheetforge.oracles`: oracle request/result/diagnostic records and backend protocol.
-- `sheetforge.formulas_oracle`: optional pure-Python `formulas` oracle implementation.
-- `sheetforge.oracle_validation`: report assembly from generated outputs and oracle results.
+- `modelwright.extraction`: workbook, sheet, cell, formula, named-range, and extraction diagnostics; `extract_workbook`.
+- `modelwright.graph`: dependency edge and graph records; `build_dependency_graph`.
+- `modelwright.formulas`: formula expression records, translation diagnostics, formula translation, and reference-index construction.
+- `modelwright.generation`: generated-module contracts, generated symbols, generation diagnostics, and Python source generation.
+- `modelwright.validation`: scenario, comparison, diagnostic, and report records; scenario loading; scalar comparison; report assembly.
+- `modelwright.oracles`: oracle request/result/diagnostic records and backend protocol.
+- `modelwright.formulas_oracle`: optional pure-Python `formulas` oracle implementation.
+- `modelwright.oracle_validation`: report assembly from generated outputs and oracle results.
 
 Module-level imports are preferred for implementation code because they make responsibility boundaries explicit.
 
 ## Curated Root Facade
 
-The package root `sheetforge` may expose convenience imports for primary records and functions, but it should not export implementation-only aliases or helper functions that are not intended as user entrypoints.
+The package root `modelwright` may expose convenience imports for primary records and functions, but it should not export implementation-only aliases or helper functions that are not intended as user entrypoints.
 
 Kept at the root facade:
 
@@ -50,7 +50,7 @@ The next CLI work should wrap these module APIs without adding new conversion be
 - inspect/extract workbook facts with `extract_workbook`;
 - build dependency graph facts with `build_dependency_graph`;
 - generate Python source with `generate_python_module`;
-- load scenarios and build validation reports with `sheetforge.validation`;
+- load scenarios and build validation reports with `modelwright.validation`;
 - run optional oracle-backed validation through explicit oracle APIs.
 
 The CLI should not hide unsupported workbook semantics. It should surface diagnostics and JSON reports.

@@ -43,7 +43,7 @@ Status: complete.
 
 Result:
 
-- added `sheetforge.execution` with `ExecutionDiagnostic`, `GeneratedExecutionResult`, and
+- added `modelwright.execution` with `ExecutionDiagnostic`, `GeneratedExecutionResult`, and
   `execute_generated_model`;
 - kept execution tied to explicit `GeneratedModuleContract` objects and generated Python module paths;
 - isolated generated-model execution from workbook extraction;
@@ -65,7 +65,7 @@ Status: complete.
 
 Result:
 
-- added `sheetforge.evaluation` with `ValidationEvaluationResult` and `evaluate_generated_model`;
+- added `modelwright.evaluation` with `ValidationEvaluationResult` and `evaluate_generated_model`;
 - orchestrated generated-model execution, cached workbook values from `WorkbookRecord`, and optional
   oracle results;
 - kept missing cached values visible as validation diagnostics and missing-oracle-output comparisons;
@@ -88,8 +88,8 @@ Status: complete.
 
 Result:
 
-- added `sheetforge model execute` for `execute_generated_model`;
-- added `sheetforge validation evaluate` for `evaluate_generated_model`;
+- added `modelwright model execute` for `execute_generated_model`;
+- added `modelwright validation evaluate` for `evaluate_generated_model`;
 - allowed cached validation from either source workbook extraction or existing `WorkbookRecord` JSON;
 - allowed oracle-backed validation from already-materialized `OracleResult` JSON;
 - kept verbose progress on stderr so stdout remains JSON;

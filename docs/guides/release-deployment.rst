@@ -1,7 +1,7 @@
 Release And Deployment
 ======================
 
-Sheetforge releases are maintainer-controlled. A release is not ready because the version changed;
+Modelwright releases are maintainer-controlled. A release is not ready because the version changed;
 it is ready only when package artifacts, documentation, benchmark claims, and publication gates have
 all been checked.
 
@@ -40,7 +40,7 @@ Build and inspect package artifacts:
 
 The artifact checker writes outputs under ignored ``tmp/release-checks/``. It builds an sdist and
 wheel, runs ``twine check``, inspects artifact contents for private/generated files, installs the wheel
-into a clean virtual environment, imports Sheetforge, and smoke-tests the installed CLI.
+into a clean virtual environment, imports Modelwright, and smoke-tests the installed CLI.
 
 Documentation Deployment Gate
 -----------------------------
@@ -69,9 +69,9 @@ After TestPyPI publication, install the package from TestPyPI in a clean environ
 
 .. code-block:: bash
 
-   python -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ sheetforge==0.1.0a1
-   python -c "import sheetforge; print(sheetforge.__version__)"
-   sheetforge --help
+   python -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ modelwright==0.1.0a1
+   python -c "import modelwright; print(modelwright.__version__)"
+   modelwright --help
 
 Real PyPI Publication
 ---------------------

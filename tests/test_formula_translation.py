@@ -4,9 +4,9 @@ from openpyxl import Workbook
 from openpyxl.worksheet.table import Table
 from openpyxl.workbook.defined_name import DefinedName
 
-from sheetforge.extraction import CellRecord, extract_workbook
-from sheetforge.formulas import build_formula_reference_index, translate_formula_cell
-from sheetforge.graph import build_dependency_graph
+from modelwright.extraction import CellRecord, extract_workbook
+from modelwright.formulas import build_formula_reference_index, translate_formula_cell
+from modelwright.graph import build_dependency_graph
 from tests.fixtures.synthetic_model.build_workbook import build_workbook
 
 

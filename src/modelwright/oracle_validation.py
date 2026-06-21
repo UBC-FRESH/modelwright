@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from sheetforge.oracles import OracleResult
-from sheetforge.validation import (
+from modelwright.oracles import OracleResult
+from modelwright.validation import (
     Diagnostic,
     JsonValue,
     ValidationReport,

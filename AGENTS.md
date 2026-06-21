@@ -4,25 +4,30 @@ This file is the working contract for AI coding agents in this repository.
 
 ## Project Purpose
 
-`sheetforge` exists to research and build a generic workflow for converting spreadsheet workbooks into transparent, version-controlled, standalone Python models.
+`modelwright` exists to research and build a generic workflow for converting spreadsheet workbooks into transparent, version-controlled, standalone Python models.
 
 The goal is not to preserve spreadsheets as the execution environment. The goal is to recover workbook logic, formulas, dependencies, inputs, outputs, and validation examples so that analyst-built spreadsheet models can be migrated into reproducible Python code.
 
 ## Current Repo State
 
-This repository is currently an early package skeleton. It contains:
+This repository is currently an early package-backed conversion toolkit. It contains:
 
 - `README.md`: concise project overview.
 - `ROADMAP.md`: lightweight project plan and current next-step tracker.
 - `CHANGE_LOG.md`: append-only project narrative.
 - `planning/`: focused planning notes and research records.
 - `pyproject.toml`: minimal package metadata and test dependency extra.
-- `src/sheetforge/`: importable package code.
+- `src/modelwright/`: importable package code.
 - `tests/`: package-backed tests and tracked synthetic fixture helpers.
-- `.github/workflows/test.yml`: first default CI workflow.
+- `.github/workflows/test.yml`: default quality, test, docs, and release-artifact checks.
+- `.github/workflows/docs-pages.yml`: Sphinx Read the Docs themed GitHub Pages deployment.
+- `.github/workflows/release.yml`: gated release artifact and publication workflow.
 - `tmp/`: ignored local working area that may contain private notes, source workbooks, scratch experiments, and generated outputs.
 
-There is no workbook extraction framework, code generator, CLI, public stability guarantee, release process, or broad CI/test matrix yet. Do not invent one without clear need or user direction.
+The package has extraction, dependency graph, formula translation, generated-model, validation, oracle,
+CLI, docs, benchmark, and release-workflow scaffolding, but it is still pre-release. Do not claim a
+full-workbook conversion guarantee, stable public API compatibility, or PyPI publication readiness
+until the relevant roadmap phase records evidence for that claim.
 
 Private bootstrap notes may exist under `tmp/`. Treat those files as local context only. Do not copy raw transcripts, private references, unpublished details, or unrelated context into tracked files unless the user explicitly asks for a cleaned public version.
 

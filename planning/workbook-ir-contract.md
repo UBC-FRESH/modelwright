@@ -4,14 +4,14 @@ Date: 2026-06-19
 
 ## Purpose
 
-This note defines the minimum intermediate representation (IR) for the next Sheetforge prototype.
+This note defines the minimum intermediate representation (IR) for the next Modelwright prototype.
 
 The IR should sit between raw workbook extraction and generated Python:
 
 ```text
 workbook file
   -> extraction facts from openpyxl/formulas
-  -> Sheetforge IR
+  -> Modelwright IR
   -> dependency graph and diagnostics
   -> generated Python prototype
 ```

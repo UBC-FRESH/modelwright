@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from sheetforge.formulas_oracle import FormulasWorkbookOracle
-from sheetforge.oracles import OracleRequest
-from sheetforge.validation import ScenarioInput, ScenarioOutput
+from modelwright.formulas_oracle import FormulasWorkbookOracle
+from modelwright.oracles import OracleRequest
+from modelwright.validation import ScenarioInput, ScenarioOutput
 from tests.fixtures.synthetic_model.build_workbook import build_workbook
 
 

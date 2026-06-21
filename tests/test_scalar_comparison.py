@@ -1,6 +1,6 @@
 import json
 
-from sheetforge.validation import MISSING_VALUE, ScenarioOutput, compare_scalar_output
+from modelwright.validation import MISSING_VALUE, ScenarioOutput, compare_scalar_output
 
 
 def test_compare_number_uses_absolute_tolerance() -> None:

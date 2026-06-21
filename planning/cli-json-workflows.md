@@ -19,23 +19,23 @@ scripts/bootstrap_dev_env.sh
 Extract workbook facts:
 
 ```bash
-sheetforge workbook extract tmp/private-workbooks/example.xlsx > tmp/extraction.json
+modelwright workbook extract tmp/private-workbooks/example.xlsx > tmp/extraction.json
 ```
 
-This command calls `sheetforge.extraction.extract_workbook` and writes the `WorkbookRecord` JSON payload.
+This command calls `modelwright.extraction.extract_workbook` and writes the `WorkbookRecord` JSON payload.
 
 Build dependency graph facts directly from a workbook:
 
 ```bash
-sheetforge workbook graph tmp/private-workbooks/example.xlsx > tmp/dependency-graph.json
+modelwright workbook graph tmp/private-workbooks/example.xlsx > tmp/dependency-graph.json
 ```
 
-This command calls `extract_workbook`, then `sheetforge.graph.build_dependency_graph`, and writes the `DependencyGraph` JSON payload.
+This command calls `extract_workbook`, then `modelwright.graph.build_dependency_graph`, and writes the `DependencyGraph` JSON payload.
 
 Generate Python source from explicit JSON inputs:
 
 ```bash
-sheetforge model generate \
+modelwright model generate \
   --contract tmp/contract.json \
   --expressions tmp/expressions.json \
   --constants tmp/constants.json \
@@ -43,26 +43,26 @@ sheetforge model generate \
   > tmp/generation-result.json
 ```
 
-This command calls `sheetforge.generation.generate_python_module`. The contract JSON must match `GeneratedModuleContract.to_dict()`. The expressions JSON must be an object keyed by cell reference where each value matches `FormulaExpression.to_dict()`. Constants are optional and must be a JSON object keyed by input cell reference.
+This command calls `modelwright.generation.generate_python_module`. The contract JSON must match `GeneratedModuleContract.to_dict()`. The expressions JSON must be an object keyed by cell reference where each value matches `FormulaExpression.to_dict()`. Constants are optional and must be a JSON object keyed by input cell reference.
 
 Execute a generated Python model from explicit JSON inputs:
 
 ```bash
-sheetforge model execute \
+modelwright model execute \
   --contract tmp/contract.json \
   --model tmp/generated_model.py \
   --inputs tmp/input-overrides.json \
   > tmp/generated-values.json
 ```
 
-This command calls `sheetforge.execution.execute_generated_model`. The inputs file is optional and must be
+This command calls `modelwright.execution.execute_generated_model`. The inputs file is optional and must be
 a JSON object keyed by input cell reference. The command returns a `GeneratedExecutionResult` payload with
 declared output values and execution diagnostics.
 
 Build a validation report from already-observed generated and oracle values:
 
 ```bash
-sheetforge validation report \
+modelwright validation report \
   --scenario tests/fixtures/synthetic_model/baseline_scenario.json \
   --generated-values tmp/generated-values.json \
   --oracle-values tmp/oracle-values.json \
@@ -74,7 +74,7 @@ This command calls `load_validation_scenario`, then `build_validation_report`. I
 Execute a generated model and assemble available validation reports:
 
 ```bash
-sheetforge validation evaluate \
+modelwright validation evaluate \
   --contract tmp/contract.json \
   --model tmp/generated_model.py \
   --scenario tests/fixtures/synthetic_model/baseline_scenario.json \
@@ -84,7 +84,7 @@ sheetforge validation evaluate \
   > tmp/evaluation-report.json
 ```
 
-This command calls `sheetforge.evaluation.evaluate_generated_model`. Cached-workbook validation is
+This command calls `modelwright.evaluation.evaluate_generated_model`. Cached-workbook validation is
 included when either `--workbook-record` or `--workbook` is supplied. Oracle-backed validation is included
 when `--oracle-result` is supplied. Verbose progress messages go to stderr; stdout remains JSON.
 
@@ -130,7 +130,7 @@ Minimal generated/oracle values shape for validation-report input:
 
 - The public CLI command groups are workflow-oriented: `workbook`, `model`, and `validation`.
 - All successful command payloads are JSON printed to stdout.
-- Generated Python source is written only when `sheetforge model generate --out` is provided.
+- Generated Python source is written only when `modelwright model generate --out` is provided.
 - The CLI does not duplicate extraction, graphing, generation, or validation logic.
 - The CLI does not run the optional oracle interface yet; oracle execution remains a Python API boundary, and `validation evaluate` accepts already-materialized oracle-result JSON.
 - The CLI does not translate every formula in a workbook or infer a generated module contract. Those steps still require explicit Python API usage and project-specific decisions.

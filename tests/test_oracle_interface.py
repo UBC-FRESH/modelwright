@@ -2,12 +2,12 @@ import json
 import tomllib
 from pathlib import Path
 
-from sheetforge.oracles import (
+from modelwright.oracles import (
     OracleRequest,
     OracleResult,
     missing_optional_dependency_diagnostic,
 )
-from sheetforge.validation import ScenarioInput, ScenarioOutput
+from modelwright.validation import ScenarioInput, ScenarioOutput
 
 
 class StaticOracle:
@@ -88,7 +88,7 @@ def test_oracle_result_reports_success_and_diagnostics() -> None:
     assert payload["diagnostics"] == [
         {
             "diagnostic_code": "missing_optional_dependency",
-            "message": "Install sheetforge[oracle] to use the formulas oracle backend.",
+            "message": "Install modelwright[oracle] to use the formulas oracle backend.",
             "severity": "error",
             "raw_value": "formulas",
         }

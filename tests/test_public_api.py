@@ -1,25 +1,25 @@
-import sheetforge
+import modelwright
 
 
 def test_root_facade_exports_primary_entrypoints() -> None:
-    assert "extract_workbook" in sheetforge.__all__
-    assert "build_dependency_graph" in sheetforge.__all__
-    assert "translate_formula_cell" in sheetforge.__all__
-    assert "generate_python_module" in sheetforge.__all__
-    assert "build_validation_report" in sheetforge.__all__
-    assert "FormulasWorkbookOracle" in sheetforge.__all__
-    assert "build_conversion_plan" in sheetforge.__all__
-    assert "ConversionPlan" in sheetforge.__all__
-    assert "execute_generated_model" in sheetforge.__all__
-    assert "GeneratedExecutionResult" in sheetforge.__all__
-    assert "evaluate_generated_model" in sheetforge.__all__
-    assert "ValidationEvaluationResult" in sheetforge.__all__
-    assert "infer_generated_module_contract" in sheetforge.__all__
-    assert "GeneratedContractInferenceResult" in sheetforge.__all__
+    assert "extract_workbook" in modelwright.__all__
+    assert "build_dependency_graph" in modelwright.__all__
+    assert "translate_formula_cell" in modelwright.__all__
+    assert "generate_python_module" in modelwright.__all__
+    assert "build_validation_report" in modelwright.__all__
+    assert "FormulasWorkbookOracle" in modelwright.__all__
+    assert "build_conversion_plan" in modelwright.__all__
+    assert "ConversionPlan" in modelwright.__all__
+    assert "execute_generated_model" in modelwright.__all__
+    assert "GeneratedExecutionResult" in modelwright.__all__
+    assert "evaluate_generated_model" in modelwright.__all__
+    assert "ValidationEvaluationResult" in modelwright.__all__
+    assert "infer_generated_module_contract" in modelwright.__all__
+    assert "GeneratedContractInferenceResult" in modelwright.__all__
 
 
 def test_root_facade_does_not_export_internal_helpers() -> None:
-    assert "FormulaReferenceIndex" not in sheetforge.__all__
-    assert "OracleOutputs" not in sheetforge.__all__
-    assert "missing_optional_dependency_diagnostic" not in sheetforge.__all__
-    assert "symbol_name_for_cell_ref" not in sheetforge.__all__
+    assert "FormulaReferenceIndex" not in modelwright.__all__
+    assert "OracleOutputs" not in modelwright.__all__
+    assert "missing_optional_dependency_diagnostic" not in modelwright.__all__
+    assert "symbol_name_for_cell_ref" not in modelwright.__all__

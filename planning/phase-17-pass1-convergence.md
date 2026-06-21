@@ -12,7 +12,7 @@ This pass implemented the first low-risk P17.3 parser/expression slice:
 - string concatenation operator: `&`;
 - explicit `#REF!` error-reference diagnostics.
 
-It also added a tracked supported-semantics fixture harness under `tests/fixtures/supported_semantics/`. That fixture is intentionally separate from private workbooks and should grow whenever Sheetforge adds support for new functions, operators, token forms, or reference forms.
+It also added a tracked supported-semantics fixture harness under `tests/fixtures/supported_semantics/`. That fixture is intentionally separate from private workbooks and should grow whenever Modelwright adds support for new functions, operators, token forms, or reference forms.
 
 ## Verification
 

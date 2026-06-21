@@ -10,7 +10,7 @@ This pass implemented the third P17.3 semantics slice:
 - generated Python helpers for criteria matching, including equality, inequality, numeric comparisons, booleans, and simple wildcard matching;
 - tracked supported-semantics fixture coverage for single-criteria sums/counts and multi-criteria sums/counts.
 
-The implementation keeps criteria behavior inside generated standalone Python modules. Generated models do not depend on the Sheetforge runtime to evaluate supported criteria functions.
+The implementation keeps criteria behavior inside generated standalone Python modules. Generated models do not depend on the Modelwright runtime to evaluate supported criteria functions.
 
 ## Verification
 

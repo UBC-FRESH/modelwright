@@ -4,7 +4,7 @@ Date: 2026-06-20
 
 ## Purpose
 
-P16.2 refactors Sheetforge's first CLI from a minimal `argparse` wrapper into a FRESH-style Typer command surface.
+P16.2 refactors Modelwright's first CLI from a minimal `argparse` wrapper into a FRESH-style Typer command surface.
 
 The change follows the Phase 16 acceptance criteria in `planning/phase-16-cli-docs-acceptance-criteria.md`.
 
@@ -14,15 +14,15 @@ The console script now points at a Typer app:
 
 ```toml
 [project.scripts]
-sheetforge = "sheetforge.cli:app"
+modelwright = "modelwright.cli:app"
 ```
 
 Public workflow groups:
 
-- `sheetforge workbook extract`
-- `sheetforge workbook graph`
-- `sheetforge model generate`
-- `sheetforge validation report`
+- `modelwright workbook extract`
+- `modelwright workbook graph`
+- `modelwright model generate`
+- `modelwright validation report`
 
 ## Behavior Preserved
 

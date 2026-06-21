@@ -18,7 +18,7 @@ The pass deliberately does not add general table joins, implicit relational sema
 Focused local verification passed before the full-suite run:
 
 - `.venv/bin/python -m pytest tests/test_dependency_graph.py tests/test_supported_semantics_fixture.py tests/test_formula_translation.py`;
-- `.venv/bin/python -m ruff check src/sheetforge/graph.py tests/test_dependency_graph.py tests/fixtures/supported_semantics/build_workbook.py tests/test_supported_semantics_fixture.py`.
+- `.venv/bin/python -m ruff check src/modelwright/graph.py tests/test_dependency_graph.py tests/fixtures/supported_semantics/build_workbook.py tests/test_supported_semantics_fixture.py`.
 
 The private diagnostic pass was run with very-verbose output redirected to an ignored local log:
 

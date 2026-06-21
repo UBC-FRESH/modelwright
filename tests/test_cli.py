@@ -4,17 +4,17 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
-from sheetforge.cli import app
-from sheetforge.extraction import extract_workbook
-from sheetforge.extraction import CellRecord, WorkbookRecord
-from sheetforge.formulas import translate_formula_cell
-from sheetforge.generation import (
+from modelwright.cli import app
+from modelwright.extraction import extract_workbook
+from modelwright.extraction import CellRecord, WorkbookRecord
+from modelwright.formulas import translate_formula_cell
+from modelwright.generation import (
     GeneratedModuleContract,
     GeneratedSymbol,
     generate_python_module,
     symbol_name_for_cell_ref,
 )
-from sheetforge.graph import build_dependency_graph
+from modelwright.graph import build_dependency_graph
 from tests.fixtures.synthetic_model.build_workbook import build_workbook
 
 
@@ -24,7 +24,7 @@ runner = CliRunner()
 def test_cli_script_entrypoint_is_declared() -> None:
     pyproject = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))
 
-    assert pyproject["project"]["scripts"]["sheetforge"] == "sheetforge.cli:app"
+    assert pyproject["project"]["scripts"]["modelwright"] == "modelwright.cli:app"
 
 
 def test_cli_help_exposes_fresh_style_workflow_groups() -> None:
@@ -252,7 +252,7 @@ def test_conversion_plan_command_outputs_plan_json(tmp_path: Path) -> None:
             "synthetic-plan",
             "--benchmark-role",
             "synthetic_fixture",
-            "--sheetforge-commit",
+            "--modelwright-commit",
             "test-commit",
         ],
     )
@@ -260,7 +260,7 @@ def test_conversion_plan_command_outputs_plan_json(tmp_path: Path) -> None:
     assert result.exit_code == 0
     payload = json.loads(result.stdout)
     assert payload["plan_id"] == "synthetic-plan"
-    assert payload["sheetforge_commit"] == "test-commit"
+    assert payload["modelwright_commit"] == "test-commit"
     assert payload["source"]["workbook_id"] == "synthetic_model.xlsx"
     assert payload["source"]["benchmark_role"] == "synthetic_fixture"
     assert payload["source"]["source_path"] is None

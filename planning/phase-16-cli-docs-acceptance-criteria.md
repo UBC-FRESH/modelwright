@@ -4,11 +4,11 @@ Date: 2026-06-20
 
 ## Purpose
 
-This note turns the `fhops`/`femic` reference audit into concrete acceptance criteria for Sheetforge's Phase 16 public surface work.
+This note turns the `fhops`/`femic` reference audit into concrete acceptance criteria for Modelwright's Phase 16 public surface work.
 
 ## Reference Baseline
 
-Sheetforge should use these local packages as style and implementation references:
+Modelwright should use these local packages as style and implementation references:
 
 - `/home/gep/projects/fhops`
 - `/home/gep/projects/femic`
@@ -17,9 +17,9 @@ The relevant patterns are recorded in `planning/fresh-cli-docs-reference-audit.m
 
 ## CLI Acceptance Criteria
 
-P16.2 should leave Sheetforge with a CLI that feels like a FRESH lab package:
+P16.2 should leave Modelwright with a CLI that feels like a FRESH lab package:
 
-- console script remains `sheetforge`;
+- console script remains `modelwright`;
 - public entrypoint is a Typer app rather than bare `argparse`;
 - command groups are workflow-oriented and discoverable;
 - no-argument invocation shows help;
@@ -68,7 +68,7 @@ P16.3 should add a GitHub Pages workflow modeled on FEMIC:
 
 P16.4 should verify:
 
-- `sheetforge --help`;
+- `modelwright --help`;
 - representative command help output for each command group;
 - JSON command behavior for existing synthetic workflows;
 - `scripts/bootstrap_dev_env.sh`;

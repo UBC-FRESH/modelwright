@@ -10,13 +10,13 @@ Primary inputs:
 
 - `planning/private-workbook-eval-001-findings.md`;
 - `planning/phase-16-closeout-phase-17-inputs.md`;
-- existing extraction, reference, graph, and formula diagnostics in `src/sheetforge/`.
+- existing extraction, reference, graph, and formula diagnostics in `src/modelwright/`.
 
 ## Ranked Semantics Gaps
 
 1. Structured table references.
 
-   These blocked the `formulas` oracle on the private workbook and are not currently represented as a first-class reference kind. They should be recorded explicitly before Sheetforge tries to translate them. This is the next implementation slice.
+   These blocked the `formulas` oracle on the private workbook and are not currently represented as a first-class reference kind. They should be recorded explicitly before Modelwright tries to translate them. This is the next implementation slice.
 
 2. Unsupported Excel functions.
 
@@ -32,7 +32,7 @@ Primary inputs:
 
 5. External workbook references.
 
-   Sheetforge already records external references as unsupported dependency sources. Phase 17 should preserve that behavior and avoid translation until multi-workbook provenance and validation policy are clearer.
+   Modelwright already records external references as unsupported dependency sources. Phase 17 should preserve that behavior and avoid translation until multi-workbook provenance and validation policy are clearer.
 
 6. Volatile functions.
 

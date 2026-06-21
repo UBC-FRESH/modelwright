@@ -4,7 +4,7 @@ Date: 2026-06-19
 
 ## Question
 
-Can Sheetforge's first prototype path use `openpyxl` for extraction and `formulas` for calculation/model inspection without creating a committed package scaffold?
+Can Modelwright's first prototype path use `openpyxl` for extraction and `formulas` for calculation/model inspection without creating a committed package scaffold?
 
 ## Prototype Setup
 
@@ -64,7 +64,7 @@ Summary!B2 -> Summary!B3
 
 Important gap:
 
-- `formulas` graph nodes are useful but not yet in the canonical provenance shape Sheetforge likely needs. The graph includes intermediate formula-expression nodes, so Sheetforge still needs its own normalized workbook reference model even if `formulas` is used for parsing or evaluation.
+- `formulas` graph nodes are useful but not yet in the canonical provenance shape Modelwright likely needs. The graph includes intermediate formula-expression nodes, so Modelwright still needs its own normalized workbook reference model even if `formulas` is used for parsing or evaluation.
 
 ## Implications
 
@@ -80,6 +80,6 @@ The recommended architecture for the next prototype is:
 
 - What is the smallest tracked intermediate representation for workbook references and formulas?
 - Should named ranges be normalized to their destination cells immediately, or preserved as first-class dependency nodes with destination metadata?
-- How should Sheetforge represent formula-expression nodes versus cell-output nodes?
+- How should Modelwright represent formula-expression nodes versus cell-output nodes?
 - What diagnostics should be emitted for unsupported references, external links, volatile functions, circular dependencies, array formulas, and macros?
 - Should the next prototype generate a tiny Python function/module for this synthetic workbook, or first formalize the extracted workbook model?

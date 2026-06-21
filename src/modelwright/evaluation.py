@@ -6,12 +6,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from sheetforge.execution import GeneratedExecutionResult, execute_generated_model
-from sheetforge.extraction import WorkbookRecord
-from sheetforge.generation import GeneratedModuleContract
-from sheetforge.oracle_validation import build_oracle_validation_report
-from sheetforge.oracles import OracleResult
-from sheetforge.validation import (
+from modelwright.execution import GeneratedExecutionResult, execute_generated_model
+from modelwright.extraction import WorkbookRecord
+from modelwright.generation import GeneratedModuleContract
+from modelwright.oracle_validation import build_oracle_validation_report
+from modelwright.oracles import OracleResult
+from modelwright.validation import (
     Diagnostic,
     JsonValue,
     OracleConfig,

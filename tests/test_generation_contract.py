@@ -1,6 +1,6 @@
 import json
 
-from sheetforge.generation import (
+from modelwright.generation import (
     GeneratedModuleContract,
     GeneratedSymbol,
     GenerationDiagnostic,

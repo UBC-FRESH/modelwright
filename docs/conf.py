@@ -8,7 +8,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SRC_ROOT = PROJECT_ROOT / "src"
 sys.path.insert(0, str(SRC_ROOT))
 
-project = "Sheetforge"
+project = "Modelwright"
 author = "UBC FRESH Lab"
 master_doc = "index"
 

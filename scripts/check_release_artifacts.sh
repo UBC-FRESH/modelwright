@@ -21,6 +21,9 @@ fi
 mkdir -p "$DIST_DIR" "$INSTALL_DIR"
 
 echo "[release-check] run directory: $RUN_DIR"
+echo "[release-check] removing stale build outputs"
+rm -rf "$ROOT_DIR/build"
+rm -rf "$ROOT_DIR/src/sheetforge.egg-info"
 echo "[release-check] building sdist and wheel"
 "$PYTHON_BIN" -m build --sdist --wheel --outdir "$DIST_DIR" "$ROOT_DIR"
 
@@ -44,6 +47,7 @@ forbidden_parts = {
     "private-workbooks",
     "private-evaluations",
     "release-checks",
+    "sheetforge",
 }
 forbidden_suffixes = {
     ".xls",
@@ -88,11 +92,17 @@ echo "[release-check] running installed package smoke tests"
 "$INSTALL_DIR/.venv/bin/python" - <<'PY'
 from __future__ import annotations
 
-import sheetforge
+import modelwright
+import importlib.util
 
-assert sheetforge.__version__ == "0.1.0a1", sheetforge.__version__
-print(f"[release-check] imported sheetforge {sheetforge.__version__}")
+assert modelwright.__version__ == "0.1.0a1", modelwright.__version__
+assert importlib.util.find_spec("sheetforge") is None
+print(f"[release-check] imported modelwright {modelwright.__version__}")
 PY
-"$INSTALL_DIR/.venv/bin/sheetforge" --help >/dev/null
+if [[ -e "$INSTALL_DIR/.venv/bin/sheetforge" ]]; then
+  echo "[release-check] unexpected old sheetforge console script" >&2
+  exit 1
+fi
+"$INSTALL_DIR/.venv/bin/modelwright" --help >/dev/null
 
 echo "[release-check] release artifact checks passed"

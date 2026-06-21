@@ -14,7 +14,7 @@ Example report assembly:
 
 .. code-block:: bash
 
-   sheetforge validation report \
+   modelwright validation report \
      --scenario tests/fixtures/synthetic_model/baseline_scenario.json \
      --generated-values tmp/generated-values.json \
      --oracle-values tmp/oracle-values.json \

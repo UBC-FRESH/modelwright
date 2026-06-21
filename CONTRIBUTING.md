@@ -1,6 +1,6 @@
-# Contributing To Sheetforge
+# Contributing To Modelwright
 
-Sheetforge is pre-release research software for converting spreadsheet workbook logic into transparent Python model artifacts.
+Modelwright is pre-release research software for converting spreadsheet workbook logic into transparent Python model artifacts.
 
 The project values reproducible workflow steps, explicit unsupported-semantics diagnostics, and clean separation between tracked source code and private/generated workbook artifacts.
 

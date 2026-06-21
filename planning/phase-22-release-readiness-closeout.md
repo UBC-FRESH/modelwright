@@ -55,7 +55,7 @@ Not yet complete:
 - real PyPI publication;
 - deployed GitHub Pages RTD-theme verification.
 
-## TestPyPI Blocker
+## Pre-Rebrand TestPyPI Blocker
 
 TestPyPI rehearsal was attempted after Phase 22 merge using the ignored local token file at
 `tmp/pypi-secrets`.
@@ -65,19 +65,20 @@ Result:
 - the local release artifact check passed before upload;
 - the token labelled `test-pypi:` was confirmed to be a TestPyPI token without printing its value;
 - `twine upload` to `https://test.pypi.org/legacy/` failed with `403 Forbidden`;
-- `https://test.pypi.org/pypi/sheetforge/json` returned `404`, so the `sheetforge` project does not currently exist on TestPyPI.
+- the old pre-rebrand TestPyPI project name returned `404`.
 
 Interpretation:
 
-The provided TestPyPI token cannot currently create or upload the `sheetforge` project. The likely
-resolution is to use an account-scoped TestPyPI token for the first upload, or manually create/claim the
-project on TestPyPI and then use a project-scoped token for `sheetforge`.
+The provided TestPyPI token could not create or upload the old package name. Phase 23 changes the
+publication target to `modelwright`, so TestPyPI rehearsal must be repeated after the rebrand using an
+account-scoped TestPyPI token, trusted publishing, or a project-scoped token after the `modelwright`
+TestPyPI project exists.
 
 Required next steps:
 
 - configure the `testpypi` GitHub environment and trusted publishing relationship;
 - run the `Release` workflow manually with `publish_target = testpypi`;
-- install `sheetforge==0.1.0a1` from TestPyPI in a clean environment and run import/CLI smoke tests.
+- install `modelwright==0.1.0a1` from TestPyPI in a clean environment and run import/CLI smoke tests.
 
 ## Real PyPI State
 
@@ -96,7 +97,9 @@ Required next steps before real PyPI:
 
 Local docs artifact verification passed. Post-merge deployed Pages verification also passed.
 
-The live site at `https://ubc-fresh.github.io/sheetforge/` contains the expected Sphinx Read the Docs markers:
+At the time of the Phase 22 closeout, the pre-rebrand live site contained the expected Sphinx Read the
+Docs markers. Phase 23 should re-verify the renamed `https://ubc-fresh.github.io/modelwright/` site
+after the rebrand merges:
 
 - `_static/css/theme.css`;
 - `wy-nav-side`;

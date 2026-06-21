@@ -1,11 +1,11 @@
 import json
 
-from sheetforge.formulas import (
+from modelwright.formulas import (
     FormulaExpression,
     FormulaExpressionNode,
     FormulaTranslationDiagnostic,
 )
-from sheetforge.references import normalize_reference
+from modelwright.references import normalize_reference
 
 
 def test_formula_expression_represents_binary_reference_expression() -> None:

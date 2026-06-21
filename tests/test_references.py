@@ -1,6 +1,6 @@
 import json
 
-from sheetforge.references import WorkbookReference, normalize_cell_reference, normalize_reference
+from modelwright.references import WorkbookReference, normalize_cell_reference, normalize_reference
 
 
 def test_normalize_sheet_relative_cell_reference() -> None:

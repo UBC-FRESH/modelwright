@@ -1,7 +1,7 @@
-Sheetforge
-==========
+Modelwright
+===========
 
-Sheetforge is an early-stage toolkit for turning spreadsheet workbooks into transparent,
+Modelwright is an early-stage toolkit for turning spreadsheet workbooks into transparent,
 version-controlled Python model artifacts.
 
 The project is intentionally explicit about boundaries. It can extract workbook facts, build

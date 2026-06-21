@@ -64,7 +64,7 @@ Sanitized remaining first-failure categories after pass 6:
 - unsupported error references: 306;
 - validation oracle: `formulas` still reports oracle calculation failure.
 
-The explicit error references are not a missing Excel function or parser feature. They represent workbook formulas containing `#REF!` references, and Sheetforge should not silently generate normal Python behavior for them. They should remain sharp diagnostics until a higher-level conversion plan can decide whether to exclude, repair, or model them as errors.
+The explicit error references are not a missing Excel function or parser feature. They represent workbook formulas containing `#REF!` references, and Modelwright should not silently generate normal Python behavior for them. They should remain sharp diagnostics until a higher-level conversion plan can decide whether to exclude, repair, or model them as errors.
 
 ## Convergence Assessment
 

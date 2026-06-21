@@ -1,7 +1,7 @@
 Developer Onboarding
 ====================
 
-Use a repository-local virtual environment for Sheetforge development. This keeps package dependencies,
+Use a repository-local virtual environment for Modelwright development. This keeps package dependencies,
 console scripts, Sphinx, and quality tools tied to the checkout being edited.
 
 Bootstrap
@@ -13,7 +13,7 @@ From the repository root:
 
    scripts/bootstrap_dev_env.sh
 
-This creates ``.venv/`` and installs Sheetforge with the ``dev`` extra:
+This creates ``.venv/`` and installs Modelwright with the ``dev`` extra:
 
 .. code-block:: bash
 

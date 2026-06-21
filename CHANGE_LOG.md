@@ -12,7 +12,10 @@ This file records completed project work in chronological order.
 - Added the P22.4 release and deployment runbook to the Sphinx docs and contributor onboarding notes.
 - Recorded P22.5 local release-readiness evidence: ruff, pytest, docs, local RTD theme verification, sdist/wheel build, `twine check`, artifact privacy inspection, and clean wheel install smoke test pass; TestPyPI, real PyPI, and deployed Pages verification remain gated after merge.
 - Merged Phase 22 PR #130, verified post-merge CI and release-artifact checks passed, confirmed the live GitHub Pages site serves the Sphinx Read the Docs themed artifact, and closed the Phase 22 publication/deployment workflow setup.
-- Attempted the TestPyPI `0.1.0a1` upload with the ignored local TestPyPI token; artifacts passed local checks, but TestPyPI rejected the upload with `403 Forbidden` while the `sheetforge` TestPyPI project returned `404`, so the next release operation is to create/authorize the TestPyPI project with an account-scoped token or trusted publishing setup.
+- Attempted the pre-rebrand TestPyPI `0.1.0a1` upload with the ignored local TestPyPI token; artifacts passed local checks, but TestPyPI rejected the upload with `403 Forbidden` while the old TestPyPI project name returned `404`, so the next release operation is to complete the Modelwright rebrand and rehearse publication under the new package name.
+- Activated Phase 23 on `feature/p23-modelwright-rebrand`, renamed the GitHub repository to `UBC-FRESH/modelwright`, and scoped a full pre-publication rebrand with no old-name compatibility aliases.
+- Completed the local Modelwright rebrand across package metadata, import package, CLI command, generated-code/runtime labels, release workflow artifacts, docs, tests, and planning notes; hardened bootstrap and release checks to remove stale pre-rebrand metadata and reject old package paths or console scripts.
+- Verified Phase 23 locally with repo-local bootstrap, ruff, 129 pytest tests, Sphinx warning-as-error docs build, Read the Docs theme verification, and a clean sdist/wheel release artifact check for `modelwright`.
 
 ## 2026-06-20
 
@@ -76,7 +79,7 @@ This file records completed project work in chronological order.
 - Revised the next roadmap horizon so Phase 16 prioritizes FRESH-style Typer/Rich CLI alignment and full Sphinx GitHub Pages documentation modeled on local `fhops` and `femic` repositories.
 - Merged Phase 15 PR #102 and closed parent issue #51.
 - Activated Phase 16 on `feature/p16-cli-docs-public-surface`.
-- Recorded Sheetforge-specific Phase 16 CLI and Sphinx documentation acceptance criteria from the local `fhops` and `femic` reference packages.
+- Recorded Modelwright-specific Phase 16 CLI and Sphinx documentation acceptance criteria from the local `fhops` and `femic` reference packages.
 - Refactored the CLI to a tight Typer/Rich command surface with grouped `workbook`, `model`, and `validation` workflows.
 - Added full Sphinx documentation with curated guide/reference pages and a GitHub Pages workflow that builds on pull requests and deploys on pushes to `main`.
 - Added repo-root `.venv` bootstrap tooling plus contributor and developer-onboarding documentation for repeatable local setup.
@@ -103,7 +106,7 @@ This file records completed project work in chronological order.
 - Promoted the public FABLE Calculator workbooks to official external benchmark status by tracking the source URL, local placement instructions, roles, and checksums while keeping workbook binaries untracked under ignored `tmp/`.
 - Added a benchmark materialization helper that downloads or consumes a local Dropbox ZIP/directory, verifies the public FABLE workbook payloads by checksum, and writes them to canonical ignored paths.
 - Added a `dev` dependency extra and linked benchmark materialization into the repo-local bootstrap ritual through `scripts/bootstrap_dev_env.sh --benchmarks`.
-- Added the P18.3 `sheetforge conversion plan` CLI command for JSON conversion-plan reports over extraction, dependency graphing, and formula translation.
+- Added the P18.3 `modelwright conversion plan` CLI command for JSON conversion-plan reports over extraction, dependency graphing, and formula translation.
 - Standardized the Sphinx documentation build on the Read the Docs theme used by the other FRESH lab packages.
 - Expanded conversion-plan residual-blocker classification across extraction, named ranges, formula extraction, graphing, validation, and generation diagnostics.
 - Closed Phase 18 with synthetic and 2020 FABLE conversion-plan workflow evidence and recorded Phase 19 validation automation inputs.
@@ -157,4 +160,4 @@ This file records completed project work in chronological order.
 - Summarized the Phase 5 implementation bootstrap plan in `planning/implementation-bootstrap-plan.md` and created the planned Phase 6 issue sequence.
 - Opened Phase 5 PR #40 from `feature/p5-package-api-cli-ci-decisions` back to `main`.
 - Merged Phase 5 PR #40, closed parent issue #24, and activated Phase 6 on `feature/p6-initial-package-validation-core`.
-- Added the initial package and test skeleton with `pyproject.toml`, `src/sheetforge`, `tests`, and documented local test commands.
+- Added the initial package and test skeleton with `pyproject.toml`, `src/modelwright`, `tests`, and documented local test commands.

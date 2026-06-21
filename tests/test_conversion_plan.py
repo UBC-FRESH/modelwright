@@ -5,12 +5,12 @@ from openpyxl import Workbook
 from openpyxl.worksheet.table import Table
 from openpyxl.workbook.defined_name import DefinedName
 
-from sheetforge.conversion import ConversionPlan, build_conversion_plan
-from sheetforge.extraction import extract_workbook
-from sheetforge.formulas import build_formula_reference_index, translate_formula_cell
-from sheetforge.generation import GeneratedModuleContract, GeneratedSymbol, generate_python_module
-from sheetforge.graph import build_dependency_graph
-from sheetforge.validation import ComparisonRules, OracleConfig, ScenarioOutput, ValidationScenario, build_validation_report
+from modelwright.conversion import ConversionPlan, build_conversion_plan
+from modelwright.extraction import extract_workbook
+from modelwright.formulas import build_formula_reference_index, translate_formula_cell
+from modelwright.generation import GeneratedModuleContract, GeneratedSymbol, generate_python_module
+from modelwright.graph import build_dependency_graph
+from modelwright.validation import ComparisonRules, OracleConfig, ScenarioOutput, ValidationScenario, build_validation_report
 from tests.fixtures.synthetic_model.build_workbook import build_workbook
 
 

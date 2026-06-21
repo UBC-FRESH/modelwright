@@ -1,4 +1,4 @@
-"""Typer-based command-line wrappers for Sheetforge JSON workflows."""
+"""Typer-based command-line wrappers for Modelwright JSON workflows."""
 
 from __future__ import annotations
 
@@ -10,15 +10,15 @@ from typing import Any, cast
 import typer
 from typer.main import get_command
 
-from sheetforge.conversion import BenchmarkRole, build_conversion_plan
-from sheetforge.evaluation import evaluate_generated_model
-from sheetforge.execution import execute_generated_model
-from sheetforge.extraction import WorkbookRecord, extract_workbook
-from sheetforge.formulas import FormulaExpression, build_formula_reference_index, translate_formula_cell
-from sheetforge.generation import GeneratedModuleContract, generate_python_module
-from sheetforge.graph import build_dependency_graph
-from sheetforge.oracles import OracleResult
-from sheetforge.validation import build_validation_report, load_validation_scenario
+from modelwright.conversion import BenchmarkRole, build_conversion_plan
+from modelwright.evaluation import evaluate_generated_model
+from modelwright.execution import execute_generated_model
+from modelwright.extraction import WorkbookRecord, extract_workbook
+from modelwright.formulas import FormulaExpression, build_formula_reference_index, translate_formula_cell
+from modelwright.generation import GeneratedModuleContract, generate_python_module
+from modelwright.graph import build_dependency_graph
+from modelwright.oracles import OracleResult
+from modelwright.validation import build_validation_report, load_validation_scenario
 
 
 JsonValue = str | int | float | bool | None | list[Any] | dict[str, Any]
@@ -56,10 +56,10 @@ app.add_typer(conversion_app, name="conversion")
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """Run the Sheetforge CLI with an explicit argv sequence."""
+    """Run the Modelwright CLI with an explicit argv sequence."""
 
     command = get_command(app)
-    command.main(args=list(argv) if argv is not None else None, prog_name="sheetforge", standalone_mode=False)
+    command.main(args=list(argv) if argv is not None else None, prog_name="modelwright", standalone_mode=False)
     return 0
 
 
@@ -272,10 +272,10 @@ def conversion_plan(
         "--benchmark-role",
         help="Benchmark role for the source workbook.",
     ),
-    sheetforge_commit: str = typer.Option(
+    modelwright_commit: str = typer.Option(
         "unknown",
-        "--sheetforge-commit",
-        help="Sheetforge commit identifier to record in the plan.",
+        "--modelwright-commit",
+        help="Modelwright commit identifier to record in the plan.",
     ),
     include_source_path: bool = typer.Option(
         False,
@@ -290,7 +290,7 @@ def conversion_plan(
             workbook=workbook,
             plan_id=plan_id,
             benchmark_role=_parse_benchmark_role(benchmark_role),
-            sheetforge_commit=sheetforge_commit,
+            modelwright_commit=modelwright_commit,
             include_source_path=include_source_path,
         )
     )
@@ -408,7 +408,7 @@ def _conversion_plan_payload(
     workbook: Path,
     plan_id: str | None,
     benchmark_role: BenchmarkRole,
-    sheetforge_commit: str,
+    modelwright_commit: str,
     include_source_path: bool,
 ) -> dict[str, JsonValue]:
     workbook_record = extract_workbook(workbook)
@@ -425,7 +425,7 @@ def _conversion_plan_payload(
         graph=graph,
         expressions=expressions,
         benchmark_role=benchmark_role,
-        sheetforge_commit=sheetforge_commit,
+        modelwright_commit=modelwright_commit,
         include_source_path=include_source_path,
     )
     return plan.to_dict()

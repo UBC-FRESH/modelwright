@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap is the current project plan and issue tracker map for `sheetforge`.
+This roadmap is the current project plan and issue tracker map for `modelwright`.
 
 The near-term implementation direction is recorded here. Broader phase rationale is recorded in `planning/long-term-roadmap.md`.
 
@@ -244,7 +244,7 @@ GitHub parent issue: #89
 
 Completed branch: `feature/p16-cli-docs-public-surface`
 
-Goal: align Sheetforge's CLI feel, command organization, help text, and documentation depth with the other FRESH lab packages `fhops` and `femic`, including full Sphinx documentation published to GitHub Pages from the `main` branch.
+Goal: align Modelwright's CLI feel, command organization, help text, and documentation depth with the other FRESH lab packages `fhops` and `femic`, including full Sphinx documentation published to GitHub Pages from the `main` branch.
 
 - [x] P16.1 Audit `fhops`/`femic` CLI and docs conventions. Child issue: #92.
 - [x] P16.2 Refactor CLI toward FRESH Typer/Rich conventions. Child issue: #90.
@@ -333,7 +333,7 @@ Closeout evidence:
 - The 2020 FABLE benchmark rerun completed extraction, dependency graphing, and formula translation:
   54 sheets, 395,482 extracted cells, 296,976 formula cells, 296,976 translated formulas,
   3,543,800 dependency edges, no graph diagnostics, and no translation diagnostics.
-- Full 2020 workbook equivalence is not proven yet because Sheetforge does not yet infer and
+- Full 2020 workbook equivalence is not proven yet because Modelwright does not yet infer and
   materialize a full generated-model contract with topologically ordered symbols and selected
   validation outputs for that workbook.
 
@@ -438,9 +438,46 @@ Merged PR: #130
 
 Status: complete.
 
+## Phase 23: Modelwright Rebrand Before Publication
+
+GitHub parent issue: #131
+
+Active branch: `feature/p23-modelwright-rebrand`
+
+Goal: complete the pre-publication rename from Modelwright to Modelwright across the GitHub repository,
+Python package, CLI, documentation, tests, and release workflow before resuming TestPyPI or PyPI
+publication. There are no external users yet, so this phase should not add compatibility aliases.
+
+- [x] P23.1 Define Modelwright rebrand scope. Child issue: #133.
+  - [x] Rename the GitHub repository from `UBC-FRESH/sheetforge` to `UBC-FRESH/modelwright`.
+  - [x] Record `modelwright` as the public package name.
+  - [x] Record `modelwright` as the only CLI command.
+  - [x] Record `modelwright` as the only Python import package.
+  - [x] Record the no-alias policy for the old name.
+- [x] P23.2 Rename package import CLI and metadata. Child issue: #135.
+  - [x] Move `src/sheetforge` to `src/modelwright`.
+  - [x] Update imports, tests, generated-code helpers, and optional dependency messages.
+  - [x] Rename the console script from `sheetforge` to `modelwright`.
+  - [x] Update package metadata, URLs, release artifact checks, and workflow smoke tests.
+  - [x] Rename JSON fields and CLI options that embed the old project name.
+- [x] P23.3 Update Modelwright docs planning and release text. Child issue: #134.
+  - [x] Update README, CONTRIBUTING, AGENTS, Sphinx docs, and release guidance.
+  - [x] Update planning notes that describe current product identity or commands.
+  - [x] Preserve historical release-blocker provenance without carrying the old package name forward as the target.
+  - [x] Update GitHub Pages references to `https://ubc-fresh.github.io/modelwright/`.
+- [x] P23.4 Verify Modelwright release readiness. Child issue: #132.
+  - [x] Rebuild the repo-local development environment.
+  - [x] Run ruff in logged mode.
+  - [x] Run pytest in verbose logged mode.
+  - [x] Build Sphinx docs in logged mode and verify the Read the Docs theme.
+  - [x] Run local release artifact checks and installed CLI smoke tests for `modelwright`.
+  - [x] Record closeout evidence and next publication steps.
+
+Status: ready for PR.
+
 ## Current Next Steps
 
-1. Create or authorize the `sheetforge` project on TestPyPI. The first token-based upload attempt returned `403 Forbidden`, and `https://test.pypi.org/pypi/sheetforge/json` returned `404`, so the provided TestPyPI token cannot currently create or upload the project.
-2. Rehearse TestPyPI publication using an account-scoped TestPyPI token or a project-scoped token after the TestPyPI project exists.
-3. Install `sheetforge==0.1.0a1` from TestPyPI in a clean environment and run import/CLI smoke tests.
+1. Open and merge the Phase 23 rebrand PR.
+2. Verify the renamed GitHub Pages site after the docs workflow deploys `https://ubc-fresh.github.io/modelwright/`.
+3. Rehearse TestPyPI publication for `modelwright==0.1.0a1` using an account-scoped TestPyPI token, a project-scoped token after the TestPyPI project exists, or trusted publishing.
 4. Decide whether to proceed to real PyPI alpha publication from tag `v0.1.0a1`.
