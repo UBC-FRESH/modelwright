@@ -280,7 +280,7 @@ def extract_workbook(path: str | Path, progress: Callable[[str], None] | None = 
 
     cell_records: list[CellRecord] = []
     for index, worksheet in enumerate(workbook.worksheets, start=1):
-        populated_cells = _populated_cells(worksheet)
+        populated_cells = _populated_cells(worksheet, cached_workbook[worksheet.title])
         _progress(
             progress,
             f"sheet cells start index={index}/{len(workbook.worksheets)} populated={len(populated_cells)}",
@@ -462,22 +462,24 @@ def _extract_sheet_cells(
     worksheet: Any,
     cached_worksheet: Any,
     *,
-    populated_cells: tuple[Any, ...] | None = None,
+    populated_cells: tuple[str, ...] | None = None,
 ) -> tuple[CellRecord, ...]:
     records: list[CellRecord] = []
-    for cell in populated_cells if populated_cells is not None else _populated_cells(worksheet):
-        if cell.value is None:
+    for coordinate in populated_cells if populated_cells is not None else _populated_cells(worksheet, cached_worksheet):
+        cell = worksheet[coordinate]
+        cached_value = cached_worksheet[coordinate].value
+        raw_value = cell.value if cell.value is not None else cached_value
+        if raw_value is None:
             continue
 
-        cell_ref = _cell_ref(worksheet.title, cell.coordinate)
-        cached_value = cached_worksheet[cell.coordinate].value
+        cell_ref = _cell_ref(worksheet.title, coordinate)
         if cell.data_type == "f":
             formula = _extract_formula(cell_ref, str(cell.value), cached_value)
             records.append(
                 CellRecord(
                     cell_ref=cell_ref,
                     kind="formula",
-                    raw_value=_json_value(cell.value),
+                    raw_value=_json_value(raw_value),
                     data_type=cell.data_type,
                     cached_value=_json_value(cached_value),
                     formula=formula,
@@ -489,7 +491,7 @@ def _extract_sheet_cells(
             CellRecord(
                 cell_ref=cell_ref,
                 kind="value",
-                raw_value=_json_value(cell.value),
+                raw_value=_json_value(raw_value),
                 data_type=cell.data_type,
                 cached_value=_json_value(cached_value),
                 formula=None,
@@ -498,12 +500,23 @@ def _extract_sheet_cells(
     return tuple(records)
 
 
-def _populated_cells(worksheet: Any) -> tuple[Any, ...]:
+def _populated_cells(worksheet: Any, cached_worksheet: Any | None = None) -> tuple[str, ...]:
+    coordinates = _worksheet_populated_coordinates(worksheet)
+    if cached_worksheet is not None:
+        coordinates = coordinates | _worksheet_populated_coordinates(cached_worksheet)
+    return tuple(sorted(coordinates, key=_coordinate_sort_key))
+
+
+def _worksheet_populated_coordinates(worksheet: Any) -> set[str]:
     cells = getattr(worksheet, "_cells", None)
     if isinstance(cells, dict):
-        return tuple(cell for _, cell in sorted(cells.items()))
+        return {cell.coordinate for cell in cells.values()}
+    return {cell.coordinate for row in worksheet.iter_rows() for cell in row if cell.value is not None}
 
-    return tuple(cell for row in worksheet.iter_rows() for cell in row)
+
+def _coordinate_sort_key(coordinate: str) -> tuple[int, int]:
+    min_col, min_row, _max_col, _max_row = range_boundaries(coordinate)
+    return min_row, min_col
 
 
 def _progress(progress: Callable[[str], None] | None, message: str) -> None:

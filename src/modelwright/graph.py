@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
@@ -81,18 +82,17 @@ class DependencyGraph:
         }
 
 
-def build_dependency_graph(workbook: WorkbookRecord) -> DependencyGraph:
+def build_dependency_graph(workbook: WorkbookRecord, progress: Callable[[str], None] | None = None) -> DependencyGraph:
     """Build semantic and execution dependency edges from extracted formulas."""
 
     named_ranges = _named_range_destinations(workbook)
     tables = {table.name: table for table in workbook.tables}
     edges: list[DependencyEdge] = []
     diagnostics: list[str] = []
+    formula_cells = tuple(cell for cell in workbook.cells if cell.formula is not None)
+    _progress(progress, f"dependency graph start formula_cells={len(formula_cells)}")
 
-    for cell in workbook.cells:
-        if cell.formula is None:
-            continue
-
+    for index, cell in enumerate(formula_cells, start=1):
         target = _target_reference(cell)
         current_sheet = target.sheet
         for raw_reference in cell.formula.raw_references:
@@ -118,10 +118,22 @@ def build_dependency_graph(workbook: WorkbookRecord) -> DependencyGraph:
                 )
             )
             edges.extend(execution_edges)
+        if index == 1 or index % 5000 == 0 or index == len(formula_cells):
+            _progress(
+                progress,
+                f"dependency graph progress formula_cells={index}/{len(formula_cells)} edges={len(edges)}",
+            )
 
+    _progress(progress, "dependency graph diagnostics start")
     diagnostics.extend(_diagnostic_codes(edges))
     diagnostics.extend(_circular_dependency_codes(edges))
+    _progress(progress, f"dependency graph done edges={len(edges)} diagnostics={len(dict.fromkeys(diagnostics))}")
     return DependencyGraph(workbook_id=workbook.workbook_id, edges=tuple(edges), diagnostics=tuple(dict.fromkeys(diagnostics)))
+
+
+def _progress(progress: Callable[[str], None] | None, message: str) -> None:
+    if progress is not None:
+        progress(message)
 
 
 def _named_range_destinations(workbook: WorkbookRecord) -> dict[str, tuple[WorkbookReference, ...]]:
@@ -413,10 +425,22 @@ def _resolve_structured_reference(
     except ValueError:
         return None
 
+    end_column_offset = column_offset
+    if parsed.end_column is not None:
+        try:
+            end_column_offset = table.columns.index(parsed.end_column)
+        except ValueError:
+            return None
+        if end_column_offset < column_offset:
+            return None
+
     column_name = _column_name(min_col + column_offset)
+    end_column_name = _column_name(min_col + end_column_offset)
     data_start_row = min_row + 1
     if parsed.current_row:
         if target.sheet != table.sheet or target.start_cell is None:
+            if parsed.end_column is not None:
+                return None
             return _resolve_cross_table_current_row(
                 source_table=table,
                 target=target,
@@ -428,15 +452,19 @@ def _resolve_structured_reference(
         except ValueError:
             return None
         if target_row < data_start_row or target_row > max_row:
+            if parsed.end_column is not None:
+                return None
             return _resolve_cross_table_current_row(
                 source_table=table,
                 target=target,
                 column_name=column_name,
                 tables=tables,
             )
+        if parsed.end_column is not None:
+            return normalize_reference(f"{table.sheet}!{column_name}{target_row}:{end_column_name}{target_row}")
         return normalize_reference(f"{table.sheet}!{column_name}{target_row}")
 
-    return normalize_reference(f"{table.sheet}!{column_name}{data_start_row}:{column_name}{max_row}")
+    return normalize_reference(f"{table.sheet}!{column_name}{data_start_row}:{end_column_name}{max_row}")
 
 
 def _resolve_cross_table_current_row(
@@ -473,6 +501,7 @@ def _resolve_cross_table_current_row(
 class _StructuredReferenceParts:
     table_name: str | None
     column: str | None
+    end_column: str | None
     current_row: bool
     include_headers: bool
 
@@ -488,17 +517,16 @@ def _parse_structured_reference(reference: str) -> _StructuredReferenceParts | N
         current_row = True
     include_headers = any(part == "#All" for part in bracketed_parts)
 
-    column = next(
-        (
-            _clean_structured_selector(part)
-            for part in reversed(bracketed_parts)
-            if not part.startswith("#")
-        ),
-        None,
-    )
+    selectors = tuple(_clean_structured_selector(part) for part in bracketed_parts if not part.startswith("#"))
+    column = selectors[-1] if selectors else None
+    end_column = None
+    if len(selectors) >= 2:
+        column = selectors[0]
+        end_column = selectors[-1]
     return _StructuredReferenceParts(
         table_name=table_name,
         column=column,
+        end_column=end_column,
         current_row=current_row,
         include_headers=include_headers,
     )

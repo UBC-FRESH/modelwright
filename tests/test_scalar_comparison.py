@@ -35,6 +35,22 @@ def test_compare_number_reports_mismatch() -> None:
     json.dumps(result.to_dict())
 
 
+def test_compare_number_can_use_relative_tolerance_for_large_values() -> None:
+    result = compare_scalar_output(
+        scenario_id="large_float_roundoff",
+        output=ScenarioOutput(cell_ref="Summary!B2", kind="number", tolerance=1e-9),
+        generated=1_000_000_000.0000002,
+        oracle=1_000_000_000.0,
+        oracle_backend="cached_workbook",
+        default_numeric_relative_tolerance=1e-12,
+    )
+
+    assert result.matches is True
+    assert result.diagnostic_code is None
+    assert result.difference > 1e-9
+    json.dumps(result.to_dict())
+
+
 def test_compare_text_requires_exact_match() -> None:
     match = compare_scalar_output(
         scenario_id="synthetic_model_baseline",

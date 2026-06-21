@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal
@@ -13,6 +13,7 @@ from openpyxl.utils.cell import get_column_letter, range_boundaries
 from modelwright.extraction import WorkbookRecord
 from modelwright.formulas import FormulaExpression, FormulaExpressionNode
 from modelwright.graph import DependencyGraph
+from modelwright.references import WorkbookReference
 
 
 JsonValue = str | int | float | bool | None | list[Any] | dict[str, Any]
@@ -184,17 +185,21 @@ def infer_generated_module_contract(
     output_refs: Sequence[str],
     module_name: str,
     input_refs: Sequence[str] = (),
+    progress: Callable[[str], None] | None = None,
 ) -> GeneratedContractInferenceResult:
     """Infer a generated module contract by walking dependencies for selected outputs."""
 
     explicit_inputs = set(input_refs)
     selected_outputs = tuple(output_refs)
+    _progress(progress, f"contract inference start outputs={len(selected_outputs)} expressions={len(expressions)}")
     cell_by_ref = {cell.cell_ref: cell for cell in workbook.cells}
-    dependencies_by_target: dict[str, list[str]] = {}
+    dependencies_by_target: dict[str, list[str | WorkbookReference]] = {}
     edge_diagnostics_by_target: dict[str, list[GenerationDiagnostic]] = {}
     diagnostics: list[GenerationDiagnostic] = []
 
-    for edge in graph.execution_edges:
+    execution_edges = graph.execution_edges
+    _progress(progress, f"contract inference edge scan start execution_edges={len(execution_edges)}")
+    for index, edge in enumerate(execution_edges, start=1):
         if edge.diagnostic_code is not None:
             edge_diagnostics_by_target.setdefault(edge.target.normalized, []).append(
                 GenerationDiagnostic(
@@ -205,6 +210,14 @@ def infer_generated_module_contract(
                     raw_value=edge.diagnostic_code,
                 )
             )
+            continue
+        if edge.source.kind == "range":
+            dependencies_by_target.setdefault(edge.target.normalized, []).append(edge.source)
+            if index == 1 or index % 100000 == 0 or index == len(execution_edges):
+                _progress(
+                    progress,
+                    f"contract inference edge scan progress execution_edges={index}/{len(execution_edges)}",
+                )
             continue
         if edge.source.kind != "cell":
             edge_diagnostics_by_target.setdefault(edge.target.normalized, []).append(
@@ -218,59 +231,105 @@ def infer_generated_module_contract(
             )
             continue
         dependencies_by_target.setdefault(edge.target.normalized, []).append(edge.source.normalized)
+        if index == 1 or index % 100000 == 0 or index == len(execution_edges):
+            _progress(
+                progress,
+                f"contract inference edge scan progress execution_edges={index}/{len(execution_edges)}",
+            )
+    _progress(
+        progress,
+        f"contract inference edge scan done dependency_targets={len(dependencies_by_target)}",
+    )
 
     input_order: list[str] = []
     formula_order: list[str] = []
     visiting: set[str] = set()
     visited: set[str] = set()
+    circular_dependency_locations: set[str] = set()
+    expanded_range_dependencies: dict[str, tuple[str, ...]] = {}
+    visit_calls = 0
 
-    def visit(cell_ref: str) -> None:
-        if cell_ref in visited:
-            return
-        if cell_ref in visiting:
-            diagnostics.append(
-                GenerationDiagnostic(
-                    code="circular_dependency",
-                    message="selected output dependency walk encountered a cycle",
-                    severity="error",
-                    location=cell_ref,
+    def dependency_refs(cell_ref: str) -> tuple[str, ...]:
+        refs: list[str] = []
+        for dependency in dependencies_by_target.get(cell_ref, []):
+            if isinstance(dependency, str):
+                refs.append(dependency)
+                continue
+            refs.extend(
+                expanded_range_dependencies.setdefault(
+                    dependency.normalized,
+                    _expand_range_dependency(dependency),
                 )
             )
-            return
+        return tuple(refs)
 
-        cell = cell_by_ref.get(cell_ref)
-        if cell is None:
-            diagnostics.append(
-                GenerationDiagnostic(
-                    code="missing_dependency_cell",
-                    message="selected output depends on a cell that was not extracted",
-                    severity="error",
-                    location=cell_ref,
+    def visit(root_ref: str) -> None:
+        nonlocal visit_calls
+        stack: list[tuple[str, bool]] = [(root_ref, False)]
+        while stack:
+            cell_ref, dependencies_processed = stack.pop()
+            if cell_ref in visited:
+                continue
+
+            if dependencies_processed:
+                visiting.discard(cell_ref)
+                if cell_ref not in formula_order:
+                    formula_order.append(cell_ref)
+                visited.add(cell_ref)
+                continue
+
+            visit_calls += 1
+            if visit_calls == 1 or visit_calls % 10000 == 0:
+                _progress(
+                    progress,
+                    "contract inference visit progress "
+                    f"calls={visit_calls} visited={len(visited)} formulas={len(formula_order)} inputs={len(input_order)}",
                 )
-            )
-            return
+            if cell_ref in visiting:
+                if cell_ref not in circular_dependency_locations:
+                    circular_dependency_locations.add(cell_ref)
+                    diagnostics.append(
+                        GenerationDiagnostic(
+                            code="static_circular_dependency",
+                            message=(
+                                "selected output dependency walk encountered a static cycle; "
+                                "generated runtime evaluation will fail only if the active execution path re-enters this cell"
+                            ),
+                            severity="warning",
+                            location=cell_ref,
+                        )
+                    )
+                continue
 
-        if cell_ref in explicit_inputs or cell.formula is None:
-            if cell_ref not in input_order:
-                input_order.append(cell_ref)
-            visited.add(cell_ref)
-            return
+            cell = cell_by_ref.get(cell_ref)
+            if cell is None:
+                if cell_ref not in input_order:
+                    input_order.append(cell_ref)
+                visited.add(cell_ref)
+                continue
 
-        visiting.add(cell_ref)
-        diagnostics.extend(edge_diagnostics_by_target.get(cell_ref, ()))
-        for dependency_ref in dependencies_by_target.get(cell_ref, []):
-            visit(dependency_ref)
-        visiting.remove(cell_ref)
+            if cell_ref in explicit_inputs or cell.formula is None:
+                if cell_ref not in input_order:
+                    input_order.append(cell_ref)
+                visited.add(cell_ref)
+                continue
 
-        if cell_ref not in formula_order:
-            formula_order.append(cell_ref)
-        visited.add(cell_ref)
+            visiting.add(cell_ref)
+            diagnostics.extend(edge_diagnostics_by_target.get(cell_ref, ()))
+            stack.append((cell_ref, True))
+            for dependency_ref in reversed(dependency_refs(cell_ref)):
+                if dependency_ref not in visited:
+                    stack.append((dependency_ref, False))
 
     for output_ref in selected_outputs:
         visit(output_ref)
 
+    _progress(
+        progress,
+        f"contract inference dependency walk done visited={len(visited)} formulas={len(formula_order)} inputs={len(input_order)}",
+    )
     selected_expressions: dict[str, FormulaExpression] = {}
-    for cell_ref in formula_order:
+    for index, cell_ref in enumerate(formula_order, start=1):
         expression = expressions.get(cell_ref)
         if expression is None:
             diagnostics.append(
@@ -283,8 +342,13 @@ def infer_generated_module_contract(
             )
             continue
         selected_expressions[cell_ref] = expression
+        if index == 1 or index % 10000 == 0 or index == len(formula_order):
+            _progress(
+                progress,
+                f"contract inference expression selection progress formulas={index}/{len(formula_order)}",
+            )
 
-    constants = {cell_ref: cell_by_ref[cell_ref].raw_value for cell_ref in input_order if cell_ref in cell_by_ref}
+    constants = {cell_ref: cell_by_ref[cell_ref].raw_value if cell_ref in cell_by_ref else None for cell_ref in input_order}
     output_set = set(selected_outputs)
     symbols = tuple(
         GeneratedSymbol(cell_ref=cell_ref, symbol_name=symbol_name_for_cell_ref(cell_ref), kind="input")
@@ -319,20 +383,34 @@ def generate_python_module(
     expressions: Mapping[str, FormulaExpression],
     constants: Mapping[str, JsonValue] | None = None,
     output_path: str | Path | None = None,
+    progress: Callable[[str], None] | None = None,
+    runtime_progress_interval: int | None = None,
 ) -> GenerationResult:
     """Generate standalone Python source from translated formula expressions."""
 
     constants = constants or {}
+    _progress(progress, f"python generation diagnostics start symbols={len(contract.symbols)}")
     diagnostics = _generation_diagnostics(contract, expressions)
     if any(diagnostic.severity == "error" for diagnostic in diagnostics):
+        _progress(progress, f"python generation blocked diagnostics={len(diagnostics)}")
         return GenerationResult(contract=contract, diagnostics=tuple(diagnostics))
 
-    source_code = _render_module(contract=contract, expressions=expressions, constants=constants)
+    _progress(progress, "python generation render start")
+    source_code = _render_module(
+        contract=contract,
+        expressions=expressions,
+        constants=constants,
+        progress=progress,
+        runtime_progress_interval=runtime_progress_interval,
+    )
     if output_path is not None:
         path = Path(output_path)
         path.parent.mkdir(parents=True, exist_ok=True)
+        _progress(progress, f"python generation write start path={path}")
         path.write_text(source_code, encoding="utf-8")
+        _progress(progress, f"python generation write done bytes={path.stat().st_size}")
 
+    _progress(progress, f"python generation done source_chars={len(source_code)} diagnostics={len(diagnostics)}")
     return GenerationResult(contract=contract, source_code=source_code, diagnostics=tuple(diagnostics))
 
 
@@ -368,6 +446,20 @@ def _generation_diagnostics(
                     raw_value=expression.raw_formula,
                 )
             )
+            continue
+
+        try:
+            _render_expression(expression.root)
+        except ValueError as error:
+            diagnostics.append(
+                GenerationDiagnostic(
+                    code="formula_render_failed",
+                    message=str(error),
+                    severity="error",
+                    location=symbol.cell_ref,
+                    raw_value=expression.raw_formula,
+                )
+            )
     return diagnostics
 
 
@@ -376,6 +468,8 @@ def _render_module(
     contract: GeneratedModuleContract,
     expressions: Mapping[str, FormulaExpression],
     constants: Mapping[str, JsonValue],
+    progress: Callable[[str], None] | None = None,
+    runtime_progress_interval: int | None = None,
 ) -> str:
     lines = [
         '"""Generated Modelwright model.',
@@ -386,12 +480,62 @@ def _render_module(
         "import fnmatch",
         "",
         "",
+        "def _sf_column_name(index):",
+        "    name = ''",
+        "    while index:",
+        "        index, remainder = divmod(index - 1, 26)",
+        "        name = chr(65 + remainder) + name",
+        "    return name",
+        "",
+        "",
         "def _sf_flatten(values):",
         "    for value in values:",
         "        if isinstance(value, (list, tuple)):",
         "            yield from _sf_flatten(value)",
         "        else:",
+        "            yield _sf_value(value)",
+        "",
+        "",
+        "def _sf_flatten_lazy(values):",
+        "    for value in values:",
+        "        if isinstance(value, (list, tuple)):",
+        "            yield from _sf_flatten_lazy(value)",
+        "        else:",
         "            yield value",
+        "",
+        "",
+        "def _sf_value(value):",
+        "    return value() if callable(value) else value",
+        "",
+        "",
+        "def _sf_number(value):",
+        "    value = _sf_value(value)",
+        "    return 0 if value is None else value",
+        "",
+        "",
+        "def _sf_direct_reference(value):",
+        "    value = _sf_value(value)",
+        "    return 0 if value is None else value",
+        "",
+        "",
+        "def _sf_sum_value(value):",
+        "    value = _sf_value(value)",
+        "    if value is None or isinstance(value, str):",
+        "        return 0",
+        "    return value",
+        "",
+        "",
+        "def _sf_numeric_value(value):",
+        "    if isinstance(value, bool):",
+        "        return None",
+        "    if isinstance(value, (int, float)):",
+        "        return float(value)",
+        "    if isinstance(value, str):",
+        "        try:",
+        "            return float(value)",
+        "        except ValueError:",
+        "            return None",
+        "    return None",
         "",
         "",
         "def _sf_average(values):",
@@ -423,6 +567,8 @@ def _render_module(
         "            return True",
         "        if upper == 'FALSE':",
         "            return False",
+        "        if isinstance(sample, str):",
+        "            return raw",
         "        try:",
         "            number = float(raw)",
         "        except ValueError:",
@@ -433,11 +579,21 @@ def _render_module(
         "    return raw",
         "",
         "",
+        "def _sf_criteria_equal(left, right):",
+        "    left_number = _sf_numeric_value(left)",
+        "    right_number = _sf_numeric_value(right)",
+        "    if left_number is not None and right_number is not None:",
+        "        return left_number == right_number",
+        "    if isinstance(left, str) and isinstance(right, str):",
+        "        return left.upper() == right.upper()",
+        "    return left == right",
+        "",
+        "",
         "def _sf_compare_criteria(value, operator, expected):",
         "    if operator == '=':",
-        "        return value == expected",
+        "        return _sf_criteria_equal(value, expected)",
         "    if operator == '<>':",
-        "        return value != expected",
+        "        return not _sf_criteria_equal(value, expected)",
         "    if operator == '>':",
         "        return value > expected",
         "    if operator == '>=':",
@@ -457,17 +613,25 @@ def _render_module(
         "                return _sf_compare_criteria(value, operator, expected)",
         "        if '*' in criteria or '?' in criteria:",
         "            return fnmatch.fnmatchcase(str(value), criteria)",
-        "    return value == criteria",
+        "        expected = _sf_coerce_criteria(criteria, value)",
+        "        return _sf_compare_criteria(value, '=', expected)",
+        "    return _sf_compare_criteria(value, '=', criteria)",
+        "",
+        "",
+        "def _sf_lookup_equal(left, right):",
+        "    if isinstance(left, str) and isinstance(right, str):",
+        "        return left.upper() == right.upper()",
+        "    return left == right",
         "",
         "",
         "def _sf_sumif(criteria_range, criteria, sum_range=None):",
         "    criteria_values = tuple(_sf_flatten((criteria_range,)))",
-        "    sum_values = criteria_values if sum_range is None else tuple(_sf_flatten((sum_range,)))",
-        "    return sum(",
-        "        sum_value",
-        "        for criteria_value, sum_value in zip(criteria_values, sum_values)",
-        "        if _sf_matches_criteria(criteria_value, criteria)",
-        "    )",
+        "    sum_values = criteria_values if sum_range is None else tuple(_sf_flatten_lazy((sum_range,)))",
+        "    total = 0",
+        "    for criteria_value, sum_value in zip(criteria_values, sum_values):",
+        "        if _sf_matches_criteria(criteria_value, criteria):",
+        "            total += _sf_sum_value(sum_value)",
+        "    return total",
         "",
         "",
         "def _sf_countif(criteria_range, criteria):",
@@ -475,12 +639,13 @@ def _render_module(
         "",
         "",
         "def _sf_sumifs(sum_range, *criteria_pairs):",
-        "    sum_values = tuple(_sf_flatten((sum_range,)))",
+        "    sum_values = tuple(_sf_flatten_lazy((sum_range,)))",
         "    criteria_ranges = [tuple(_sf_flatten((criteria_range,))) for criteria_range, _criteria in criteria_pairs]",
+        "    criteria_values = tuple(criteria for _range, criteria in criteria_pairs)",
         "    total = 0",
         "    for index, sum_value in enumerate(sum_values):",
-        "        if all(_sf_matches_criteria(criteria_range[index], criteria) for criteria_range, criteria in zip(criteria_ranges, (criteria for _range, criteria in criteria_pairs))):",
-        "            total += sum_value",
+        "        if all(_sf_matches_criteria(criteria_range[index], criteria) for criteria_range, criteria in zip(criteria_ranges, criteria_values)):",
+        "            total += _sf_sum_value(sum_value)",
         "    return total",
         "",
         "",
@@ -513,7 +678,7 @@ def _render_module(
         "        raise IndexError('VLOOKUP column index is outside the table')",
         "    if not _sf_range_lookup_enabled(range_lookup):",
         "        for row in rows:",
-        "            if row[0] == lookup_value:",
+        "            if _sf_lookup_equal(row[0], lookup_value):",
         "                return row[column_index]",
         "        raise LookupError('VLOOKUP exact match not found')",
         "    candidate = None",
@@ -533,28 +698,108 @@ def _render_module(
         "",
         f"def {contract.entrypoint}(inputs=None):",
         "    inputs = {} if inputs is None else dict(inputs)",
+        "    _cache = {}",
+        "    _stack = []",
+        "    _evaluated_count = 0",
+        "    _constants = {",
     ]
 
-    for symbol in contract.symbols:
-        if contract.include_provenance_comments:
-            lines.append(f"    # {symbol.cell_ref}" + (f": {symbol.raw_formula}" if symbol.raw_formula else ""))
+    input_symbols = tuple(symbol for symbol in contract.symbols if symbol.kind == "input")
+    formula_symbols = tuple(symbol for symbol in contract.symbols if symbol.kind != "input")
 
-        if symbol.kind == "input":
-            default_value = constants.get(symbol.cell_ref)
-            lines.append(
-                f"    {symbol.symbol_name} = inputs.get({symbol.cell_ref!r}, {default_value!r})"
-            )
-            continue
+    for symbol in input_symbols:
+        default_value = constants.get(symbol.cell_ref)
+        lines.append(f"        {symbol.cell_ref!r}: {default_value!r},")
+
+    lines.extend(
+        [
+            "    }",
+            "",
+            "    def _get(cell_ref):",
+            "        nonlocal _evaluated_count",
+            "        if cell_ref in inputs:",
+            "            return inputs[cell_ref]",
+            "        if cell_ref in _cache:",
+            "            return _cache[cell_ref]",
+            "        if cell_ref in _constants:",
+            "            return _constants[cell_ref]",
+            "        formula = _formulas.get(cell_ref)",
+            "        if formula is None:",
+            "            return None",
+            "        if cell_ref in _stack:",
+            "            cycle = _stack[_stack.index(cell_ref):] + [cell_ref]",
+            "            raise RuntimeError('circular dependency during generated model execution: ' + ' -> '.join(cycle))",
+            "        _stack.append(cell_ref)",
+            "        try:",
+            "            value = formula()",
+            "        finally:",
+            "            _stack.pop()",
+            "        _cache[cell_ref] = value",
+            "        _evaluated_count += 1",
+        ]
+    )
+    if runtime_progress_interval:
+        lines.extend(
+            [
+                f"        if _evaluated_count == 1 or _evaluated_count % {runtime_progress_interval} == 0:",
+            "            print(f'generated model progress formulas={_evaluated_count}', flush=True)",
+            ]
+        )
+    lines.extend(
+        [
+            "        return value",
+            "",
+            "    def _range(sheet, min_col, min_row, max_col, max_row):",
+            "        return tuple(",
+            "            lambda ref=f'{sheet}!{_sf_column_name(column)}{row}': _get(ref)",
+            "            for row in range(min_row, max_row + 1)",
+            "            for column in range(min_col, max_col + 1)",
+            "        )",
+            "",
+            "    def _table(sheet, min_col, min_row, max_col, max_row):",
+            "        return tuple(",
+            "            tuple(_sf_direct_reference(_get(f'{sheet}!{_sf_column_name(column)}{row}')) for column in range(min_col, max_col + 1))",
+            "            for row in range(min_row, max_row + 1)",
+            "        )",
+            "",
+            "    _formulas = {",
+        ]
+    )
+
+    for index, symbol in enumerate(formula_symbols, start=1):
+        if contract.include_provenance_comments:
+            lines.append(f"        # {symbol.cell_ref}" + (f": {symbol.raw_formula}" if symbol.raw_formula else ""))
 
         expression = expressions[symbol.cell_ref]
-        lines.append(f"    {symbol.symbol_name} = {_render_expression(expression.root)}")
+        lines.append(f"        {symbol.cell_ref!r}: lambda: {_render_formula_root(expression.root)},")
 
-    lines.append("    return {")
+        if index == 1 or index % 10000 == 0 or index == len(formula_symbols):
+            _progress(
+                progress,
+                f"python generation render progress formulas={index}/{len(formula_symbols)} lines={len(lines)}",
+            )
+    lines.extend(
+        [
+            "    }",
+            "    return {",
+        ]
+    )
     for output_ref in contract.output_refs:
-        lines.append(f"        {output_ref!r}: {symbol_name_for_cell_ref(output_ref)},")
+        lines.append(f"        {output_ref!r}: _get({output_ref!r}),")
     lines.append("    }")
     lines.append("")
     return "\n".join(lines)
+
+
+def _progress(progress: Callable[[str], None] | None, message: str) -> None:
+    if progress is not None:
+        progress(message)
+
+
+def _render_formula_root(node: FormulaExpressionNode | None) -> str:
+    if node is None:
+        raise ValueError("cannot render missing formula expression root")
+    return _render_expression(node)
 
 
 def _render_expression(node: FormulaExpressionNode | None) -> str:
@@ -568,21 +813,23 @@ def _render_expression(node: FormulaExpressionNode | None) -> str:
             raise ValueError("cannot render reference expression without reference")
         if node.reference.kind == "range":
             return _render_range_reference(node.reference)
-        return symbol_name_for_cell_ref(node.reference.normalized)
+        return f"_sf_direct_reference(_get({node.reference.normalized!r}))"
     if node.kind == "unary":
         (operand,) = node.operands
         if node.operator == "-":
-            return f"(-{_render_expression(operand)})"
+            return f"(-_sf_number({_render_expression(operand)}))"
         raise ValueError(f"unsupported unary operator: {node.operator}")
     if node.kind == "binary":
         left, right = node.operands
         if node.operator == "^":
-            return f"({_render_expression(left)} ** {_render_expression(right)})"
+            return f"(_sf_number({_render_expression(left)}) ** _sf_number({_render_expression(right)}))"
         if node.operator == "&":
             return f"(str({_render_expression(left)}) + str({_render_expression(right)}))"
-        return f"({_render_expression(left)} {node.operator} {_render_expression(right)})"
+        return f"(_sf_number({_render_expression(left)}) {node.operator} _sf_number({_render_expression(right)}))"
     if node.kind == "comparison":
         left, right = node.operands
+        if node.operator in {"=", "<>"}:
+            return f"_sf_compare_criteria({_render_expression(left)}, {node.operator!r}, {_render_expression(right)})"
         operator = _python_comparison_operator(node.operator)
         return f"({_render_expression(left)} {operator} {_render_expression(right)})"
     if node.kind == "function_call":
@@ -597,9 +844,10 @@ def _render_function_call(node: FormulaExpressionNode) -> str:
             raise ValueError("ROUND requires two operands")
         return f"round({_render_expression(node.operands[0])}, {_render_expression(node.operands[1])})"
     if node.function_name == "IF":
-        if len(node.operands) != 3:
-            raise ValueError("IF requires three operands")
-        condition, true_value, false_value = node.operands
+        if len(node.operands) not in {2, 3}:
+            raise ValueError("IF requires two or three operands")
+        condition, true_value, *false_value_operands = node.operands
+        false_value = false_value_operands[0] if false_value_operands else FormulaExpressionNode.literal(False)
         return f"({_render_expression(true_value)} if {_render_expression(condition)} else {_render_expression(false_value)})"
     if node.function_name == "IFERROR":
         if len(node.operands) != 2:
@@ -690,12 +938,7 @@ def _render_range_reference(reference) -> str:
         raise ValueError(f"cannot render incomplete range reference: {reference.normalized}")
 
     min_col, min_row, max_col, max_row = range_boundaries(f"{reference.start_cell}:{reference.end_cell}")
-    rendered_cells = [
-        symbol_name_for_cell_ref(f"{reference.sheet}!{get_column_letter(column)}{row}")
-        for row in range(min_row, max_row + 1)
-        for column in range(min_col, max_col + 1)
-    ]
-    return f"({', '.join(rendered_cells)}{',' if len(rendered_cells) == 1 else ''})"
+    return f"_range({reference.sheet!r}, {min_col}, {min_row}, {max_col}, {max_row})"
 
 
 def _render_table_array(node: FormulaExpressionNode) -> str:
@@ -706,14 +949,7 @@ def _render_table_array(node: FormulaExpressionNode) -> str:
         raise ValueError(f"cannot render incomplete VLOOKUP table reference: {reference.normalized}")
 
     min_col, min_row, max_col, max_row = range_boundaries(f"{reference.start_cell}:{reference.end_cell}")
-    rendered_rows = []
-    for row in range(min_row, max_row + 1):
-        rendered_cells = [
-            symbol_name_for_cell_ref(f"{reference.sheet}!{get_column_letter(column)}{row}")
-            for column in range(min_col, max_col + 1)
-        ]
-        rendered_rows.append(f"({', '.join(rendered_cells)}{',' if len(rendered_cells) == 1 else ''})")
-    return f"({', '.join(rendered_rows)}{',' if len(rendered_rows) == 1 else ''})"
+    return f"_table({reference.sheet!r}, {min_col}, {min_row}, {max_col}, {max_row})"
 
 
 def _python_comparison_operator(operator: str | None) -> str:
@@ -724,3 +960,15 @@ def _python_comparison_operator(operator: str | None) -> str:
     if operator is None:
         raise ValueError("missing comparison operator")
     return operator
+
+
+def _expand_range_dependency(reference) -> tuple[str, ...]:
+    if reference.sheet is None or reference.start_cell is None or reference.end_cell is None:
+        return ()
+
+    min_col, min_row, max_col, max_row = range_boundaries(f"{reference.start_cell}:{reference.end_cell}")
+    return tuple(
+        f"{reference.sheet}!{get_column_letter(column)}{row}"
+        for row in range(min_row, max_row + 1)
+        for column in range(min_col, max_col + 1)
+    )
