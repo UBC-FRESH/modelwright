@@ -257,7 +257,9 @@ Status: complete.
 
 GitHub parent issue: #88
 
-Active branch: `feature/p17-real-workbook-formula-semantics`
+Completed branch: `feature/p17-real-workbook-formula-semantics`
+
+Merged PR: #109
 
 Goal: expand formula and reference semantics based on real workbook evidence, especially structured references, unsupported functions, parser token forms, operators, external references, volatile functions, named ranges, and cached-value gaps.
 
@@ -272,7 +274,7 @@ Goal: expand formula and reference semantics based on real workbook evidence, es
   - [x] Pass 6: constrained static `OFFSET` support.
 - [x] P17.4 Validate expanded semantics and closeout. Child issue: #94.
 
-Status: complete pending PR.
+Status: complete.
 
 ## Phase 18: Conversion Planning And Pipeline Orchestration
 
@@ -311,7 +313,9 @@ Status: complete.
 
 GitHub parent issue: #112
 
-Active branch: `feature/p20-automated-validation-reports`
+Completed branch: `feature/p20-automated-validation-reports`
+
+Merged PR: #117
 
 Goal: after residual blockers have concrete resolution or scope decisions, make generated-model execution, oracle execution where available, cached-value comparisons, and benchmark evaluation reports repeatable through APIs and CLI commands.
 
@@ -320,7 +324,7 @@ Goal: after residual blockers have concrete resolution or scope decisions, make 
 - [x] P20.3 Add evaluation report CLI and JSON outputs. Child issue: #115.
 - [x] P20.4 Run repeatable evaluation and closeout. Child issue: #116.
 
-Status: complete pending PR merge.
+Status: complete.
 
 Closeout evidence:
 
@@ -345,7 +349,9 @@ Ignored local evidence:
 
 GitHub parent issue: #118
 
-Active branch: `feature/p21-full-benchmark-model-validation`
+Completed branch: `feature/p21-full-benchmark-model-validation`
+
+Merged PR: #123
 
 Goal: turn the clean 2020 FABLE extraction, graph, and translation evidence into an executable generated
 Python benchmark model, then validate selected benchmark outputs and keep iterating on concrete blockers
@@ -356,7 +362,7 @@ until generated-model equivalence is either proven or sharply scoped.
 - [x] P21.3 Validate selected 2020 FABLE outputs against cached or oracle values. Child issue: #120.
 - [x] P21.4 Rerun the blocker-find-resolve-continue loop until the benchmark result converges. Child issue: #119.
 
-Status: complete pending PR merge.
+Status: complete.
 
 Closeout evidence:
 
@@ -385,9 +391,36 @@ Ignored local evidence:
 - `tmp/logs/p21-fable-2020-validation.log`
 - `tmp/logs/p21-convergence-closeout.log`
 
+## Phase 22: PyPI Publication And Deployment Workflow
+
+GitHub parent issue: #124
+
+Active branch: `feature/p22-pypi-publication-deployment`
+
+Goal: establish a professional deployment and publication workflow before any real PyPI release. This phase should make release metadata, artifact builds, TestPyPI rehearsal, documentation deployment checks, and maintainer publication gates explicit and reproducible.
+
+- [ ] P22.1 Decide alpha release target, license, and publication policy. Child issue: #127.
+- [ ] P22.2 Harden package metadata and artifact build checks. Child issue: #125.
+- [ ] P22.3 Add release automation for GitHub, TestPyPI, and PyPI gates. Child issue: #129.
+  - [ ] Verify GitHub Pages serves the built Sphinx Read the Docs themed artifact, not a fallback Jekyll/minima site.
+- [ ] P22.4 Document deployment runbook and developer release onboarding. Child issue: #128.
+- [ ] P22.5 Rehearse release artifacts and close publication readiness. Child issue: #126.
+
+Publication gates:
+
+- Local sdist/wheel builds must pass metadata checks and clean install smoke tests.
+- CI must validate release artifacts before any publication workflow can publish them.
+- TestPyPI publication must be rehearsed or blocked with a concrete documented reason.
+- Real PyPI publication must be protected by a maintainer-controlled gate.
+- The first published alpha version must use canonical Python packaging syntax such as `0.1.0a1` or `1.0.0a1`.
+- The project license must be selected explicitly by the maintainer before real PyPI publication.
+
+Status: active.
+
 ## Current Next Steps
 
-1. Run full verification on branch `feature/p21-full-benchmark-model-validation`.
-2. Commit and push the P21.4 closeout.
-3. Open the Phase 21 PR back to `main`.
-4. After merge, activate the next phase around broader benchmark coverage and remaining dependency policy.
+1. Complete P22.1 by deciding the first alpha version target, license, and publication policy.
+2. Complete P22.2 by hardening package metadata and adding local build/artifact checks.
+3. Complete P22.3 by adding gated TestPyPI/PyPI release workflows and verifying the GitHub Pages RTD-themed Sphinx artifact.
+4. Complete P22.4 by documenting the deployment runbook and developer release onboarding path.
+5. Complete P22.5 by rehearsing artifacts, recording release readiness, opening the Phase 22 PR, and closing parent issue #124 only after merge.

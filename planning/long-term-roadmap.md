@@ -26,6 +26,7 @@ scenario/report core
   -> real workbook semantics expansion
   -> conversion planning
   -> automated validation reports
+  -> alpha publication and deployment workflow
 ```
 
 Each phase should produce package-backed behavior, tests, and documentation before the next phase relies on it.
@@ -242,6 +243,24 @@ Expected outputs:
 
 This phase is the next convergence gate. It should not accept a planning-only result if a concrete blocker
 can be reproduced, fixed, and rerun within the phase.
+
+## Phase 22: PyPI Publication And Deployment Workflow
+
+Goal: establish a professional deployment and publication workflow before any real PyPI release.
+
+Expected outputs:
+
+- explicit alpha release target and publication policy;
+- maintainer-approved project license before real PyPI publication;
+- hardened package metadata, project URLs, classifiers, and version handling;
+- local sdist/wheel build checks, artifact inspection, and clean install smoke tests;
+- CI release artifact validation;
+- maintainer-gated TestPyPI and real PyPI publication workflows;
+- GitHub release/tag policy;
+- deployment runbook for maintainers and contributor-facing release onboarding docs;
+- GitHub Pages verification that the published site is the Sphinx Read the Docs themed artifact rather than a fallback Jekyll/minima site.
+
+Publication should remain gated. The project can be ready for a TestPyPI/internal alpha before it is ready for real PyPI. The first published alpha should use canonical Python packaging syntax such as `0.1.0a1` or `1.0.0a1`, and the decision between those version lines should be explicit.
 
 ## Planning Discipline
 

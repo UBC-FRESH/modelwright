@@ -2,6 +2,10 @@
 
 This file records completed project work in chronological order.
 
+## 2026-06-21
+
+- Activated Phase 22 on `feature/p22-pypi-publication-deployment`, created GitHub parent issue #124 and child issues #125 through #129, and scoped PyPI/TestPyPI publication, release artifact checks, maintainer gates, deployment docs, and GitHub Pages Read the Docs theme verification.
+
 ## 2026-06-20
 
 - Added validation report core objects for comparison records, diagnostics, report status, mismatch extraction, and JSON-serializable boundaries.
