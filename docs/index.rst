@@ -18,6 +18,8 @@ assemble validation reports. It is not yet a general workbook converter.
    guides/private-workbooks
    guides/validation
    guides/wrapping-generated-models
+   guides/notebook-interface
+   examples
    guides/release-deployment
    guides/limitations
 

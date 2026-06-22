@@ -9,6 +9,7 @@ from types import ModuleType
 
 import pytest
 
+from modelwright.notebooks import outputs_frame, report_frames, table_frame
 from modelwright.wrappers import ModelFacade, cell, report, table
 
 
@@ -86,4 +87,25 @@ def test_model_facade_wraps_2020_fable_benchmark_model_outputs() -> None:
     )
     assert report_payload["tables"]["scenario_selection_slice"]["values"][2][0] == pytest.approx(
         FABLE_SCENARIO_OUTPUTS["SCENARIOS selection!D22"]
+    )
+
+    output_rows = outputs_frame(facade).set_index("cell_ref")
+    assert output_rows.loc["SCENARIOS selection!D20", "value"] == pytest.approx(
+        FABLE_SCENARIO_OUTPUTS["SCENARIOS selection!D20"]
+    )
+
+    table_rows = table_frame(facade, "scenario_selection_slice")
+    assert table_rows.loc["d21", "value"] == pytest.approx(FABLE_SCENARIO_OUTPUTS["SCENARIOS selection!D21"])
+    assert table_rows.attrs["cell_refs"] == [
+        ["SCENARIOS selection!D20"],
+        ["SCENARIOS selection!D21"],
+        ["SCENARIOS selection!D22"],
+    ]
+
+    frames = report_frames(facade, "scenario_selection")
+    assert frames["cells"].set_index("name").loc["scenario_metric_3", "value"] == pytest.approx(
+        FABLE_SCENARIO_OUTPUTS["SCENARIOS selection!D22"]
+    )
+    assert frames["tables"]["scenario_selection_slice"].loc["d20", "value"] == pytest.approx(
+        FABLE_SCENARIO_OUTPUTS["SCENARIOS selection!D20"]
     )

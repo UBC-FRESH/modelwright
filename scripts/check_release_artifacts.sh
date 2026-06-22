@@ -98,7 +98,7 @@ from __future__ import annotations
 import modelwright
 import importlib.util
 
-assert modelwright.__version__ == "0.1.0a4", modelwright.__version__
+assert modelwright.__version__ == "0.1.0a5", modelwright.__version__
 assert importlib.util.find_spec("sheetforge") is None
 print(f"[release-check] imported modelwright {modelwright.__version__}")
 PY

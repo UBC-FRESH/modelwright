@@ -721,9 +721,9 @@ Release claim boundary:
 
 GitHub parent issue: #167
 
-Active branch: `feature/p29-model-wrapper-templates`
+Completed branch: `feature/p29-model-wrapper-templates`
 
-Status: active.
+Status: complete.
 
 Goal: explore and implement an initial `modelwright` module that helps users build custom wrapper
 facades around generated Python models, bridging the gap between raw generated cell-address APIs and
@@ -794,5 +794,121 @@ Release evidence:
 
 ## Current Next Steps
 
-1. Keep Phase 29 closed unless a release defect is discovered.
-2. Plan the next roadmap phase before opening a new feature branch.
+## Phase 30: Notebook Interface And DataFrame Display Layer
+
+GitHub parent issue: #174
+
+Active branch: `feature/p30-notebook-dataframe-interface`
+
+Status: active.
+
+Goal: add an optional notebook-facing layer on top of `modelwright.wrappers` that exposes wrapped
+generated models as Jupyter-friendly, pandas-backed analyst workflows. This phase should support a
+live-kernel loop where analysts can inspect declared inputs, outputs, and tables; mutate scenarios;
+recalculate; render declared tables as DataFrames; and compare baseline-vs-scenario results without
+using raw generated source or `Sheet!A1` dictionaries as the common path.
+
+Planning note: `planning/notebook-dataframe-interface.md`.
+
+Release target: `modelwright==0.1.0a5`.
+
+- [x] P30.1 Define notebook adapter contract. Child issue: #175.
+  - Status: complete.
+  - [x] Decide the module boundary for notebook-facing helpers.
+  - [x] Define the relationship to `ModelFacade` without making pandas a core wrapper dependency.
+  - [x] Decide the optional dependency policy for `pandas`.
+  - [x] Define helper API sketches for inputs, outputs, tables, reports, scenarios, and comparisons.
+  - [x] Define non-goals: no full spreadsheet UI, no dashboard server, no automatic workbook semantic
+        naming, no widget framework unless explicitly scoped, and no stable public API guarantee yet.
+- [x] P30.2 Implement DataFrame view helpers. Child issue: #178.
+  - Status: complete.
+  - [x] Add the selected notebook/DataFrame module.
+  - [x] Add a lazy pandas import and clear missing-dependency error.
+  - [x] Convert declared inputs and outputs to tidy DataFrames.
+  - [x] Convert declared table views to DataFrames preserving row labels, column labels, values,
+        cell refs, and provenance where practical.
+  - [x] Convert report bundles to DataFrame payloads without changing `ModelFacade` calculation behavior.
+  - [x] Add focused synthetic tests.
+- [x] P30.3 Implement scenario comparison helpers. Child issue: #176.
+  - Status: complete.
+  - [x] Define scenario comparison inputs and output columns.
+  - [x] Include declared name, label, cell ref, baseline value, scenario value, absolute change,
+        percent change where numeric, unit, role, and provenance/drilldown metadata where practical.
+  - [x] Preserve generated-model execution errors as wrapper/notebook-layer errors.
+  - [x] Add synthetic tests for numeric, text, missing, and zero-baseline comparison behavior.
+  - [x] Keep raw cell refs available without making them the primary notebook-facing interaction.
+- [x] P30.4 Add notebook-oriented docs. Child issue: #177.
+  - Status: complete.
+  - [x] Add `docs/guides/notebook-interface.rst`.
+  - [x] Show loading a generated model and wrapping it with `ModelFacade`.
+  - [x] Show declared inputs, outputs, tables, and reports.
+  - [x] Show DataFrame rendering helpers.
+  - [x] Show scenario mutation and scenario comparison.
+  - [x] Document alpha limits and non-goals clearly.
+  - [x] Add the guide to the docs index.
+- [x] P30.5 Validate synthetic and FABLE notebook workflows. Child issue: #179.
+  - Status: complete.
+  - [x] Add always-on synthetic tests for DataFrame conversion and scenario comparison.
+  - [x] Confirm the notebook layer does not change generated-model calculation behavior.
+  - [x] Add or extend an opt-in FABLE benchmark-gated test with `MODELWRIGHT_RUN_FABLE_BENCHMARKS=1`
+        if local artifacts support it.
+  - [x] Keep generated FABLE models and raw reports under ignored `tmp/`.
+  - [x] Run full local verification and record evidence in roadmap, changelog, and issue comments.
+- [x] P30.6 Add examples gallery. Child issue: #181.
+  - Status: complete.
+  - [x] Add an `examples/` directory with a tiny synthetic notebook-interface example.
+  - [x] Add a production-size 2020 FABLE generated-model example without tracking the original workbook.
+  - [x] Keep the original FABLE workbook and raw local validation reports out of tracked files.
+  - [x] Avoid ordinary Git blobs larger than GitHub/PyPI practical limits.
+  - [x] Add Sphinx Examples Gallery pages linked from the docs index.
+  - [x] Add lightweight tests for example integrity without running expensive production-size FABLE
+        calculation in default pytest.
+- [ ] P30.7 Publish `modelwright==0.1.0a5`. Child issue: #180.
+  - Status: active.
+  - [x] Confirm P30 notebook/DataFrame scope and evidence are complete.
+  - [x] Bump package/import version and release docs to `0.1.0a5`.
+  - [x] Run local release checks, including Ruff, pytest, Sphinx docs, docs theme verification, and
+        release artifact checks.
+  - [ ] Open and merge the P30 PR to `main`.
+  - [ ] Create annotated tag `v0.1.0a5`.
+  - [ ] Publish through the gated release workflow after maintainer approval.
+  - [ ] Verify PyPI JSON, clean PyPI install, import version, CLI help, GitHub release, and docs deployment.
+
+Acceptance boundary:
+
+- May claim initial Jupyter/DataFrame-facing helpers for wrapped generated models.
+- May claim optional pandas-backed display helpers.
+- May claim scenario mutation and comparison as notebook-native workflows.
+- May claim synthetic and opt-in FABLE evidence that notebook helpers do not change calculation behavior.
+- Must not claim a full spreadsheet UI, dashboard application, widget framework, automatic workbook
+  semantic recovery, stable public API compatibility, or compact runtime IR production readiness.
+
+Implementation evidence:
+
+- Added `modelwright.notebooks` with lazy pandas-backed helpers:
+  `inputs_frame`, `outputs_frame`, `scenario_frame`, `table_frame`, `report_frames`, and
+  `compare_scenarios_frame`.
+- Added the `notebook` optional extra with `pandas>=2`, while keeping pandas out of core dependencies.
+- Added always-on synthetic notebook tests, including real generated synthetic model coverage and
+  missing-pandas dependency behavior.
+- Extended the opt-in FABLE wrapper benchmark to validate notebook DataFrame helpers over the ignored
+  generated 2020 FABLE model.
+- Added `examples/` with a tracked synthetic notebook-interface example and a production-size FABLE
+  notebook-interface example. The FABLE generated Python output is tracked as a compressed
+  `generated_fable_2020_model.py.xz` artifact because the uncompressed module is larger than ordinary
+  GitHub per-file limits.
+
+Verification evidence:
+
+- `scripts/bootstrap_dev_env.sh` passed and installed the updated `dev` extra.
+- `.venv/bin/python -m ruff check .` passed.
+- `.venv/bin/python -m pytest -vv` passed with `161` passed and `1` skipped benchmark.
+- `.venv/bin/sphinx-build -b html docs _build/html -W` passed.
+- `.venv/bin/python scripts/verify_docs_theme.py _build/html` passed.
+- `MODELWRIGHT_RUN_FABLE_BENCHMARKS=1 .venv/bin/python -m pytest -vv tests/test_fable_wrapper_benchmark.py`
+  passed in `149.67` seconds, using ignored local FABLE artifacts under `tmp/p26-fable-full-validation/`.
+- `scripts/check_release_artifacts.sh` passed for `0.1.0a5`; the clean wheel install imported
+  `modelwright 0.1.0a5` and the artifact inspection found no forbidden private workbook, ignored
+  `tmp/`, or source workbook content.
+- Release artifacts from the local check were about `56K` for the wheel and `2.2M` for the sdist. The
+  sdist includes the compressed FABLE generated-model example; the wheel remains package-code only.
