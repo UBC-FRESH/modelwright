@@ -84,7 +84,7 @@ Restore the public external FABLE benchmark workbooks into ignored local paths:
 scripts/bootstrap_dev_env.sh --benchmarks
 ```
 
-`modelwright` is pre-release. The current alpha line is `0.1.0a2`; alpha releases must not be described as full-workbook conversion guarantees.
+`modelwright` is pre-release. The current alpha line is `0.1.0a3`; alpha releases must not be described as full-workbook conversion guarantees.
 
 Check release artifacts locally:
 

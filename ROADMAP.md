@@ -618,7 +618,7 @@ GitHub parent issue: #152
 
 Active branch: `feature/p27-performance-memory-hardening`
 
-Status: active.
+Status: complete.
 
 Goal: make full-workbook generated-model validation practical by profiling and reducing generated
 runtime, cache-load, and memory costs exposed by the 2020 FABLE benchmark. This phase should start
@@ -668,9 +668,46 @@ Acceptance criteria:
   measured source.
 - Any optimization keeps full FABLE validation correctness evidence at least as good as before.
 
+## Phase 28: Publish Modelwright 0.1.0a3
+
+GitHub parent issue: #162
+
+Active branch: `feature/p28-v0.1.0a3-release`
+
+Status: active.
+
+Goal: publish `modelwright==0.1.0a3` as the alpha release that records Phase 27 performance and
+memory hardening after full 2020 FABLE comparable-output validation remained green.
+
+- [x] P28.1 Update `0.1.0a3` release metadata and notes. Child issue: #165.
+  - Status: complete.
+  - [x] Bump package and import version to `0.1.0a3`.
+  - [x] Update release deployment docs and current alpha target text.
+  - [x] Record P27 performance/correctness release boundary in roadmap/changelog.
+  - [x] Avoid overstating public API stability or universal workbook conversion claims.
+- [x] P28.2 Verify local release artifacts for `0.1.0a3`. Child issue: #164.
+  - [x] Run Ruff, pytest, Sphinx docs, docs theme verification, and `git diff --check`.
+  - [x] Run `scripts/check_release_artifacts.sh`.
+  - [x] Confirm artifacts contain no private workbooks, generated clones, logs, or ignored `tmp/` material.
+  - [x] Record local verification evidence in roadmap/changelog and issue comments.
+- [ ] P28.3 Publish and verify `0.1.0a3`. Child issue: #163.
+  - [ ] Open and merge the release PR to `main`.
+  - [ ] Create annotated tag `v0.1.0a3` after merge.
+  - [ ] Publish through the gated GitHub Actions release workflow after maintainer approval.
+  - [ ] Verify PyPI JSON lists `0.1.0a3`.
+  - [ ] Install from PyPI into a clean ignored environment, import `modelwright`, verify `__version__`, and run `modelwright --help`.
+  - [ ] Verify GitHub release and docs deployment.
+
+Release claim boundary:
+
+- May claim full comparable-output validation for the 2020 FABLE benchmark remains green.
+- May claim measured generated-runtime performance and import/source-size improvements from P27.
+- Must not claim stable public API, universal workbook conversion, Excel-backed recalculation
+  equivalence, or compact runtime IR production readiness.
+
 ## Current Next Steps
 
-1. Run final local verification for the P27 branch: Ruff, pytest, Sphinx docs, and `git diff --check`.
-2. Push `feature/p27-performance-memory-hardening` and open the Phase 27 PR back to `main`.
-3. Keep parent issue #152 open until the PR merges, per workflow.
-4. Preserve formula-template/vectorized-kernel work as a follow-on architecture target after P27 records current pipeline memory costs.
+1. Open the P28 release PR back to `main`.
+2. Wait for CI release artifact checks and docs build to pass.
+3. Merge the release PR, then create annotated tag `v0.1.0a3`.
+4. Publish `0.1.0a3` only after the release PR is merged and the maintainer approves the release workflow gate.
