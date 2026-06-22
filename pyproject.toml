@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "modelwright"
-version = "0.1.0a4"
+version = "0.1.0a5"
 description = "Tools for converting spreadsheet workbooks into transparent Python models."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -56,11 +56,15 @@ docs = [
 dev = [
   "build>=1.2",
   "formulas",
+  "pandas>=2",
   "pytest>=8",
   "ruff>=0.8",
   "sphinx>=7",
   "sphinx-rtd-theme>=2",
   "twine>=5"
+]
+notebook = [
+  "pandas>=2"
 ]
 oracle = [
   "formulas"
@@ -74,6 +78,7 @@ release = [
 ]
 test = [
   "formulas",
+  "pandas>=2",
   "pytest>=8"
 ]
 

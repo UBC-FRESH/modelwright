@@ -54,6 +54,15 @@ from modelwright.graph import (
     DependencyGraph,
     build_dependency_graph,
 )
+from modelwright.notebooks import (
+    NotebookDependencyError,
+    compare_scenarios_frame,
+    inputs_frame,
+    outputs_frame,
+    report_frames,
+    scenario_frame,
+    table_frame,
+)
 from modelwright.oracles import (
     OracleDiagnostic,
     OracleRequest,
@@ -95,7 +104,7 @@ from modelwright.wrappers import (
     table,
 )
 
-__version__ = "0.1.0a4"
+__version__ = "0.1.0a5"
 
 __all__ = [
     "CellRecord",
@@ -127,6 +136,7 @@ __all__ = [
     "MISSING_VALUE",
     "ModelFacade",
     "NamedRangeRecord",
+    "NotebookDependencyError",
     "OracleConfig",
     "OracleDiagnostic",
     "OracleRequest",
@@ -160,15 +170,21 @@ __all__ = [
     "build_validation_report",
     "cell",
     "compare_scalar_output",
+    "compare_scenarios_frame",
     "execute_generated_model",
     "evaluate_generated_model",
     "extract_workbook",
     "generate_python_module",
     "infer_generated_module_contract",
+    "inputs_frame",
     "load_validation_scenario",
     "normalize_cell_reference",
     "normalize_reference",
+    "outputs_frame",
     "report",
+    "report_frames",
+    "scenario_frame",
     "table",
+    "table_frame",
     "translate_formula_cell",
 ]

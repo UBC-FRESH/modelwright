@@ -21,6 +21,10 @@ def test_root_facade_exports_primary_entrypoints() -> None:
     assert "cell" in modelwright.__all__
     assert "table" in modelwright.__all__
     assert "report" in modelwright.__all__
+    assert "inputs_frame" in modelwright.__all__
+    assert "outputs_frame" in modelwright.__all__
+    assert "table_frame" in modelwright.__all__
+    assert "compare_scenarios_frame" in modelwright.__all__
 
 
 def test_root_facade_does_not_export_internal_helpers() -> None:

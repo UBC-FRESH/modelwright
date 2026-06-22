@@ -58,6 +58,12 @@ Wrapper Facades
 .. automodule:: modelwright.wrappers
    :members:
 
+Notebook Helpers
+----------------
+
+.. automodule:: modelwright.notebooks
+   :members:
+
 Validation
 ----------
 
