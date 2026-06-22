@@ -767,8 +767,8 @@ files as the execution environment.
   - [x] Run full local verification.
   - [x] Record evidence in roadmap/changelog and issue comments.
 - [ ] P29.5 Publish `modelwright==0.1.0a4`. Child issue: #172.
-  - [ ] Bump package/import version and release docs to `0.1.0a4`.
-  - [ ] Run local release artifact checks.
+  - [x] Bump package/import version and release docs to `0.1.0a4`.
+  - [x] Run local release artifact checks.
   - [ ] Open and merge release PR to `main`.
   - [ ] Create annotated tag `v0.1.0a4`.
   - [ ] Publish through the gated release workflow after maintainer approval.
@@ -782,7 +782,7 @@ Release boundary:
 
 ## Current Next Steps
 
-1. Start P29.5 by preparing the `0.1.0a4` release closeout.
-2. Bump package/import versions and release documentation to `0.1.0a4`.
-3. Run release artifact checks and full local verification.
-4. Open and merge the Phase 29 PR before tagging and publishing.
+1. Open the Phase 29 PR from `feature/p29-model-wrapper-templates` to `main`.
+2. Wait for CI to pass and merge the PR.
+3. Create annotated tag `v0.1.0a4` from `main`.
+4. Publish through the gated release workflow and verify PyPI, GitHub release, and docs deployment.
