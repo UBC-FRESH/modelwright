@@ -766,13 +766,14 @@ files as the execution environment.
   - [x] Confirm wrapper behavior does not change generated-model calculation semantics.
   - [x] Run full local verification.
   - [x] Record evidence in roadmap/changelog and issue comments.
-- [ ] P29.5 Publish `modelwright==0.1.0a4`. Child issue: #172.
+- [x] P29.5 Publish `modelwright==0.1.0a4`. Child issue: #172.
+  - Status: complete.
   - [x] Bump package/import version and release docs to `0.1.0a4`.
   - [x] Run local release artifact checks.
-  - [ ] Open and merge release PR to `main`.
-  - [ ] Create annotated tag `v0.1.0a4`.
-  - [ ] Publish through the gated release workflow after maintainer approval.
-  - [ ] Verify PyPI JSON, clean PyPI install, import version, CLI help, GitHub release, and docs deployment.
+  - [x] Open and merge release PR to `main`.
+  - [x] Create annotated tag `v0.1.0a4`.
+  - [x] Publish through the gated release workflow after maintainer approval.
+  - [x] Verify PyPI JSON, clean PyPI install, import version, CLI help, GitHub release, and docs deployment.
 
 Release boundary:
 
@@ -780,9 +781,18 @@ Release boundary:
 - Must not claim a full spreadsheet UI, automatic workbook semantic recovery, stable public API
   compatibility, or compact runtime IR production readiness.
 
+Release evidence:
+
+- PR #173 merged to `main`.
+- Annotated tag: `v0.1.0a4`.
+- GitHub release: `modelwright 0.1.0a4`.
+- PyPI package: `modelwright==0.1.0a4`.
+- Clean PyPI install verified in ignored `tmp/pypi-install/modelwright-0.1.0a4-rerun/.venv`.
+- Import verified `modelwright.__version__ == "0.1.0a4"`.
+- CLI help verified from the clean PyPI install.
+- GitHub Pages release docs verified with Read the Docs themed markup and `0.1.0a4` content.
+
 ## Current Next Steps
 
-1. Open the Phase 29 PR from `feature/p29-model-wrapper-templates` to `main`.
-2. Wait for CI to pass and merge the PR.
-3. Create annotated tag `v0.1.0a4` from `main`.
-4. Publish through the gated release workflow and verify PyPI, GitHub release, and docs deployment.
+1. Keep Phase 29 closed unless a release defect is discovered.
+2. Plan the next roadmap phase before opening a new feature branch.
