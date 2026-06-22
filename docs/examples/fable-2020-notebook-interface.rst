@@ -16,6 +16,27 @@ Run it from the repository root:
 
    python examples/fable_2020/notebook_interface.py
 
+Use it from a notebook stored under ``tmp/notebooks/``:
+
+.. code-block:: python
+
+   from pathlib import Path
+   import sys
+
+   repo_root = Path.cwd().resolve()
+   while repo_root.name != "sheetforge":
+       repo_root = repo_root.parent
+
+   sys.path.insert(0, str(repo_root))
+
+   from examples.fable_2020.notebook_interface import build_facade
+   from modelwright.notebooks import outputs_frame, report_frames, table_frame
+
+   facade = build_facade()
+   facade.calculate()
+
+   outputs_frame(facade)
+
 Source
 ------
 

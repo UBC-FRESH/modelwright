@@ -13,6 +13,20 @@ Install the optional notebook dependency when using these helpers:
 
 The core package and ``modelwright.wrappers`` do not require pandas.
 
+When using the tracked source-tree examples from a notebook stored under ``tmp/notebooks/``, add the
+repository root to ``sys.path`` before importing from ``examples``:
+
+.. code-block:: python
+
+   from pathlib import Path
+   import sys
+
+   repo_root = Path.cwd().resolve()
+   while repo_root.name != "sheetforge":
+       repo_root = repo_root.parent
+
+   sys.path.insert(0, str(repo_root))
+
 Boundary
 --------
 
