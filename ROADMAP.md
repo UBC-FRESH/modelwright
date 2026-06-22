@@ -751,12 +751,13 @@ files as the execution environment.
   - [x] Support user-authored labels and rectangular table declarations.
   - [x] Support input mutation and output reporting without mutating generated source.
   - [x] Add focused synthetic tests.
-- [ ] P29.3 Document custom wrapper workflow. Child issue: #169.
-  - [ ] Add Sphinx docs explaining why raw generated models need facades.
-  - [ ] Show a minimal custom wrapper around a generated synthetic model.
-  - [ ] Document inspection, mutation, execution, and reporting examples.
-  - [ ] Document limitations and alpha API stability boundary.
-  - [ ] Keep examples free of private workbook content.
+- [x] P29.3 Document custom wrapper workflow. Child issue: #169.
+  - Status: complete.
+  - [x] Add Sphinx docs explaining why raw generated models need facades.
+  - [x] Show a minimal custom wrapper around a generated synthetic model.
+  - [x] Document inspection, mutation, execution, and reporting examples.
+  - [x] Document limitations and alpha API stability boundary.
+  - [x] Keep examples free of private workbook content.
 - [ ] P29.4 Validate wrapper workflow against benchmarks. Child issue: #168.
   - [ ] Verify wrapper primitives against tracked synthetic fixture outputs.
   - [ ] Use FABLE-derived public/extracted metadata where practical without committing private/generated artifacts.
@@ -779,7 +780,7 @@ Release boundary:
 
 ## Current Next Steps
 
-1. Start P29.3 by documenting custom wrapper usage and alpha limitations.
-2. Include examples for facade declarations, scenario input overrides, table views, and report payloads.
-3. Validate wrapper behavior against synthetic and benchmark-derived metadata after docs are in place.
+1. Start P29.4 by validating wrapper behavior against synthetic and benchmark-derived metadata.
+2. Confirm wrapper behavior does not change generated-model calculation semantics.
+3. Run full local verification before opening the Phase 29 PR.
 4. Publish `0.1.0a4` only as the final Phase 29 closeout task after verification and maintainer approval.

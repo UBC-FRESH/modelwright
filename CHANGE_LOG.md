@@ -7,6 +7,7 @@ This file records completed project work in chronological order.
 - Activated Phase 29 on `feature/p29-model-wrapper-templates`, created GitHub parent issue #167 and child issues #171, #170, #169, #168, and #172, and scoped initial wrapper-template facades for generated Python models with `0.1.0a4` publication as the final phase closeout task.
 - Closed P29.1 by expanding `planning/model-wrapper-template-facades.md` into a concrete initial wrapper API contract covering generated-model boundaries, facade records, declaration helpers, table semantics, scenario mutation, report payloads, provenance preservation, error handling, and alpha API limits.
 - Completed P29.2 by adding the initial `modelwright.wrappers` module with `ModelFacade`, `Scenario`, cell/table/report declarations, table and report view payloads, wrapper declaration/execution errors, public package exports, and focused tests for scenario overrides, rectangular table reporting, duplicate declarations, report references, and generated-model error wrapping.
+- Completed P29.3 by adding Sphinx documentation for custom generated-model wrapper facades, including examples for facade declarations, scenario input overrides, inspection, rectangular table views, report payloads, and explicit alpha limitations; added `modelwright.wrappers` to the API reference.
 
 ## 2026-06-21
 
