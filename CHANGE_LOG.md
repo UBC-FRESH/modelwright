@@ -2,6 +2,15 @@
 
 This file records completed project work in chronological order.
 
+## 2026-06-22
+
+- Activated Phase 29 on `feature/p29-model-wrapper-templates`, created GitHub parent issue #167 and child issues #171, #170, #169, #168, and #172, and scoped initial wrapper-template facades for generated Python models with `0.1.0a4` publication as the final phase closeout task.
+- Closed P29.1 by expanding `planning/model-wrapper-template-facades.md` into a concrete initial wrapper API contract covering generated-model boundaries, facade records, declaration helpers, table semantics, scenario mutation, report payloads, provenance preservation, error handling, and alpha API limits.
+- Completed P29.2 by adding the initial `modelwright.wrappers` module with `ModelFacade`, `Scenario`, cell/table/report declarations, table and report view payloads, wrapper declaration/execution errors, public package exports, and focused tests for scenario overrides, rectangular table reporting, duplicate declarations, report references, and generated-model error wrapping.
+- Completed P29.3 by adding Sphinx documentation for custom generated-model wrapper facades, including examples for facade declarations, scenario input overrides, inspection, rectangular table views, report payloads, and explicit alpha limitations; added `modelwright.wrappers` to the API reference.
+- Completed P29.4 by adding an integration-style wrapper test that builds the tracked synthetic workbook, generates a real Modelwright Python module, wraps it with `ModelFacade`, and verifies facade calculations, inspection, tables, and reports preserve generated-model semantics under input overrides; also added an opt-in benchmark-gated wrapper test against the ignored generated 2020 FABLE model, where `MODELWRIGHT_RUN_FABLE_BENCHMARKS=1 .venv/bin/python -m pytest -vv tests/test_fable_wrapper_benchmark.py` passed in 148.96 seconds while wrapping `SCENARIOS selection!D20:D22` from the P26 full-validation report that recorded `281,741` matches and `0` mismatches.
+- Prepared the `0.1.0a4` release candidate by bumping package/import metadata and release docs, tightening docs-theme verification to avoid false positives from ordinary `minimal` words, and passing local release checks: Ruff, default `pytest -vv` with `156` passed and `1` benchmark skip, Sphinx warning-as-error docs, Read the Docs theme verification, and `scripts/check_release_artifacts.sh` with clean artifact build, twine check, artifact privacy inspection, clean wheel install, `modelwright 0.1.0a4` import, and CLI smoke test.
+
 ## 2026-06-21
 
 - Activated Phase 22 on `feature/p22-pypi-publication-deployment`, created GitHub parent issue #124 and child issues #125 through #129, and scoped PyPI/TestPyPI publication, release artifact checks, maintainer gates, deployment docs, and GitHub Pages Read the Docs theme verification.

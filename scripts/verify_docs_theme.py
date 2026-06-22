@@ -35,7 +35,8 @@ def verify_docs_theme(build_dir: Path) -> None:
         )
 
     forbidden_markers = {
-        "minima": "Jekyll minima theme",
+        "jekyll-theme-minimal": "Jekyll minimal theme",
+        "jekyll-theme-minima": "Jekyll minima theme",
         "jekyll-theme": "Jekyll theme marker",
     }
     found_forbidden = [

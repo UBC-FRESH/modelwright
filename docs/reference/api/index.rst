@@ -52,6 +52,12 @@ Conversion Planning
 .. automodule:: modelwright.conversion
    :members:
 
+Wrapper Facades
+---------------
+
+.. automodule:: modelwright.wrappers
+   :members:
+
 Validation
 ----------
 

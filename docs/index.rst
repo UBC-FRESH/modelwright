@@ -17,6 +17,7 @@ assemble validation reports. It is not yet a general workbook converter.
    guides/workflow-boundaries
    guides/private-workbooks
    guides/validation
+   guides/wrapping-generated-models
    guides/release-deployment
    guides/limitations
 

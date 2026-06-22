@@ -16,6 +16,11 @@ def test_root_facade_exports_primary_entrypoints() -> None:
     assert "ValidationEvaluationResult" in modelwright.__all__
     assert "infer_generated_module_contract" in modelwright.__all__
     assert "GeneratedContractInferenceResult" in modelwright.__all__
+    assert "ModelFacade" in modelwright.__all__
+    assert "Scenario" in modelwright.__all__
+    assert "cell" in modelwright.__all__
+    assert "table" in modelwright.__all__
+    assert "report" in modelwright.__all__
 
 
 def test_root_facade_does_not_export_internal_helpers() -> None:

@@ -717,7 +717,72 @@ Release claim boundary:
 
 ## Current Next Steps
 
-1. Activate the next development phase for compact runtime IR / benchmark artifact architecture.
-2. Keep the source backend as the audit/debug backend while moving production full-workbook materialization toward compact runtime artifacts.
-3. Preserve the 2020 FABLE full comparable-output validation as the release benchmark gate.
-4. Treat inference-cache replacement as part of the compact runtime/cache architecture because the current JSON inference cache is not a speed win after P27.
+## Phase 29: Model Wrapper Templates And Analyst-Facing Facades
+
+GitHub parent issue: #167
+
+Active branch: `feature/p29-model-wrapper-templates`
+
+Status: active.
+
+Goal: explore and implement an initial `modelwright` module that helps users build custom wrapper
+facades around generated Python models, bridging the gap between raw generated cell-address APIs and
+usable analyst-facing workbook structures.
+
+Planning note: `planning/model-wrapper-template-facades.md`.
+
+Motivation: generated Python code from a spreadsheet workbook can be validated and version controlled,
+but a raw `Sheet!A1` output dictionary is not a humane analyst interface. This phase should restore
+enough workbook, sheet, table, row, column, cell, scenario, and report structure around generated
+models to support inspection, mutation, execution, and reporting without reintroducing spreadsheet
+files as the execution environment.
+
+- [x] P29.1 Define wrapper facade contract. Child issue: #171.
+  - Status: complete.
+  - [x] Define the problem boundary between raw generated models and analyst-usable facades.
+  - [x] Specify workbook, sheet, table, row, column, cell, and scenario concepts.
+  - [x] Decide what metadata must come from extraction/generation versus user-authored wrapper declarations.
+  - [x] Define inspection, mutation, execution, and reporting API sketches.
+  - [x] Record non-goals: no full spreadsheet UI, no Excel dependency, no stable public API guarantee yet.
+- [x] P29.2 Implement initial wrapper template module. Child issue: #170.
+  - Status: complete.
+  - [x] Add an initial `modelwright` wrapper/template module.
+  - [x] Provide workbook/sheet/table/cell facade primitives around generated `calculate(inputs=None) -> dict` models.
+  - [x] Support user-authored labels and rectangular table declarations.
+  - [x] Support input mutation and output reporting without mutating generated source.
+  - [x] Add focused synthetic tests.
+- [x] P29.3 Document custom wrapper workflow. Child issue: #169.
+  - Status: complete.
+  - [x] Add Sphinx docs explaining why raw generated models need facades.
+  - [x] Show a minimal custom wrapper around a generated synthetic model.
+  - [x] Document inspection, mutation, execution, and reporting examples.
+  - [x] Document limitations and alpha API stability boundary.
+  - [x] Keep examples free of private workbook content.
+- [x] P29.4 Validate wrapper workflow against benchmarks. Child issue: #168.
+  - Status: complete.
+  - [x] Verify wrapper primitives against tracked synthetic fixture outputs.
+  - [x] Use FABLE-derived public/extracted metadata where practical without committing private/generated artifacts.
+  - [x] Add an opt-in benchmark-gated wrapper test against the local generated 2020 FABLE model.
+  - [x] Confirm wrapper behavior does not change generated-model calculation semantics.
+  - [x] Run full local verification.
+  - [x] Record evidence in roadmap/changelog and issue comments.
+- [ ] P29.5 Publish `modelwright==0.1.0a4`. Child issue: #172.
+  - [x] Bump package/import version and release docs to `0.1.0a4`.
+  - [x] Run local release artifact checks.
+  - [ ] Open and merge release PR to `main`.
+  - [ ] Create annotated tag `v0.1.0a4`.
+  - [ ] Publish through the gated release workflow after maintainer approval.
+  - [ ] Verify PyPI JSON, clean PyPI install, import version, CLI help, GitHub release, and docs deployment.
+
+Release boundary:
+
+- May claim an initial wrapper-template API for custom generated-model facades if tests/docs support it.
+- Must not claim a full spreadsheet UI, automatic workbook semantic recovery, stable public API
+  compatibility, or compact runtime IR production readiness.
+
+## Current Next Steps
+
+1. Open the Phase 29 PR from `feature/p29-model-wrapper-templates` to `main`.
+2. Wait for CI to pass and merge the PR.
+3. Create annotated tag `v0.1.0a4` from `main`.
+4. Publish through the gated release workflow and verify PyPI, GitHub release, and docs deployment.
