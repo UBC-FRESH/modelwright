@@ -758,12 +758,13 @@ files as the execution environment.
   - [x] Document inspection, mutation, execution, and reporting examples.
   - [x] Document limitations and alpha API stability boundary.
   - [x] Keep examples free of private workbook content.
-- [ ] P29.4 Validate wrapper workflow against benchmarks. Child issue: #168.
-  - [ ] Verify wrapper primitives against tracked synthetic fixture outputs.
-  - [ ] Use FABLE-derived public/extracted metadata where practical without committing private/generated artifacts.
-  - [ ] Confirm wrapper behavior does not change generated-model calculation semantics.
-  - [ ] Run full local verification.
-  - [ ] Record evidence in roadmap/changelog and issue comments.
+- [x] P29.4 Validate wrapper workflow against benchmarks. Child issue: #168.
+  - Status: complete.
+  - [x] Verify wrapper primitives against tracked synthetic fixture outputs.
+  - [x] Use FABLE-derived public/extracted metadata where practical without committing private/generated artifacts.
+  - [x] Confirm wrapper behavior does not change generated-model calculation semantics.
+  - [x] Run full local verification.
+  - [x] Record evidence in roadmap/changelog and issue comments.
 - [ ] P29.5 Publish `modelwright==0.1.0a4`. Child issue: #172.
   - [ ] Bump package/import version and release docs to `0.1.0a4`.
   - [ ] Run local release artifact checks.
@@ -780,7 +781,7 @@ Release boundary:
 
 ## Current Next Steps
 
-1. Start P29.4 by validating wrapper behavior against synthetic and benchmark-derived metadata.
-2. Confirm wrapper behavior does not change generated-model calculation semantics.
-3. Run full local verification before opening the Phase 29 PR.
-4. Publish `0.1.0a4` only as the final Phase 29 closeout task after verification and maintainer approval.
+1. Start P29.5 by preparing the `0.1.0a4` release closeout.
+2. Bump package/import versions and release documentation to `0.1.0a4`.
+3. Run release artifact checks and full local verification.
+4. Open and merge the Phase 29 PR before tagging and publishing.

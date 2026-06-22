@@ -1,5 +1,14 @@
+import importlib.util
+import sys
+from pathlib import Path
+from types import ModuleType
+
 import pytest
 
+from modelwright.extraction import extract_workbook
+from modelwright.formulas import translate_formula_cell
+from modelwright.generation import generate_python_module, infer_generated_module_contract
+from modelwright.graph import build_dependency_graph
 from modelwright.wrappers import (
     ModelFacade,
     Scenario,
@@ -9,6 +18,7 @@ from modelwright.wrappers import (
     report,
     table,
 )
+from tests.fixtures.synthetic_model.build_workbook import build_workbook
 
 
 def generated_model(inputs=None):
@@ -21,6 +31,44 @@ def generated_model(inputs=None):
         "Summary!B3": "ok",
         "Summary!C3": base + 5,
     }
+
+
+def load_module(path: Path) -> ModuleType:
+    spec = importlib.util.spec_from_file_location("wrapped_generated_synthetic_model", path)
+    assert spec is not None
+    assert spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def build_generated_synthetic_model(tmp_path: Path) -> ModuleType:
+    workbook = extract_workbook(build_workbook(tmp_path / "synthetic_model.xlsx"))
+    graph = build_dependency_graph(workbook)
+    formula_cells = {cell.cell_ref: cell for cell in workbook.cells if cell.formula is not None}
+    expressions = {
+        cell_ref: translate_formula_cell(cell, graph)
+        for cell_ref, cell in formula_cells.items()
+    }
+    inference = infer_generated_module_contract(
+        workbook=workbook,
+        graph=graph,
+        expressions=expressions,
+        output_refs=("Summary!B2", "Summary!B3"),
+        module_name="synthetic_model",
+    )
+    output_path = tmp_path / "generated_synthetic_model.py"
+
+    generation = generate_python_module(
+        contract=inference.contract,
+        expressions=inference.expressions,
+        constants=inference.constants,
+        output_path=output_path,
+    )
+
+    assert generation.generated is True
+    return load_module(output_path)
 
 
 def test_model_facade_wraps_generated_model_with_scenario_tables_and_reports() -> None:
@@ -83,6 +131,45 @@ def test_model_facade_wraps_generated_model_with_scenario_tables_and_reports() -
     assert report_payload["cells"]["base"]["value"] == 50
     assert report_payload["cells"]["projected"]["value"] == 60.0
     assert report_payload["tables"]["summary_grid"]["values"] == [[60.0, 100], ["ok", 55]]
+
+
+def test_model_facade_preserves_real_generated_synthetic_model_semantics(tmp_path: Path) -> None:
+    module = build_generated_synthetic_model(tmp_path)
+    facade = ModelFacade(
+        module,
+        cells=[
+            cell("Inputs!B2", name="base", label="Base volume", role="input"),
+            cell("Inputs!B3", name="growth", label="Growth rate", role="input"),
+            cell("Inputs!B4", name="harvest_share", label="Harvest share", role="input"),
+            cell("Summary!B2", name="harvest", label="Rounded harvest", role="output"),
+            cell("Summary!B3", name="status", label="Status", role="output"),
+        ],
+        tables=[
+            table(
+                "summary",
+                sheet="Summary",
+                range_ref="B2:B3",
+                row_labels=["harvest", "status"],
+                column_labels=["value"],
+            )
+        ],
+        reports=[report("default", cells=["base", "harvest", "status"], tables=["summary"])],
+    )
+
+    assert facade.calculate() == module.calculate()
+
+    scenario = facade.scenario(name="low-volume", inputs={"Inputs!B2": 10})
+    generated_values = module.calculate(scenario.inputs)
+
+    assert facade.calculate(scenario) == generated_values
+    assert generated_values == {"Summary!B2": 7.02, "Summary!B3": "low"}
+    assert facade.inspect("Summary!B2", scenario).value == generated_values["Summary!B2"]
+    assert facade.table("summary", scenario).to_dict()["values"] == [[7.02], ["low"]]
+
+    report_payload = facade.report("default", scenario)
+    assert report_payload["cells"]["base"]["value"] == 10
+    assert report_payload["cells"]["harvest"]["value"] == generated_values["Summary!B2"]
+    assert report_payload["tables"]["summary"]["values"] == [[7.02], ["low"]]
 
 
 def test_scenario_is_copy_on_write_and_normalizes_input_refs() -> None:

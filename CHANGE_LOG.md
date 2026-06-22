@@ -8,6 +8,7 @@ This file records completed project work in chronological order.
 - Closed P29.1 by expanding `planning/model-wrapper-template-facades.md` into a concrete initial wrapper API contract covering generated-model boundaries, facade records, declaration helpers, table semantics, scenario mutation, report payloads, provenance preservation, error handling, and alpha API limits.
 - Completed P29.2 by adding the initial `modelwright.wrappers` module with `ModelFacade`, `Scenario`, cell/table/report declarations, table and report view payloads, wrapper declaration/execution errors, public package exports, and focused tests for scenario overrides, rectangular table reporting, duplicate declarations, report references, and generated-model error wrapping.
 - Completed P29.3 by adding Sphinx documentation for custom generated-model wrapper facades, including examples for facade declarations, scenario input overrides, inspection, rectangular table views, report payloads, and explicit alpha limitations; added `modelwright.wrappers` to the API reference.
+- Completed P29.4 by adding an integration-style wrapper test that builds the tracked synthetic workbook, generates a real Modelwright Python module, wraps it with `ModelFacade`, and verifies facade calculations, inspection, tables, and reports preserve generated-model semantics under input overrides; also ran a local ignored FABLE-derived metadata smoke over `SCENARIOS selection!D20:D22` using the P26 full-validation report that recorded `281,741` matches and `0` mismatches.
 
 ## 2026-06-21
 
