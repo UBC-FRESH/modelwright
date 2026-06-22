@@ -1,0 +1,44 @@
+name: Usability observation
+description: Record notebook, interface, documentation, or workflow friction.
+title: "Usability observation: "
+labels: ["usability", "fable-pyculator"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Confusion is useful data. Use this form for observations about the workflow, even if nothing is technically broken.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Notebook example
+        - Modelwright wrapper/interface
+        - DataFrame output
+        - Documentation
+        - Scenario editing workflow
+        - Validation workflow
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: observation
+    attributes:
+      label: Observation
+      description: What felt confusing, hidden, too technical, or awkward?
+    validations:
+      required: true
+  - type: textarea
+    id: expected-experience
+    attributes:
+      label: Expected experience
+      description: What did you expect to happen or wish the workflow made easier?
+    validations:
+      required: false
+  - type: textarea
+    id: suggested-change
+    attributes:
+      label: Suggested change
+      description: Optional. Suggest a documentation, notebook, naming, or interface change.
+    validations:
+      required: false

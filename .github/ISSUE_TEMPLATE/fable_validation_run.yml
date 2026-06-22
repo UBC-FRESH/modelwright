@@ -1,0 +1,60 @@
+name: FABLE validation run
+description: Record a FABLE Calculator Excel-vs-Python validation run.
+title: "FABLE validation: "
+labels: ["validation", "fable-pyculator"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for sanitized validation notes only. Do not attach raw workbooks, raw validation reports, or private files.
+  - type: input
+    id: calculator-provenance
+    attributes:
+      label: Calculator provenance
+      description: Public source, country calculator identifier, version/date, or sanitized local identifier.
+      placeholder: "Example: Zenodo FABLE Calculator country workbook, downloaded YYYY-MM-DD"
+    validations:
+      required: true
+  - type: textarea
+    id: scenario-changes
+    attributes:
+      label: Scenario changes
+      description: List the scenario names and changed parameters/cells. Keep private details sanitized.
+      placeholder: |
+        Scenario A:
+        - Parameter/cell:
+        - Excel value:
+        - Python value:
+    validations:
+      required: true
+  - type: textarea
+    id: output-metrics
+    attributes:
+      label: Output metrics compared
+      description: List the key output metrics/cells and why they were selected.
+      placeholder: |
+        - Metric/cell:
+        - Excel output:
+        - Python output:
+        - Match status:
+    validations:
+      required: true
+  - type: dropdown
+    id: comparison-result
+    attributes:
+      label: Overall comparison result
+      options:
+        - All selected outputs matched.
+        - Some selected outputs mismatched.
+        - Python conversion or execution blocked.
+        - Excel baseline capture blocked.
+        - Unsure, needs review.
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes and blockers
+      description: Include commands, diagnostics, or screenshots only if they are safe to publish.
+    validations:
+      required: false

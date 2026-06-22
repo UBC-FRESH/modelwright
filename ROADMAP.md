@@ -1040,3 +1040,96 @@ Release result:
 - CLI help verified from the clean PyPI install.
 - GitHub Pages docs verified with the Examples Gallery, both notebook example pages, both downloadable
   `.ipynb` files, and `0.1.0a6` release-deployment content.
+
+## Current Next Steps
+
+## Phase 32: FABLE Pyculator Onboarding And Validation Pilot
+
+GitHub parent issue: #191
+
+Active branch: `feature/p32-fable-pyculator-pilot`
+
+Status: active.
+
+Goal: turn the current Modelwright humane-interface prototype into a structured onboarding and
+validation pilot for Abdulateef, Gloria, and Camilla. The phase should make setup repeatable, make
+tester feedback easy to capture, and define an initial FABLE-P validation protocol before deeper
+FABLE Calculator compatibility work begins.
+
+Release target: `modelwright==0.1.0a7`.
+
+- [x] P32.1 Add FABLE Pyculator HQP onboarding guide. Child issue: #192.
+  - Status: complete.
+  - [x] Document JupyterHub login with UBC CWL.
+  - [x] Document opening VSCode/code-server from JupyterLab.
+  - [x] Document GitHub authentication and cloning the Modelwright repo.
+  - [x] Document creating a repo-local `.venv` and selecting it as the notebook kernel.
+  - [x] Document running the tracked notebook examples.
+  - [x] Include Basecamp setup-help invitation and source-workbook hygiene.
+  - [x] Link the guide from the Sphinx docs index.
+- [x] P32.2 Add structured tester GitHub issue templates. Child issue: #193.
+  - Status: complete.
+  - [x] Add FABLE validation run issue form.
+  - [x] Add usability observation issue form.
+  - [x] Add setup problem issue form.
+  - [x] Leave blank issues enabled.
+  - [x] Validate issue-template YAML syntax.
+- [x] P32.3 Define FABLE-P validation pilot protocol. Child issue: #194.
+  - Status: complete.
+  - [x] Define workbook provenance and local artifact rules.
+  - [x] Define scenario parameter-change recording expectations.
+  - [x] Define Excel-vs-generated-Python output comparison expectations.
+  - [x] Define sanitized tracked finding boundaries.
+  - [x] Keep raw workbooks and raw validation reports ignored under `tmp/`.
+- [x] P32.4 Add scenario/output manifest seed format. Child issue: #195.
+  - Status: complete.
+  - [x] Define workbook identifier and provenance summary fields.
+  - [x] Define scenario name and changed input fields.
+  - [x] Define key output metric fields.
+  - [x] Define Excel value, Python value, comparison status, and notes fields.
+  - [x] Keep this as a seed format, not a full validation framework.
+- [ ] P32.5 Improve notebook examples from first-user friction. Child issue: #196.
+  - Status: active.
+  - [ ] Triage Gloria/Camilla usability observations.
+  - [ ] Triage Abdulateef validation-run friction.
+  - [ ] Apply only focused notebook/docs/API-polish changes justified by pilot feedback.
+  - [ ] Keep unrelated converter compatibility work out of this phase.
+- [ ] P32.6 Publish `modelwright==0.1.0a7`. Child issue: #197.
+  - Status: planned.
+  - [ ] Confirm P32 onboarding/protocol/template scope and evidence are complete.
+  - [ ] Bump package/import version and release docs to `0.1.0a7`.
+  - [ ] Run local release checks, including Ruff, pytest, Sphinx docs, docs theme verification, and
+        release artifact checks.
+  - [ ] Open and merge the P32 PR to `main`.
+  - [ ] Create annotated tag `v0.1.0a7`.
+  - [ ] Publish through the gated release workflow after maintainer approval.
+  - [ ] Verify PyPI JSON, clean PyPI install, import version, CLI help, GitHub release, and docs deployment.
+
+Acceptance boundary:
+
+- May claim a documented onboarding and validation pilot workflow for FABLE Pyculator testers.
+- May claim structured validation and usability feedback can be captured through GitHub issues and
+  manifest seeds.
+- Must not claim arbitrary FABLE country calculator support, production FABLE-P Canada readiness,
+  stable public API compatibility, or a full scenario automation framework.
+
+Implementation evidence:
+
+- Added `docs/guides/fable-pyculator-onboarding.rst` and linked it from the Sphinx guide index.
+- Added GitHub issue forms for FABLE validation runs, setup problems, and usability observations.
+- Added `planning/phase-32-fable-pyculator-onboarding-validation-pilot.md` with local artifact rules,
+  validation protocol, usability protocol, and manifest-seed intent.
+- Added `examples/fable_2020/scenario_output_manifest.example.json` as a sanitized seed for recording
+  scenario inputs and selected Excel-vs-Python output comparisons.
+- Updated `MANIFEST.in` so JSON example artifacts are included in source distributions.
+
+Verification evidence:
+
+- `.venv/bin/python -m pytest -vv tests/test_examples.py` passed with `7` tests.
+- `.venv/bin/python -m ruff check .` passed.
+- `.venv/bin/python -m pytest` passed with `168` passed and `1` skipped benchmark.
+- `.venv/bin/sphinx-build -b html docs _build/html -W` passed and included the FABLE Pyculator
+  onboarding guide.
+- `ruby -e 'require "yaml"; ...'` parsed all GitHub issue-template YAML files successfully.
+- `.venv/bin/python` parsed `examples/fable_2020/scenario_output_manifest.example.json` as valid JSON.
+- `git diff --check` passed.

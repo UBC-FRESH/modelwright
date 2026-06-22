@@ -1,0 +1,43 @@
+name: Setup problem
+description: Report a JupyterHub, VSCode, GitHub, virtual environment, or notebook setup problem.
+title: "Setup problem: "
+labels: ["setup", "fable-pyculator"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form when the onboarding path blocks progress. Do not include passwords, tokens, private paths, or raw workbook files.
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - Project JupyterHub
+        - VSCode/code-server
+        - Local computer
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: step-reached
+    attributes:
+      label: Step reached
+      description: Which setup step were you trying to complete?
+      placeholder: "Example: selecting the .venv notebook kernel"
+    validations:
+      required: true
+  - type: textarea
+    id: observed-problem
+    attributes:
+      label: What happened?
+      description: Include exact error text if safe.
+      placeholder: "Describe what you expected and what happened instead."
+    validations:
+      required: true
+  - type: textarea
+    id: attempted-fixes
+    attributes:
+      label: What did you try?
+      description: List any commands, clicks, reloads, or settings changes you already tried.
+    validations:
+      required: false

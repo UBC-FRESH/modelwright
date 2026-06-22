@@ -1,0 +1,43 @@
+{
+  "schema_name": "modelwright-fable-pyculator-scenario-output-manifest",
+  "schema_version": 1,
+  "workbook": {
+    "identifier": "fable-country-calculator-sanitized-id",
+    "source": "Public source URL or citation goes here.",
+    "version": "Workbook version or release date if known.",
+    "downloaded_on": "YYYY-MM-DD",
+    "local_workbook_path": "tmp/private-workbooks/<local-file>; do not commit the workbook."
+  },
+  "scenario": {
+    "name": "example-scenario",
+    "description": "Short human-readable summary of the scenario change.",
+    "changed_inputs": [
+      {
+        "label": "Scenario selection parameter",
+        "cell_ref": "SCENARIOS selection!A1",
+        "excel_value": "baseline",
+        "python_value": "baseline",
+        "notes": "Use public or sanitized labels only."
+      }
+    ]
+  },
+  "outputs": [
+    {
+      "label": "Key output metric",
+      "cell_ref": "Output sheet!A1",
+      "unit": "reported unit",
+      "excel_value": 0.0,
+      "python_value": 0.0,
+      "comparison_status": "match",
+      "absolute_difference": 0.0,
+      "notes": "Use match, mismatch, blocked, or needs-review."
+    }
+  ],
+  "run": {
+    "modelwright_commit": "git-commit-sha",
+    "excel_capture_method": "Manual workbook run or documented local script.",
+    "python_capture_method": "Modelwright generated-model run or notebook workflow.",
+    "status": "pass",
+    "notes": "Sanitized run notes only."
+  }
+}

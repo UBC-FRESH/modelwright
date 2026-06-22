@@ -42,6 +42,18 @@ def test_fable_generated_model_archive_is_tracked_and_readable() -> None:
     assert b"Generated Modelwright model" in prefix
 
 
+def test_fable_scenario_output_manifest_seed_is_valid() -> None:
+    manifest_path = ROOT / "examples/fable_2020/scenario_output_manifest.example.json"
+    payload = json.loads(manifest_path.read_text())
+
+    assert payload["schema_name"] == "modelwright-fable-pyculator-scenario-output-manifest"
+    assert payload["schema_version"] == 1
+    assert payload["workbook"]["local_workbook_path"].startswith("tmp/")
+    assert payload["scenario"]["changed_inputs"]
+    assert payload["outputs"][0]["comparison_status"] == "match"
+    assert payload["run"]["status"] == "pass"
+
+
 def notebook(path: str) -> dict:
     return json.loads((ROOT / path).read_text())
 

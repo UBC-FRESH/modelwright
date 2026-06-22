@@ -1,1 +1,1 @@
-recursive-include examples *.ipynb *.md *.py *.xz
+recursive-include examples *.ipynb *.json *.md *.py *.xz
