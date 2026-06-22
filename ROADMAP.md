@@ -800,7 +800,7 @@ GitHub parent issue: #174
 
 Active branch: `feature/p30-notebook-dataframe-interface`
 
-Status: active.
+Status: complete.
 
 Goal: add an optional notebook-facing layer on top of `modelwright.wrappers` that exposes wrapped
 generated models as Jupyter-friendly, pandas-backed analyst workflows. This phase should support a
@@ -864,15 +864,15 @@ Release target: `modelwright==0.1.0a5`.
   - [x] Add lightweight tests for example integrity without running expensive production-size FABLE
         calculation in default pytest.
 - [ ] P30.7 Publish `modelwright==0.1.0a5`. Child issue: #180.
-  - Status: active.
+  - Status: complete.
   - [x] Confirm P30 notebook/DataFrame scope and evidence are complete.
   - [x] Bump package/import version and release docs to `0.1.0a5`.
   - [x] Run local release checks, including Ruff, pytest, Sphinx docs, docs theme verification, and
         release artifact checks.
-  - [ ] Open and merge the P30 PR to `main`.
-  - [ ] Create annotated tag `v0.1.0a5`.
-  - [ ] Publish through the gated release workflow after maintainer approval.
-  - [ ] Verify PyPI JSON, clean PyPI install, import version, CLI help, GitHub release, and docs deployment.
+  - [x] Open and merge the P30 PR to `main`.
+  - [x] Create annotated tag `v0.1.0a5`.
+  - [x] Publish through the gated release workflow after maintainer approval.
+  - [x] Verify PyPI JSON, clean PyPI install, import version, CLI help, GitHub release, and docs deployment.
 
 Acceptance boundary:
 
@@ -912,3 +912,22 @@ Verification evidence:
   `tmp/`, or source workbook content.
 - Release artifacts from the local check were about `56K` for the wheel and `2.2M` for the sdist. The
   sdist includes the compressed FABLE generated-model example; the wheel remains package-code only.
+
+Release result:
+
+- PR #182 merged to `main`.
+- Annotated tag: `v0.1.0a5`.
+- GitHub release: `modelwright 0.1.0a5`.
+- PyPI package: `modelwright==0.1.0a5`.
+- Clean PyPI install verified in ignored `tmp/pypi-install/modelwright-0.1.0a5/.venv` with
+  `modelwright[notebook]==0.1.0a5`.
+- Import verified `modelwright.__version__ == "0.1.0a5"`.
+- Notebook extra verified by importing pandas and `modelwright.notebooks.inputs_frame`.
+- CLI help verified from the clean PyPI install.
+- GitHub Pages release docs verified with Read the Docs themed Examples Gallery, notebook-interface
+  guide, and `0.1.0a5` release-deployment content.
+
+## Current Next Steps
+
+1. Keep Phase 30 closed unless a release defect is discovered.
+2. Plan the next roadmap phase before opening a new feature branch.
