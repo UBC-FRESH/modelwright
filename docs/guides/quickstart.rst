@@ -40,5 +40,18 @@ The public CLI uses workflow groups:
    modelwright workbook extract path/to/workbook.xlsx > tmp/extraction.json
    modelwright workbook graph path/to/workbook.xlsx > tmp/dependency-graph.json
    modelwright conversion plan path/to/workbook.xlsx > tmp/conversion-plan.json
-   modelwright model generate --contract tmp/contract.json --expressions tmp/expressions.json --out tmp/generated_model.py
+   modelwright model infer-contract path/to/workbook.xlsx \
+     --module-name generated_model \
+     --output-ref "Summary!B2" \
+     --contract tmp/contract.json \
+     --expressions tmp/expressions.json \
+     --constants tmp/constants.json
+   modelwright model generate \
+     --contract tmp/contract.json \
+     --expressions tmp/expressions.json \
+     --constants tmp/constants.json \
+     --out tmp/generated_model.py
    modelwright validation report --scenario tmp/scenario.json --generated-values tmp/generated-values.json --oracle-values tmp/oracle-values.json
+
+See :doc:`generated-model-artifacts` for the full workflow that creates ``contract.json``,
+``expressions.json``, and ``constants.json`` before Python generation.

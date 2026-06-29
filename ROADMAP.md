@@ -1047,7 +1047,7 @@ Release result:
 
 GitHub parent issue: #191
 
-Active branch: `feature/p32-fable-pyculator-pilot`
+Active branch: `feature/p32-generated-artifact-materialization`
 
 Status: active.
 
@@ -1092,6 +1092,7 @@ Release target: `modelwright==0.1.0a7`.
   - Status: active.
   - [ ] Triage Gloria/Camilla usability observations.
   - [ ] Triage Abdulateef validation-run friction.
+  - [ ] Close generated-model artifact materialization documentation/tooling gap. Implementation issue: #201.
   - [ ] Apply only focused notebook/docs/API-polish changes justified by pilot feedback.
   - [ ] Keep unrelated converter compatibility work out of this phase.
 - [ ] P32.6 Publish `modelwright==0.1.0a7`. Child issue: #197.
@@ -1122,14 +1123,20 @@ Implementation evidence:
 - Added `examples/fable_2020/scenario_output_manifest.example.json` as a sanitized seed for recording
   scenario inputs and selected Excel-vs-Python output comparisons.
 - Updated `MANIFEST.in` so JSON example artifacts are included in source distributions.
+- Added `modelwright model infer-contract` to materialize `contract.json`, `expressions.json`, and
+  `constants.json` from a source workbook plus explicit selected output refs, and documented the
+  generated-model artifact workflow for FABLE Pyculator testers.
 
 Verification evidence:
 
 - `.venv/bin/python -m pytest -vv tests/test_examples.py` passed with `7` tests.
 - `.venv/bin/python -m ruff check .` passed.
-- `.venv/bin/python -m pytest` passed with `168` passed and `1` skipped benchmark.
+- `.venv/bin/python -m pytest` passed with `172` passed and `1` skipped benchmark.
 - `.venv/bin/sphinx-build -b html docs _build/html -W` passed and included the FABLE Pyculator
-  onboarding guide.
+  onboarding guide and generated-model artifact guide.
+- `.venv/bin/python scripts/verify_docs_theme.py _build/html` passed.
+- `scripts/check_release_artifacts.sh` passed; the clean wheel install imported `modelwright 0.1.0a6`
+  and smoke-tested the CLI.
 - `ruby -e 'require "yaml"; ...'` parsed all GitHub issue-template YAML files successfully.
 - `.venv/bin/python` parsed `examples/fable_2020/scenario_output_manifest.example.json` as valid JSON.
 - `git diff --check` passed.

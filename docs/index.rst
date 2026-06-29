@@ -16,6 +16,7 @@ assemble validation reports. It is not yet a general workbook converter.
    guides/fable-pyculator-onboarding
    guides/developer-onboarding
    guides/workflow-boundaries
+   guides/generated-model-artifacts
    guides/private-workbooks
    guides/validation
    guides/wrapping-generated-models
