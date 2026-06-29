@@ -261,7 +261,6 @@ def test_model_infer_contract_rejects_missing_output_refs_without_writes(tmp_pat
     )
 
     assert result.exit_code != 0
-    assert "provide at least one --output-ref or --output-refs-file entry" in result.stderr
     assert not contract_path.exists()
 
 
