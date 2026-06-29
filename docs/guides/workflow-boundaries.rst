@@ -29,6 +29,20 @@ Python Generation
 translated expression records. Generated modules are local artifacts and should normally stay under
 ignored paths such as ``tmp/``.
 
+The CLI can infer the three generation-input JSON files for selected output refs:
+
+.. code-block:: bash
+
+   modelwright model infer-contract path/to/workbook.xlsx \
+     --module-name generated_model \
+     --output-refs-file tmp/output_refs.json \
+     --contract tmp/contract.json \
+     --expressions tmp/expressions.json \
+     --constants tmp/constants.json
+
+The selected output refs remain a user or project decision. See :doc:`generated-model-artifacts` for
+the full inference, generation, execution, and validation sequence.
+
 Conversion Planning
 -------------------
 
@@ -58,3 +72,7 @@ No One-Step Conversion Yet
 Modelwright does not yet expose a broad ``convert workbook`` command. Real workbook evaluation showed
 that conversion plans must first explain which formulas were translated, which cells were unsupported,
 which outputs were generated, and which oracle was used for validation.
+
+``modelwright model infer-contract`` is therefore a materialization step for an explicit selected-output
+boundary, not a claim that Modelwright can automatically choose the right full-workbook model boundary
+for every spreadsheet.

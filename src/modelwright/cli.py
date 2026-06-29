@@ -16,6 +16,7 @@ from modelwright.execution import execute_generated_model
 from modelwright.extraction import WorkbookRecord, extract_workbook
 from modelwright.formulas import FormulaExpression, build_formula_reference_index, translate_formula_cell
 from modelwright.generation import GeneratedModuleContract, generate_python_module
+from modelwright.generation import infer_generated_module_contract
 from modelwright.graph import build_dependency_graph
 from modelwright.oracles import OracleResult
 from modelwright.validation import build_validation_report, load_validation_scenario
@@ -116,6 +117,65 @@ def model_generate(
     """Generate Python from explicit JSON contracts."""
 
     _emit_json(_generate_payload(contract=contract, expressions=expressions, constants=constants, output=output))
+
+
+@model_app.command("infer-contract")
+def model_infer_contract(
+    workbook: Path = typer.Argument(..., exists=True, dir_okay=False, readable=True, help="Source workbook path."),
+    module_name: str = typer.Option(
+        ...,
+        "--module-name",
+        help="Python module name to record in the generated-module contract.",
+    ),
+    output_refs: list[str] = typer.Option(
+        [""],
+        "--output-ref",
+        help="Workbook output cell ref to include in the generated model. May be repeated.",
+        show_default=False,
+    ),
+    output_refs_file: Path | None = typer.Option(
+        None,
+        "--output-refs-file",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="JSON array of workbook output cell refs to include in the generated model.",
+    ),
+    contract: Path = typer.Option(
+        ...,
+        "--contract",
+        help="Path to write GeneratedModuleContract JSON.",
+    ),
+    expressions: Path = typer.Option(
+        ...,
+        "--expressions",
+        help="Path to write selected translated formula expressions JSON.",
+    ),
+    constants: Path = typer.Option(
+        ...,
+        "--constants",
+        help="Path to write selected input constants JSON.",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        help="Print progress messages to stderr while keeping stdout as JSON.",
+    ),
+) -> None:
+    """Infer and write the JSON inputs required by model generate."""
+
+    _emit_json(
+        _infer_contract_payload(
+            workbook=workbook,
+            module_name=module_name,
+            output_refs=output_refs,
+            output_refs_file=output_refs_file,
+            contract=contract,
+            expressions=expressions,
+            constants=constants,
+            verbose=verbose,
+        )
+    )
 
 
 @model_app.command("execute")
@@ -327,6 +387,61 @@ def _generate_payload(
     return result.to_dict()
 
 
+def _infer_contract_payload(
+    *,
+    workbook: Path,
+    module_name: str,
+    output_refs: Sequence[str],
+    output_refs_file: Path | None,
+    contract: Path,
+    expressions: Path,
+    constants: Path,
+    verbose: bool,
+) -> dict[str, JsonValue]:
+    selected_output_refs = _selected_output_refs(output_refs=output_refs, output_refs_file=output_refs_file)
+    if not selected_output_refs:
+        raise typer.BadParameter("provide at least one --output-ref or --output-refs-file entry")
+
+    def progress(message: str) -> None:
+        if verbose:
+            typer.echo(message, err=True)
+
+    progress("extract workbook start")
+    workbook_record = extract_workbook(workbook, progress=progress if verbose else None)
+    progress("extract workbook done")
+    progress("build dependency graph start")
+    graph = build_dependency_graph(workbook_record)
+    progress("build dependency graph done")
+    progress("translate formulas start")
+    reference_index = build_formula_reference_index(graph)
+    formula_expressions = {
+        cell.cell_ref: translate_formula_cell(cell, graph, reference_index)
+        for cell in workbook_record.cells
+        if cell.formula is not None
+    }
+    progress(f"translate formulas done expressions={len(formula_expressions)}")
+    inference = infer_generated_module_contract(
+        workbook=workbook_record,
+        graph=graph,
+        expressions=formula_expressions,
+        output_refs=selected_output_refs,
+        module_name=module_name,
+        progress=progress if verbose else None,
+    )
+    if not inference.inferred:
+        error_locations = ", ".join(
+            diagnostic.location or diagnostic.code
+            for diagnostic in inference.diagnostics
+            if diagnostic.severity == "error"
+        )
+        raise typer.BadParameter(f"generated-model contract inference produced error diagnostics: {error_locations}")
+
+    _write_json(contract, inference.contract.to_dict())
+    _write_json(expressions, {cell_ref: expression.to_dict() for cell_ref, expression in inference.expressions.items()})
+    _write_json(constants, inference.constants)
+    return inference.to_dict()
+
+
 def _execute_payload(
     *,
     contract: Path,
@@ -435,13 +550,40 @@ def _emit_json(payload: dict[str, JsonValue]) -> None:
     typer.echo(json.dumps(payload, indent=2, sort_keys=True))
 
 
-def _load_object(path: str | Path) -> dict[str, JsonValue]:
+def _write_json(path: Path, payload: JsonValue | dict[str, JsonValue]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+
+
+def _selected_output_refs(*, output_refs: Sequence[str], output_refs_file: Path | None) -> tuple[str, ...]:
+    refs = list(output_refs)
+    if output_refs_file is not None:
+        loaded_refs = _load_json(output_refs_file)
+        if not isinstance(loaded_refs, list) or not all(isinstance(item, str) for item in loaded_refs):
+            raise typer.BadParameter(f"expected JSON array of strings in {output_refs_file}")
+        refs.extend(loaded_refs)
+    selected: list[str] = []
+    seen: set[str] = set()
+    for ref in refs:
+        if not ref:
+            continue
+        if ref not in seen:
+            selected.append(ref)
+            seen.add(ref)
+    return tuple(selected)
+
+
+def _load_json(path: str | Path) -> JsonValue:
     try:
-        data = json.loads(Path(path).read_text(encoding="utf-8"))
+        return json.loads(Path(path).read_text(encoding="utf-8"))
     except OSError as error:
         raise typer.BadParameter(f"could not read JSON file {path}: {error}") from error
     except json.JSONDecodeError as error:
         raise typer.BadParameter(f"could not parse JSON file {path}: {error}") from error
+
+
+def _load_object(path: str | Path) -> dict[str, JsonValue]:
+    data = _load_json(path)
 
     if not isinstance(data, dict):
         raise typer.BadParameter(f"expected JSON object in {path}")

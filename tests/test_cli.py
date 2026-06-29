@@ -126,6 +126,174 @@ def test_model_generate_rejects_removed_output_option(tmp_path: Path) -> None:
     assert not output_path.exists()
 
 
+def test_model_infer_contract_command_writes_generation_inputs(tmp_path: Path) -> None:
+    workbook_path = build_workbook(tmp_path / "synthetic_model.xlsx")
+    artifact_dir = tmp_path / "artifacts"
+    contract_path = artifact_dir / "contract.json"
+    expressions_path = artifact_dir / "expressions.json"
+    constants_path = artifact_dir / "constants.json"
+
+    result = runner.invoke(
+        app,
+        [
+            "model",
+            "infer-contract",
+            str(workbook_path),
+            "--module-name",
+            "synthetic_model",
+            "--output-ref",
+            "Summary!B2",
+            "--output-ref",
+            "Summary!B3",
+            "--contract",
+            str(contract_path),
+            "--expressions",
+            str(expressions_path),
+            "--constants",
+            str(constants_path),
+            "--verbose",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "extract workbook start" in result.stderr
+    payload = json.loads(result.stdout)
+    assert payload["inferred"] is True
+    assert payload["contract"]["output_refs"] == ["Summary!B2", "Summary!B3"]
+    assert json.loads(contract_path.read_text(encoding="utf-8"))["module_name"] == "synthetic_model"
+    assert set(json.loads(expressions_path.read_text(encoding="utf-8"))) == {
+        "Calc!B2",
+        "Calc!B3",
+        "Calc!B4",
+        "Summary!B2",
+        "Summary!B3",
+    }
+    assert json.loads(constants_path.read_text(encoding="utf-8")) == {
+        "Inputs!B2": 100,
+        "Inputs!B3": 0.08,
+        "Inputs!B4": 0.65,
+    }
+
+
+def test_model_infer_contract_output_refs_file_can_feed_model_generate(tmp_path: Path) -> None:
+    workbook_path = build_workbook(tmp_path / "synthetic_model.xlsx")
+    artifact_dir = tmp_path / "generated-model"
+    output_refs_path = artifact_dir / "output_refs.json"
+    contract_path = artifact_dir / "contract.json"
+    expressions_path = artifact_dir / "expressions.json"
+    constants_path = artifact_dir / "constants.json"
+    generated_model_path = artifact_dir / "generated_model.py"
+    artifact_dir.mkdir()
+    _write_json(output_refs_path, ["Summary!B2", "Summary!B3"])
+
+    inference = runner.invoke(
+        app,
+        [
+            "model",
+            "infer-contract",
+            str(workbook_path),
+            "--module-name",
+            "synthetic_model",
+            "--output-refs-file",
+            str(output_refs_path),
+            "--contract",
+            str(contract_path),
+            "--expressions",
+            str(expressions_path),
+            "--constants",
+            str(constants_path),
+        ],
+    )
+    generation = runner.invoke(
+        app,
+        [
+            "model",
+            "generate",
+            "--contract",
+            str(contract_path),
+            "--expressions",
+            str(expressions_path),
+            "--constants",
+            str(constants_path),
+            "--out",
+            str(generated_model_path),
+        ],
+    )
+    execution = runner.invoke(
+        app,
+        [
+            "model",
+            "execute",
+            "--contract",
+            str(contract_path),
+            "--model",
+            str(generated_model_path),
+        ],
+    )
+
+    assert inference.exit_code == 0
+    assert json.loads(inference.stdout)["contract"]["output_refs"] == ["Summary!B2", "Summary!B3"]
+    assert generation.exit_code == 0
+    assert json.loads(generation.stdout)["generated"] is True
+    assert execution.exit_code == 0
+    assert json.loads(execution.stdout)["output_values"] == {"Summary!B2": 70.2, "Summary!B3": "ok"}
+
+
+def test_model_infer_contract_rejects_missing_output_refs_without_writes(tmp_path: Path) -> None:
+    workbook_path = build_workbook(tmp_path / "synthetic_model.xlsx")
+    contract_path = tmp_path / "contract.json"
+
+    result = runner.invoke(
+        app,
+        [
+            "model",
+            "infer-contract",
+            str(workbook_path),
+            "--module-name",
+            "synthetic_model",
+            "--contract",
+            str(contract_path),
+            "--expressions",
+            str(tmp_path / "expressions.json"),
+            "--constants",
+            str(tmp_path / "constants.json"),
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert not contract_path.exists()
+
+
+def test_model_infer_contract_rejects_invalid_output_refs_file_without_writes(tmp_path: Path) -> None:
+    workbook_path = build_workbook(tmp_path / "synthetic_model.xlsx")
+    output_refs_path = tmp_path / "output_refs.json"
+    contract_path = tmp_path / "contract.json"
+    _write_json(output_refs_path, {"not": "a list"})
+
+    result = runner.invoke(
+        app,
+        [
+            "model",
+            "infer-contract",
+            str(workbook_path),
+            "--module-name",
+            "synthetic_model",
+            "--output-refs-file",
+            str(output_refs_path),
+            "--contract",
+            str(contract_path),
+            "--expressions",
+            str(tmp_path / "expressions.json"),
+            "--constants",
+            str(tmp_path / "constants.json"),
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert "expected JSON array of strings" in result.stderr
+    assert not contract_path.exists()
+
+
 def test_model_execute_command_outputs_generated_values(tmp_path: Path) -> None:
     contract, expressions, constants = _synthetic_generation_inputs(tmp_path)
     contract_path = tmp_path / "contract.json"

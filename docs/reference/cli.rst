@@ -27,6 +27,16 @@ Model Commands
 
 .. code-block:: bash
 
+   modelwright model infer-contract path/to/workbook.xlsx \
+     --module-name generated_model \
+     --output-ref "Summary!B2" \
+     --output-ref "Summary!B3" \
+     --contract tmp/contract.json \
+     --expressions tmp/expressions.json \
+     --constants tmp/constants.json \
+     --verbose \
+     > tmp/inference-result.json
+
    modelwright model generate \
      --contract tmp/contract.json \
      --expressions tmp/expressions.json \
@@ -39,6 +49,11 @@ Model Commands
      --model tmp/generated_model.py \
      --inputs tmp/input-overrides.json \
      > tmp/generated-values.json
+
+``infer-contract`` extracts the workbook, builds the dependency graph, translates formulas, and writes
+the three JSON inputs consumed by ``model generate``. Output refs may also be supplied with
+``--output-refs-file`` as a JSON array of cell refs. See :doc:`../guides/generated-model-artifacts`
+for the end-to-end generated-artifact workflow.
 
 Validation Commands
 -------------------

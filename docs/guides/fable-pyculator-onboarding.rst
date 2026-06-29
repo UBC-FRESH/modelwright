@@ -66,6 +66,21 @@ Then run the tracked notebooks:
 As you go, write down every point where the workflow assumes too much, hides too much, or makes you
 wonder what to do next. Those notes are part of the development process.
 
+Generated Model Artifacts
+-------------------------
+
+FABLE Pyculator notebooks wrap Modelwright-generated Python models. When testing a new FABLE
+Calculator workbook version, the workbook and generated Python model must come from the same workbook
+version.
+
+Modelwright documents the generated-model artifact workflow in :doc:`generated-model-artifacts`.
+That guide explains how to create ``contract.json``, ``expressions.json``, and ``constants.json`` with
+``modelwright model infer-contract`` before running ``modelwright model generate``.
+
+For FABLE workbooks, the output-ref list is still a project-specific choice. Keep version-specific
+workbooks, output-ref lists, inferred JSON files, generated Python models, and validation reports under
+ignored ``tmp/`` paths unless a maintainer explicitly approves a tracked artifact.
+
 Where To Leave Notes
 --------------------
 
