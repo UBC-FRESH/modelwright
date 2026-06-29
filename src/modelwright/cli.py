@@ -127,8 +127,8 @@ def model_infer_contract(
         "--module-name",
         help="Python module name to record in the generated-module contract.",
     ),
-    output_refs: list[str] | None = typer.Option(
-        None,
+    output_refs: list[str] = typer.Option(
+        [],
         "--output-ref",
         help="Workbook output cell ref to include in the generated model. May be repeated.",
     ),
@@ -167,7 +167,7 @@ def model_infer_contract(
         _infer_contract_payload(
             workbook=workbook,
             module_name=module_name,
-            output_refs=output_refs or [],
+            output_refs=output_refs,
             output_refs_file=output_refs_file,
             contract=contract,
             expressions=expressions,
