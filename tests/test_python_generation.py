@@ -1076,6 +1076,71 @@ def test_generate_python_module_renders_ifna_for_lookup_errors(tmp_path: Path) -
     }
 
 
+def test_generate_python_module_propagates_vlookup_na_error_values(tmp_path: Path) -> None:
+    contract = GeneratedModuleContract(
+        workbook_id="vlookup-na.xlsx",
+        module_name="vlookup_na",
+        input_refs=("Lookup!A1", "Lookup!B1"),
+        output_refs=("Calc!B1", "Calc!B2", "Calc!B3"),
+        symbols=(
+            GeneratedSymbol(cell_ref="Lookup!A1", symbol_name="lookup_a1", kind="input"),
+            GeneratedSymbol(cell_ref="Lookup!B1", symbol_name="lookup_b1", kind="input"),
+            GeneratedSymbol(cell_ref="Calc!B1", symbol_name="calc_b1", kind="output", raw_formula="=VLOOKUP(9,Lookup!A1:B1,2,FALSE)"),
+            GeneratedSymbol(
+                cell_ref="Calc!B2",
+                symbol_name="calc_b2",
+                kind="output",
+                raw_formula='=IFNA(VLOOKUP(9,Lookup!A1:B1,2,FALSE),"missing")',
+            ),
+            GeneratedSymbol(
+                cell_ref="Calc!B3",
+                symbol_name="calc_b3",
+                kind="output",
+                raw_formula='=IFERROR(VLOOKUP(9,Lookup!A1:B1,2,FALSE),"fallback")',
+            ),
+        ),
+    )
+    table_range = normalize_reference("Lookup!A1:B1")
+    missing_lookup = FormulaExpressionNode.function_call(
+        "VLOOKUP",
+        (
+            FormulaExpressionNode.literal(9),
+            FormulaExpressionNode.reference_to(table_range),
+            FormulaExpressionNode.literal(2),
+            FormulaExpressionNode.literal(False),
+        ),
+    )
+    expressions = {
+        "Calc!B1": formula_expression("Calc!B1", "=VLOOKUP(9,Lookup!A1:B1,2,FALSE)", missing_lookup),
+        "Calc!B2": formula_expression(
+            "Calc!B2",
+            '=IFNA(VLOOKUP(9,Lookup!A1:B1,2,FALSE),"missing")',
+            FormulaExpressionNode.function_call("IFNA", (missing_lookup, FormulaExpressionNode.literal("missing"))),
+        ),
+        "Calc!B3": formula_expression(
+            "Calc!B3",
+            '=IFERROR(VLOOKUP(9,Lookup!A1:B1,2,FALSE),"fallback")',
+            FormulaExpressionNode.function_call("IFERROR", (missing_lookup, FormulaExpressionNode.literal("fallback"))),
+        ),
+    }
+    output_path = tmp_path / "generated_vlookup_na.py"
+
+    result = generate_python_module(
+        contract=contract,
+        expressions=expressions,
+        constants={"Lookup!A1": 1, "Lookup!B1": "one"},
+        output_path=output_path,
+    )
+    module = load_module(output_path)
+
+    assert result.generated is True
+    assert module.calculate() == {
+        "Calc!B1": "#N/A",
+        "Calc!B2": "missing",
+        "Calc!B3": "fallback",
+    }
+
+
 def test_generate_python_module_renders_if_with_omitted_false_branch(tmp_path: Path) -> None:
     contract = GeneratedModuleContract(
         workbook_id="if.xlsx",

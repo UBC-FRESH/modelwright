@@ -1093,6 +1093,8 @@ Release target: `modelwright==0.1.0a7`.
   - [ ] Triage Gloria/Camilla usability observations.
   - [x] Triage Abdulateef validation-run friction.
   - [x] Close generated-model artifact materialization documentation/tooling gap. Implementation issue: #201.
+  - [x] Fix generated `VLOOKUP` `#N/A` error-value propagation uncovered by the 2021 FABLE
+        validation run. Implementation issue: #203.
   - [x] Apply only focused notebook/docs/API-polish changes justified by pilot feedback.
   - [x] Keep unrelated converter compatibility work out of this phase.
 - [ ] P32.6 Publish `modelwright==0.1.0a7`. Child issue: #197.
@@ -1128,6 +1130,9 @@ Implementation evidence:
   generated-model artifact workflow for FABLE Pyculator testers.
 - PR #202 merged the generated-model artifact materialization slice to `main`, and issue #201 is
   closed.
+- Added generated runtime semantics for `VLOOKUP` misses as `#N/A` error values, while preserving
+  `IFNA` and `IFERROR` fallback behavior. This closes the generic Modelwright blocker uncovered by
+  the FABLE Pyculator 2021 validation run.
 
 Verification evidence:
 
