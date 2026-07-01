@@ -240,3 +240,6 @@ This file records completed project work in chronological order.
   verification, release-artifact checks, and `git diff --check`.
 - Merged Phase 34 PR #219, verified PR checks and post-merge docs deployment, and closed the Phase
   34 issue set.
+- Created Modelwright parent issues #220 and #221 and recorded planned roadmap phases for generated
+  workflow summaries/provider diagnostics and compact validation evidence extraction needed by the
+  downstream CLEWs-C2020 FreshForge/FABLE Pyculator automation lane.

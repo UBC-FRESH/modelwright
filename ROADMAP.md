@@ -1206,6 +1206,35 @@ Closeout evidence:
 - PR checks passed for quality, pytest, docs build, and release artifacts.
 - Post-merge docs workflow passed and deployed the updated FreshForge provider docs.
 
+## Phase 35: Generated-Model Workflow Summaries And Provider Diagnostics
+
+GitHub parent issue: #220
+
+Status: planned backlog.
+
+Goal: improve machine-readable summaries and diagnostics for Modelwright generated-model workflows
+used through FreshForge and downstream tools.
+
+Acceptance boundary:
+
+- May expose clearer generated-model workflow status, artifact, and diagnostic summaries.
+- Must not add FABLE output-table discovery, scenario-bundle semantics, or FreshForge orchestration
+  policy beyond provider-owned generated-model execution details.
+
+## Phase 36: Compact Validation Evidence Extraction For Downstream Automation
+
+GitHub parent issue: #221
+
+Status: planned backlog.
+
+Goal: expose compact generated-model validation evidence that downstream packages can record in
+docs, planning notes, and optional CI workflows without tracking raw validation reports.
+
+Acceptance boundary:
+
+- May summarize validation evidence for downstream publication and CI gates.
+- Must not declare arbitrary workbook equivalence or absorb FABLE-specific output selection logic.
+
 ## Phase 32: FABLE Pyculator Onboarding And Validation Pilot
 
 GitHub parent issue: #191
