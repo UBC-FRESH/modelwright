@@ -24,6 +24,14 @@ This file records completed project work in chronological order.
   models now propagate bare lookup misses as `#N/A` values while `IFNA` and `IFERROR` still return
   their fallbacks. This unblocked the FABLE Pyculator 2021 full comparable-output validation run.
 - Merged P32.5 PR #202, verified post-merge Test and Docs Pages workflows on `main`, confirmed the generated-model artifact guide deployed to GitHub Pages, and closed generated-model materialization issue #201 while leaving broader P32.5 pilot-feedback tracking open.
+- Prepared the `0.1.0a7` release candidate by closing the concrete first-user P32.5 feedback loop,
+  folding in the Phase 33/34 FreshForge provider planning and execution evidence, bumping
+  package/import/provider metadata and release docs, and preserving the alpha boundary around
+  selected-output generated-model materialization rather than arbitrary full-workbook conversion.
+- Verified the `0.1.0a7` release candidate locally with Ruff, `180` passing pytest tests and `1`
+  skipped benchmark, warning-clean Sphinx docs, Read the Docs theme verification, release artifact
+  checks, `modelwright --help`, `modelwright model infer-contract --help`, and FreshForge provider
+  discovery showing Modelwright provider version `0.1.0a7` with FreshForge `0.1.0a2` installed.
 - Activated Phase 31 on `feature/p31-literate-notebook-examples`, created GitHub parent issue #183 and child issues #187, #185, #186, #184, #188, and #189, and scoped the next `0.1.0a6` alpha around actual known-valid literate `.ipynb` notebook files for the synthetic and generated 2020 FABLE examples, plus matching Sphinx Examples Gallery documentation and validation.
 - Completed P31.1 through P31.5 by adding real literate Jupyter notebooks under `examples/notebooks/` for the synthetic and generated 2020 FABLE notebook-interface workflows; each notebook includes headings, explanatory markdown, code cells, and stored outputs; Sphinx Examples Gallery pages now link to downloadable `.ipynb` files; and default tests validate notebook JSON, Python kernel metadata, markdown-before-code structure, stored outputs, synthetic notebook execution, and static FABLE notebook validation-boundary output without running the expensive generated FABLE model in default pytest.
 - Prepared the `0.1.0a6` release candidate by bumping package/import metadata and release docs, passing repo-local bootstrap, Ruff, default `pytest -vv` with `167` passed and `1` benchmark skip, Sphinx warning-as-error docs with notebook downloads copied, Read the Docs theme verification, and `scripts/check_release_artifacts.sh`; the artifact checker built a roughly `56K` wheel and `2.2M` sdist, included the tracked literate notebooks in the sdist, installed the wheel into a clean ignored environment, imported `modelwright 0.1.0a6`, and smoke-tested the CLI.

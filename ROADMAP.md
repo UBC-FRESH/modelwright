@@ -1047,6 +1047,11 @@ Phase 34 is complete on `main`: Modelwright's FreshForge provider can execute
 supported generated-model workflow stages using Modelwright Python APIs and the
 FreshForge serial local runner.
 
+Phase 32 is in release closeout on `feature/p32-v0.1.0a7-release`: publish
+`modelwright==0.1.0a7` with the generated-model artifact materialization and
+FreshForge generated-model workflow orchestration evidence accumulated since
+`0.1.0a6`.
+
 ## Phase 33: FreshForge Provider Pilot For Modelwright Workflows
 
 GitHub parent issue: #205
@@ -1280,9 +1285,9 @@ Release target: `modelwright==0.1.0a7`.
   - [x] Define key output metric fields.
   - [x] Define Excel value, Python value, comparison status, and notes fields.
   - [x] Keep this as a seed format, not a full validation framework.
-- [ ] P32.5 Improve notebook examples from first-user friction. Child issue: #196.
-  - Status: active.
-  - [ ] Triage Gloria/Camilla usability observations.
+- [x] P32.5 Improve notebook examples from first-user friction. Child issue: #196.
+  - Status: complete.
+  - [x] Triage Gloria/Camilla usability observations. Deferred until concrete observations are filed.
   - [x] Triage Abdulateef validation-run friction.
   - [x] Close generated-model artifact materialization documentation/tooling gap. Implementation issue: #201.
   - [x] Fix generated `VLOOKUP` `#N/A` error-value propagation uncovered by the 2021 FABLE
@@ -1290,10 +1295,10 @@ Release target: `modelwright==0.1.0a7`.
   - [x] Apply only focused notebook/docs/API-polish changes justified by pilot feedback.
   - [x] Keep unrelated converter compatibility work out of this phase.
 - [ ] P32.6 Publish `modelwright==0.1.0a7`. Child issue: #197.
-  - Status: planned.
-  - [ ] Confirm P32 onboarding/protocol/template scope and evidence are complete.
-  - [ ] Bump package/import version and release docs to `0.1.0a7`.
-  - [ ] Run local release checks, including Ruff, pytest, Sphinx docs, docs theme verification, and
+  - Status: active.
+  - [x] Confirm P32 onboarding/protocol/template scope and evidence are complete.
+  - [x] Bump package/import version and release docs to `0.1.0a7`.
+  - [x] Run local release checks, including Ruff, pytest, Sphinx docs, docs theme verification, and
         release artifact checks.
   - [ ] Open and merge the P32 PR to `main`.
   - [ ] Create annotated tag `v0.1.0a7`.
@@ -1325,6 +1330,9 @@ Implementation evidence:
 - Added generated runtime semantics for `VLOOKUP` misses as `#N/A` error values, while preserving
   `IFNA` and `IFERROR` fallback behavior. This closes the generic Modelwright blocker uncovered by
   the FABLE Pyculator 2021 validation run.
+- Added plan-only and executable FreshForge provider integration after the first-user feedback loop,
+  allowing FreshForge to validate, plan, and execute supported Modelwright generated-model workflow
+  stages when FreshForge is installed separately.
 
 Verification evidence:
 
@@ -1339,6 +1347,18 @@ Verification evidence:
 - Post-merge `Test` workflow passed on `main` for commit `f865ec9`.
 - Post-merge `docs-pages` workflow passed and deployed the generated-model artifact guide at
   `https://ubc-fresh.github.io/modelwright/guides/generated-model-artifacts.html`.
+- Phase 33 PR #211 merged the plan-only FreshForge provider and deployed provider-integration docs.
+- Phase 34 PR #219 merged the executable FreshForge provider for generated-model workflows and
+  deployed updated provider-integration docs.
 - `ruby -e 'require "yaml"; ...'` parsed all GitHub issue-template YAML files successfully.
 - `.venv/bin/python` parsed `examples/fable_2020/scenario_output_manifest.example.json` as valid JSON.
 - `git diff --check` passed.
+- `.venv/bin/python -m ruff check .` passed for the `0.1.0a7` release candidate.
+- `.venv/bin/python -m pytest` passed with `180` passed and `1` skipped benchmark.
+- `.venv/bin/sphinx-build -b html docs _build/html -W` passed.
+- `.venv/bin/python scripts/verify_docs_theme.py _build/html` passed.
+- `scripts/check_release_artifacts.sh` passed; the clean wheel install imported `modelwright 0.1.0a7`
+  and smoke-tested the CLI.
+- `.venv/bin/modelwright --help` and `.venv/bin/modelwright model infer-contract --help` passed.
+- `.venv/bin/freshforge providers --json` reported the Modelwright provider version as `0.1.0a7`
+  after installing FreshForge `0.1.0a2`.
