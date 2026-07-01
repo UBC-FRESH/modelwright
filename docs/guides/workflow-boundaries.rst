@@ -77,10 +77,11 @@ which outputs were generated, and which oracle was used for validation.
 boundary, not a claim that Modelwright can automatically choose the right full-workbook model boundary
 for every spreadsheet.
 
-FreshForge Planning
--------------------
+FreshForge Planning And Run
+---------------------------
 
-Modelwright also exposes a plan-only FreshForge provider for declaring these stages as a workflow
-graph. FreshForge can validate, inspect, and plan that graph, but it does not execute Modelwright
-commands or materialize artifacts. See :doc:`freshforge-provider-integration` for the provider
-boundary and example workflow.
+Modelwright also exposes a FreshForge provider for declaring these stages as a workflow graph.
+FreshForge can validate, inspect, and plan that graph without execution. With FreshForge's serial
+local runner, supported generated-model nodes can also materialize artifacts through Modelwright
+Python APIs. See :doc:`freshforge-provider-integration` for the provider boundary and example
+workflow.

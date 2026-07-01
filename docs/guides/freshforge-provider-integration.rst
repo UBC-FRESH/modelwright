@@ -4,11 +4,12 @@ FreshForge Provider Integration
 Purpose
 -------
 
-Modelwright exposes a plan-only FreshForge provider for workbook conversion
-workflow stages. FreshForge owns declarative graph validation, provider
-discovery, inspection, and deterministic non-executing planning. Modelwright
-still owns actual extraction, graphing, generated-model materialization,
-execution, and validation through its Python APIs and ``modelwright`` CLI.
+Modelwright exposes a FreshForge provider for workbook conversion workflow
+stages. FreshForge owns declarative graph validation, provider discovery,
+inspection, deterministic non-executing planning, and serial local scheduling.
+Modelwright still owns actual extraction, graphing, generated-model
+materialization, execution, and validation through its Python APIs and
+``modelwright`` CLI.
 
 The provider is intentionally workbook-neutral. Concrete workflow documents
 belong to the project or package that owns the workbook, output-ref list,
@@ -41,8 +42,7 @@ discover provider id ``modelwright``:
 
    freshforge providers
 
-The provider references currently exposed for plan-only workflow declarations
-are:
+The provider references currently exposed for workflow declarations are:
 
 - ``modelwright.workbook_extract``
 - ``modelwright.workbook_graph``
@@ -69,6 +69,13 @@ Validate and plan it with:
    freshforge inspect examples/freshforge/generated_model_workflow.yaml
    freshforge plan examples/freshforge/generated_model_workflow.yaml
 
+When a workflow declares real public-safe paths and the required artifacts
+exist, executable generated-model stages can also be run with:
+
+.. code-block:: bash
+
+   freshforge run path/to/generated_model_workflow.yaml --workdir /path/to/project --json
+
 The graph declares this order:
 
 1. extract workbook facts;
@@ -82,21 +89,23 @@ The graph declares this order:
 Relationship To Modelwright Execution
 -------------------------------------
 
-FreshForge graph planning is not Modelwright execution. Use the FreshForge
-workflow to make the conversion graph explicit and checkable before running
-commands such as:
+FreshForge graph planning is not Modelwright execution. Planning validates and
+orders the graph. FreshForge ``run`` then calls Modelwright provider
+``run_node`` hooks for supported nodes. Those hooks use Modelwright Python APIs
+and write the same JSON artifacts as commands such as:
 
 .. code-block:: bash
 
-   modelwright workbook extract path/to/workbook.xlsx
-   modelwright workbook graph path/to/workbook.xlsx
    modelwright model infer-contract path/to/workbook.xlsx ...
    modelwright model generate ...
    modelwright model execute ...
    modelwright validation evaluate ...
 
-FreshForge currently does not run those commands, read declared artifacts, or
-decide which workbook outputs should define a generated-model boundary.
+The executable provider currently supports ``model_infer_contract``,
+``model_generate``, ``model_execute``, and ``validation_evaluate``. It does not
+shell out to the CLI. Workbook extraction and graph construction remain
+Modelwright internals of contract inference unless a workflow deliberately uses
+those stages for planning context.
 
 FABLE Pyculator Boundary
 ------------------------
@@ -110,13 +119,11 @@ refs for FABLE Calculator versions.
 Boundaries
 ----------
 
-The Modelwright provider validates broad node shape only. It does not:
+The Modelwright provider remains bounded. It does not:
 
-- execute FreshForge nodes;
-- add ``freshforge run``;
-- read workbooks or declared artifact files;
-- call the Modelwright CLI;
-- materialize generated-model artifacts;
+- implement FreshForge scheduling;
+- call the Modelwright CLI via subprocess;
+- choose workbook output refs;
 - cache or checkpoint workflow stages; or
 - claim full-workbook conversion or validation equivalence.
 
