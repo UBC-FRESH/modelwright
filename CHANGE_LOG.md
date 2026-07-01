@@ -15,6 +15,8 @@ This file records completed project work in chronological order.
 - Verified Phase 33 locally with Ruff, full pytest, Sphinx warning-as-error docs, docs-theme
   verification, FreshForge `providers` / `validate` / `inspect` / `plan` smoke checks after installing
   FreshForge `v0.1.0a1`, release artifact checks, and `git diff --check`.
+- Merged Phase 33 PR #211 to `main`, verified post-merge Test and Docs Pages workflows, confirmed
+  GitHub Pages deployment, and closed the Phase 33 child and parent issue set.
 - Activated Phase 32 on `feature/p32-fable-pyculator-pilot`, created GitHub parent issue #191 and child issues #192 through #197, and scoped the next `0.1.0a7` alpha around FABLE Pyculator HQP onboarding, structured tester issue forms, a validation pilot protocol, and a scenario/output manifest seed format before deeper country-calculator compatibility work.
 - Completed the first Phase 32 onboarding and pilot-infrastructure slice by adding a public FABLE Pyculator onboarding guide for the project JupyterHub/code-server workflow, GitHub issue forms for validation runs, usability observations, and setup problems, a planning protocol for Abdulateef's validation checks plus Gloria and Camilla's usability feedback, and a tracked JSON scenario/output manifest seed for sanitized FABLE validation evidence.
 - Added the P32.5 generated-model artifact materialization fix from first-user feedback: `modelwright model infer-contract` now writes the `contract.json`, `expressions.json`, and `constants.json` inputs required by `modelwright model generate` from a workbook plus explicit selected output refs, with Sphinx docs explaining the artifact boundary, FABLE version-pairing expectations, and validation caveats.

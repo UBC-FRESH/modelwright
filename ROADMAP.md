@@ -1049,7 +1049,7 @@ GitHub parent issue: #205
 
 Active branch: `feature/p33-modelwright-freshforge-provider`.
 
-Status: implemented locally; PR pending.
+Status: complete.
 
 Goal: add a plan-only FreshForge provider for Modelwright workflow stages so FreshForge can discover,
 validate, inspect, and plan workbook-to-generated-model workflows without executing Modelwright
@@ -1084,14 +1084,14 @@ published package metadata.
   - [x] Document why FABLE-specific output-ref discovery belongs in FABLE Pyculator.
   - [x] Add tests for provider discovery, example planning, metadata, and diagnostics.
 - [ ] P33.5 Verify, PR, and close Phase 33. Child issue: #210.
-  - Status: active.
+  - Status: complete.
   - [x] Run Ruff, pytest, Sphinx docs, docs theme verification, release artifact checks, and
         `git diff --check`.
   - [x] Smoke-test FreshForge `providers`, `validate`, `inspect`, and `plan` after installing
         FreshForge separately.
   - [x] Update roadmap and changelog evidence.
-  - [ ] Open PR from `feature/p33-modelwright-freshforge-provider` to `main`.
-  - [ ] Merge only after CI passes and close the parent issue after merge.
+  - [x] Open PR from `feature/p33-modelwright-freshforge-provider` to `main`.
+  - [x] Merge only after CI passes and close the parent issue after merge.
 
 Acceptance boundary:
 
@@ -1130,6 +1130,14 @@ Verification evidence:
 - `scripts/check_release_artifacts.sh` passed; the clean wheel install imported `modelwright
   0.1.0a6`, and artifact inspection included `modelwright/freshforge.py` plus entry-point metadata.
 - `git diff --check` passed.
+
+Closeout evidence:
+
+- Phase 33 child issues #206, #207, #208, and #209 are closed.
+- Phase 33 PR #211 merged to `main` with merge commit `193f3c6`.
+- Post-merge `Test` workflow passed on `main`, including quality, pytest, and release-artifact jobs.
+- Post-merge `docs-pages` workflow passed on `main`, including Sphinx build, Read the Docs theme
+  artifact verification, artifact upload, and GitHub Pages deployment.
 
 ## Phase 32: FABLE Pyculator Onboarding And Validation Pilot
 
