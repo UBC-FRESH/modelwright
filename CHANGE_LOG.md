@@ -14,6 +14,9 @@ This file records completed project work in chronological order.
 - Verified the Phase 36 implementation locally with targeted evidence/CLI/API tests, Ruff, full pytest
   (`195` passed and `1` skipped benchmark), Sphinx warning-as-error docs, Read the Docs theme
   verification, release artifact checks, and `git diff --check`.
+- Completed Phase 36 by merging PR #234, confirming post-merge Test run 28548149402 and docs-pages
+  run 28548149355 passed, verifying the live validation-evidence guide on GitHub Pages, and closing
+  the Phase 36 issue set.
 - Activated Phase 35 on `feature/p35-generated-model-workflow-summaries`, created child issues #223
   through #227 under parent issue #220, and scoped the phase around compact Modelwright stage
   summaries plus sharper FreshForge provider diagnostics for generated-model workflows.

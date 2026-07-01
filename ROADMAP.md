@@ -1054,10 +1054,9 @@ Phase 35 is complete on `main`: Modelwright's FreshForge provider now emits comp
 summaries and sharper diagnostics for generated-model workflows, using FreshForge Phase 7
 namespaces and whole-run summaries where useful.
 
-Phase 36 is active on `feature/p36-compact-validation-evidence`: Modelwright is adding generic
-compact validation-evidence extraction so downstream packages can publish sanitized evidence
-summaries without copying raw generated source, generated values, workbooks, or full validation
-reports.
+Phase 36 is complete on `main`: Modelwright now packages generic compact validation-evidence
+summaries for downstream automation without copying raw generated source, generated values,
+workbooks, or full validation reports.
 
 ## Phase 33: FreshForge Provider Pilot For Modelwright Workflows
 
@@ -1292,9 +1291,9 @@ Closeout evidence:
 
 GitHub parent issue: #221
 
-Active branch: `feature/p36-compact-validation-evidence`.
+Active branch: `main` after PR #234.
 
-Status: active.
+Status: complete.
 
 Goal: expose compact generated-model validation evidence that downstream packages can record in
 docs, planning notes, and optional CI workflows without tracking raw validation reports.
@@ -1318,12 +1317,12 @@ docs, planning notes, and optional CI workflows without tracking raw validation 
   - [x] Add API and CLI documentation.
   - [x] Add validation-evidence guide and cross-link generated-model workflow docs.
   - [x] Update the Phase 35/36 downstream planning note.
-- [ ] P36.5 Verify, PR, deploy docs, and close phase. Child issue: #233.
+- [x] P36.5 Verify, PR, deploy docs, and close phase. Child issue: #233.
   - [x] Run full local verification.
   - [x] Open PR from `feature/p36-compact-validation-evidence` to `main`.
-  - [ ] Merge only after CI passes.
-  - [ ] Confirm post-merge Test and Docs Pages workflows pass.
-  - [ ] Close Phase 36 child issues and parent #221.
+  - [x] Merge only after CI passes.
+  - [x] Confirm post-merge Test and Docs Pages workflows pass.
+  - [x] Close Phase 36 child issues and parent #221.
 
 Dependency note: this phase follows Phase 35 because compact evidence should be derived from stable
 stage summaries and diagnostics. FABLE Pyculator Phase 20 should consume this generic evidence rather
@@ -1357,7 +1356,14 @@ Local verification:
 - `scripts/check_release_artifacts.sh` passed; artifact inspection included `modelwright/evidence.py`,
   and the clean wheel install imported `modelwright 0.1.0a7` and smoke-tested the CLI.
 - `git diff --check` passed.
-- Phase 36 PR #234 is open.
+- Phase 36 PR #234 merged to `main` with merge commit `06814c5`.
+- PR Test workflow passed quality, pytest, and release-artifact jobs after the CI help-rendering test
+  fix.
+- PR docs-pages workflow passed.
+- Post-merge Test workflow run 28548149402 passed quality, pytest, and release-artifact jobs.
+- Post-merge docs-pages workflow run 28548149355 passed and deployed GitHub Pages.
+- Live docs smoke check verified
+  `https://ubc-fresh.github.io/modelwright/guides/validation-evidence.html`.
 
 ## Phase 32: FABLE Pyculator Onboarding And Validation Pilot
 
