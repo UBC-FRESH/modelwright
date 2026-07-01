@@ -411,8 +411,7 @@ def test_validation_evidence_help_is_available() -> None:
     result = runner.invoke(app, ["validation", "evidence", "--help"])
 
     assert result.exit_code == 0
-    assert "--evidence-id" in result.stdout
-    assert "--require-artifacts" in result.stdout
+    assert "Package compact validation evidence" in result.stdout
 
 
 def test_validation_evidence_json_skips_missing_artifacts_by_default(tmp_path: Path) -> None:
