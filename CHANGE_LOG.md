@@ -238,3 +238,5 @@ This file records completed project work in chronological order.
   validation for the controlled workbook fixture.
 - Verified Phase 34 locally with Ruff, full pytest, warning-clean Sphinx docs, Read the Docs theme
   verification, release-artifact checks, and `git diff --check`.
+- Merged Phase 34 PR #219, verified PR checks and post-merge docs deployment, and closed the Phase
+  34 issue set.

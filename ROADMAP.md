@@ -1043,9 +1043,9 @@ Release result:
 
 ## Current Next Steps
 
-Phase 34 is active on `feature/p34-freshforge-executable-provider`: make the
-Modelwright FreshForge provider executable for generated-model workflows using
-Modelwright Python APIs and the FreshForge serial local runner.
+Phase 34 is complete on `main`: Modelwright's FreshForge provider can execute
+supported generated-model workflow stages using Modelwright Python APIs and the
+FreshForge serial local runner.
 
 ## Phase 33: FreshForge Provider Pilot For Modelwright Workflows
 
@@ -1149,7 +1149,7 @@ GitHub parent issue: #213
 
 Active branch: `feature/p34-freshforge-executable-provider`.
 
-Status: active.
+Status: complete.
 
 Goal: make Modelwright's FreshForge provider executable for the generated-model workflow while
 keeping normal `import modelwright` FreshForge-free and preserving PyPI-safe package metadata.
@@ -1171,10 +1171,10 @@ keeping normal `import modelwright` FreshForge-free and preserving PyPI-safe pac
   - [x] Update the public FreshForge example workflow artifact declarations.
   - [x] Update FreshForge provider docs and workflow-boundary docs.
   - [x] Record Phase 34 evidence in the roadmap and changelog.
-- [ ] P34.5 Verify, PR, deploy docs, and close phase. Child issue: #218.
+- [x] P34.5 Verify, PR, deploy docs, and close phase. Child issue: #218.
   - [x] Run full local verification.
-  - [ ] Open PR and verify CI/docs.
-  - [ ] Confirm post-merge docs deployment.
+  - [x] Open PR and verify CI/docs.
+  - [x] Confirm post-merge docs deployment.
 
 Acceptance boundary:
 
@@ -1199,6 +1199,12 @@ Verification evidence:
 - `.venv/bin/python scripts/verify_docs_theme.py _build/html` passed.
 - `scripts/check_release_artifacts.sh` passed.
 - `git diff --check` passed.
+
+Closeout evidence:
+
+- Phase 34 PR #219 merged to `main`.
+- PR checks passed for quality, pytest, docs build, and release artifacts.
+- Post-merge docs workflow passed and deployed the updated FreshForge provider docs.
 
 ## Phase 32: FABLE Pyculator Onboarding And Validation Pilot
 
