@@ -1043,6 +1043,10 @@ Release result:
 
 ## Current Next Steps
 
+Phase 34 is active on `feature/p34-freshforge-executable-provider`: make the
+Modelwright FreshForge provider executable for generated-model workflows using
+Modelwright Python APIs and the FreshForge serial local runner.
+
 ## Phase 33: FreshForge Provider Pilot For Modelwright Workflows
 
 GitHub parent issue: #205
@@ -1138,6 +1142,63 @@ Closeout evidence:
 - Post-merge `Test` workflow passed on `main`, including quality, pytest, and release-artifact jobs.
 - Post-merge `docs-pages` workflow passed on `main`, including Sphinx build, Read the Docs theme
   artifact verification, artifact upload, and GitHub Pages deployment.
+
+## Phase 34: Executable FreshForge Provider For Generated-Model Workflows
+
+GitHub parent issue: #213
+
+Active branch: `feature/p34-freshforge-executable-provider`.
+
+Status: active.
+
+Goal: make Modelwright's FreshForge provider executable for the generated-model workflow while
+keeping normal `import modelwright` FreshForge-free and preserving PyPI-safe package metadata.
+
+- [x] P34.1 Update provider execution contract and workflow artifact requirements. Child issue:
+      #214.
+  - [x] Make `model_infer_contract` executable from an explicit workbook path and output refs.
+  - [x] Require concrete artifact paths on executable generation, execution, and evaluation nodes.
+  - [x] Keep FABLE-specific output-ref discovery outside Modelwright.
+- [x] P34.2 Implement executable generated-model nodes with Python APIs. Child issue: #215.
+  - [x] Add `run_node(...)` support to `modelwright.freshforge`.
+  - [x] Use Modelwright Python payload helpers instead of CLI subprocesses.
+  - [x] Write inference, generation, execution, and evaluation JSON artifacts.
+- [x] P34.3 Add synthetic workflow run tests and CLI compatibility checks. Child issue: #216.
+  - [x] Add a FreshForge run test over the synthetic workbook fixture.
+  - [x] Confirm the generated model executes and cached validation passes.
+  - [x] Preserve the normal import boundary that avoids eager FreshForge imports.
+- [x] P34.4 Update docs, roadmap, changelog, and examples. Child issue: #217.
+  - [x] Update the public FreshForge example workflow artifact declarations.
+  - [x] Update FreshForge provider docs and workflow-boundary docs.
+  - [x] Record Phase 34 evidence in the roadmap and changelog.
+- [ ] P34.5 Verify, PR, deploy docs, and close phase. Child issue: #218.
+  - [x] Run full local verification.
+  - [ ] Open PR and verify CI/docs.
+  - [ ] Confirm post-merge docs deployment.
+
+Acceptance boundary:
+
+- May claim Modelwright's FreshForge provider can execute supported generated-model workflow stages
+  through Python APIs.
+- Must not claim FreshForge chooses workbook output refs, executes shell commands, caches stages, or
+  validates arbitrary workbook equivalence.
+- Must keep normal `import modelwright` from importing FreshForge eagerly.
+
+Implementation evidence:
+
+- Updated `modelwright.freshforge` with `run_node(...)` support.
+- Updated `examples/freshforge/generated_model_workflow.yaml` with executable artifact paths.
+- Added synthetic FreshForge run coverage for infer, generate, execute, and validation-evaluate.
+- Updated Sphinx docs for FreshForge planning versus run behavior.
+
+Verification evidence:
+
+- `.venv/bin/python -m ruff check .` passed.
+- `.venv/bin/python -m pytest` passed with 180 tests and 1 skipped benchmark.
+- `.venv/bin/sphinx-build -b html docs _build/html -W` passed.
+- `.venv/bin/python scripts/verify_docs_theme.py _build/html` passed.
+- `scripts/check_release_artifacts.sh` passed.
+- `git diff --check` passed.
 
 ## Phase 32: FABLE Pyculator Onboarding And Validation Pilot
 

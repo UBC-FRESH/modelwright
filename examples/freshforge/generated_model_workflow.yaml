@@ -33,6 +33,7 @@ nodes:
       formula_expressions: formula_expressions
       input_constants: input_constants
     parameters:
+      workbook: examples/synthetic/workbook.xlsx
       module_name: generated_demo_model
     artifacts:
       output_refs: tmp/freshforge-demo/output_refs.json
@@ -51,6 +52,9 @@ nodes:
     outputs:
       generated_model: generated_demo_model
     artifacts:
+      contract: tmp/freshforge-demo/contract.json
+      expressions: tmp/freshforge-demo/expressions.json
+      constants: tmp/freshforge-demo/constants.json
       generated_model: tmp/freshforge-demo/generated_demo_model.py
       generation_result: tmp/freshforge-demo/generation-result.json
   - id: execute_model
@@ -63,6 +67,8 @@ nodes:
     outputs:
       generated_values: generated_values
     artifacts:
+      contract: tmp/freshforge-demo/contract.json
+      generated_model: tmp/freshforge-demo/generated_demo_model.py
       generated_values: tmp/freshforge-demo/generated-values.json
   - id: evaluate_model
     provider: modelwright.validation_evaluate
@@ -76,6 +82,8 @@ nodes:
     parameters:
       scenario: examples/synthetic/baseline_scenario.json
     artifacts:
+      contract: tmp/freshforge-demo/contract.json
+      generated_model: tmp/freshforge-demo/generated_demo_model.py
       scenario: examples/synthetic/baseline_scenario.json
       evaluation_report: tmp/freshforge-demo/evaluation-report.json
   - id: summarize_conversion

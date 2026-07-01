@@ -227,3 +227,14 @@ This file records completed project work in chronological order.
 - Opened Phase 5 PR #40 from `feature/p5-package-api-cli-ci-decisions` back to `main`.
 - Merged Phase 5 PR #40, closed parent issue #24, and activated Phase 6 on `feature/p6-initial-package-validation-core`.
 - Added the initial package and test skeleton with `pyproject.toml`, `src/modelwright`, `tests`, and documented local test commands.
+- Activated Phase 34 on `feature/p34-freshforge-executable-provider` with parent issue #213 and
+  child issues #214 through #218 for executable FreshForge provider contracts, generated-model node
+  execution, synthetic run tests, docs, and closeout.
+- Updated `modelwright.freshforge` so supported generated-model workflow nodes can execute through
+  Modelwright Python APIs when FreshForge's serial local runner is installed, while preserving the
+  normal import boundary and PyPI-safe dependency metadata.
+- Added synthetic FreshForge run coverage proving `model_infer_contract`, `model_generate`,
+  `model_execute`, and `validation_evaluate` can materialize JSON/model artifacts and pass cached
+  validation for the controlled workbook fixture.
+- Verified Phase 34 locally with Ruff, full pytest, warning-clean Sphinx docs, Read the Docs theme
+  verification, release-artifact checks, and `git diff --check`.
