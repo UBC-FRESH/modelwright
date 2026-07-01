@@ -1320,7 +1320,7 @@ docs, planning notes, and optional CI workflows without tracking raw validation 
   - [x] Update the Phase 35/36 downstream planning note.
 - [ ] P36.5 Verify, PR, deploy docs, and close phase. Child issue: #233.
   - [x] Run full local verification.
-  - [ ] Open PR from `feature/p36-compact-validation-evidence` to `main`.
+  - [x] Open PR from `feature/p36-compact-validation-evidence` to `main`.
   - [ ] Merge only after CI passes.
   - [ ] Confirm post-merge Test and Docs Pages workflows pass.
   - [ ] Close Phase 36 child issues and parent #221.
@@ -1357,6 +1357,7 @@ Local verification:
 - `scripts/check_release_artifacts.sh` passed; artifact inspection included `modelwright/evidence.py`,
   and the clean wheel install imported `modelwright 0.1.0a7` and smoke-tested the CLI.
 - `git diff --check` passed.
+- Phase 36 PR #234 is open.
 
 ## Phase 32: FABLE Pyculator Onboarding And Validation Pilot
 
