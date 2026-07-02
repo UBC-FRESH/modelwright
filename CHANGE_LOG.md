@@ -4,6 +4,16 @@ This file records completed project work in chronological order.
 
 ## 2026-07-02
 
+- Activated Phase 38 on `feature/p38-matrix-generated-model-evidence`, created parent issue #243 and
+  child issues #244 through #248, and scoped the phase around generic compact generated-model
+  evidence aggregation for FreshForge matrix runs.
+- Implemented Phase 38 matrix evidence aggregation by adding compact matrix evidence records,
+  extraction/writer helpers, a `modelwright validation matrix-evidence` CLI command, public exports,
+  and validation-evidence documentation while keeping FABLE semantics and raw artifacts out of
+  Modelwright summaries.
+- Verified the Phase 38 implementation locally with Ruff, focused evidence/CLI/API tests, full pytest
+  (`202` passed and `1` skipped benchmark), warning-clean Sphinx docs, Read the Docs theme
+  verification, release artifact checks, and `git diff --check`.
 - Updated the optional FreshForge integration dependency now that FreshForge is published on PyPI:
   `modelwright[freshforge]`, `dev`, and `test` install `freshforge>=0.1.0a5,<0.2` while the core
   Modelwright package remains FreshForge-free.

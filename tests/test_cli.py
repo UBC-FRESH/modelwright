@@ -494,6 +494,73 @@ def test_validation_evidence_uses_custom_artifact_output_and_scenario_paths(tmp_
     assert json.loads((output_dir / "summary.json").read_text(encoding="utf-8"))["evidence_id"] == "synthetic"
 
 
+def test_validation_matrix_evidence_help_is_available() -> None:
+    result = runner.invoke(app, ["validation", "matrix-evidence", "--help"])
+
+    assert result.exit_code == 0
+    assert "Package compact validation evidence for a FreshForge matrix run" in result.stdout
+
+
+def test_validation_matrix_evidence_json_output(tmp_path: Path) -> None:
+    matrix_run = tmp_path / "matrix-run.json"
+    artifact_root = tmp_path / "artifacts"
+    output_dir = tmp_path / "matrix-evidence"
+    case_dir = artifact_root / "strategy" / "output-columns"
+    _write_matrix_run(matrix_run, case_ids=("output-columns",))
+    _write_validation_evidence_artifacts(case_dir, case_dir / "validation-scenario.json")
+
+    result = runner.invoke(
+        app,
+        [
+            "validation",
+            "matrix-evidence",
+            "--evidence-id",
+            "strategy-matrix",
+            "--matrix-run",
+            str(matrix_run),
+            "--artifact-root",
+            str(artifact_root),
+            "--output-dir",
+            str(output_dir),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["ok"] is True
+    assert payload["evidence_status"] == "complete"
+    assert payload["equivalence_status"] == "pass"
+    assert payload["case_count"] == 1
+    assert payload["summary"]["cases"][0]["case_id"] == "output-columns"
+    assert (output_dir / "summary.json").exists()
+    assert (output_dir / "summary.md").exists()
+
+
+def test_validation_matrix_evidence_require_evidence_fails(tmp_path: Path) -> None:
+    matrix_run = tmp_path / "matrix-run.json"
+    _write_matrix_run(matrix_run, case_ids=("output-columns",))
+
+    result = runner.invoke(
+        app,
+        [
+            "validation",
+            "matrix-evidence",
+            "--matrix-run",
+            str(matrix_run),
+            "--artifact-root",
+            str(tmp_path / "missing"),
+            "--require-evidence",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code != 0
+    payload = json.loads(result.stdout)
+    assert payload["ok"] is False
+    assert "missing matrix case evidence" in payload["error"]
+
+
 def test_conversion_plan_command_outputs_plan_json(tmp_path: Path) -> None:
     workbook_path = build_workbook(tmp_path / "synthetic_model.xlsx")
 
@@ -649,5 +716,70 @@ def _write_validation_evidence_artifacts(artifact_dir: Path, scenario_path: Path
             },
             "oracle_validation_report": None,
             "diagnostics": [],
+        },
+    )
+
+
+def _write_matrix_run(path: Path, *, case_ids: tuple[str, ...]) -> None:
+    _write_json(
+        path,
+        {
+            "ok": True,
+            "run": {
+                "matrix_id": "strategy",
+                "status": "success",
+                "cases": [
+                    {
+                        "case_id": case_id,
+                        "namespace": f"strategy/{case_id}",
+                        "run": {
+                            "workflow_id": f"workflow-{case_id}",
+                            "run_namespace": f"strategy/{case_id}",
+                            "status": "success",
+                            "nodes": [],
+                            "diagnostics": [],
+                        },
+                        "summary": {
+                            "workflow_id": f"workflow-{case_id}",
+                            "run_namespace": f"strategy/{case_id}",
+                            "status": "success",
+                            "node_count": 0,
+                            "diagnostic_count": 0,
+                            "error_count": 0,
+                            "warning_count": 0,
+                            "artifact_count": 0,
+                            "nodes": [],
+                        },
+                        "diagnostics": [],
+                    }
+                    for case_id in case_ids
+                ],
+                "diagnostics": [],
+            },
+            "summary": {
+                "matrix_id": "strategy",
+                "status": "success",
+                "case_count": len(case_ids),
+                "succeeded_count": len(case_ids),
+                "failed_count": 0,
+                "skipped_count": 0,
+                "diagnostic_count": 0,
+                "error_count": 0,
+                "warning_count": 0,
+                "cases": [
+                    {
+                        "workflow_id": f"workflow-{case_id}",
+                        "run_namespace": f"strategy/{case_id}",
+                        "status": "success",
+                        "node_count": 0,
+                        "diagnostic_count": 0,
+                        "error_count": 0,
+                        "warning_count": 0,
+                        "artifact_count": 0,
+                        "nodes": [],
+                    }
+                    for case_id in case_ids
+                ],
+            },
         },
     )

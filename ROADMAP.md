@@ -1058,6 +1058,10 @@ Phase 36 is complete on `main`: Modelwright now packages generic compact validat
 summaries for downstream automation without copying raw generated source, generated values,
 workbooks, or full validation reports.
 
+Phase 38 is active on `feature/p38-matrix-generated-model-evidence`: Modelwright will aggregate
+compact generated-model evidence across FreshForge matrix runs so downstream packages can summarize
+repeated validation cases without parsing raw artifacts or encoding domain-specific semantics.
+
 ## Phase 33: FreshForge Provider Pilot For Modelwright Workflows
 
 GitHub parent issue: #205
@@ -1559,3 +1563,51 @@ Verification evidence:
 - PyPI JSON listed `modelwright-0.1.0a7-py3-none-any.whl` and `modelwright-0.1.0a7.tar.gz`.
 - Clean PyPI install verified `modelwright[notebook]==0.1.0a7`, imported `modelwright 0.1.0a7`,
   imported pandas, and ran `modelwright --help`.
+
+## Phase 38: Matrix Generated-Model Evidence Aggregation
+
+GitHub parent issue: #243.
+
+Active branch: `feature/p38-matrix-generated-model-evidence`.
+
+Status: implemented locally; PR pending.
+
+Goal: aggregate compact generated-model evidence across FreshForge matrix runs without rerunning
+FreshForge, Modelwright generation, or validation.
+
+- [x] P38.1 Define matrix evidence aggregation records. Child issue: #244.
+- [x] P38.2 Add aggregation API and compact writers. Child issue: #245.
+- [x] P38.3 Add CLI command for matrix evidence packaging. Child issue: #246.
+- [x] P38.4 Update docs, examples, and tests. Child issue: #247.
+- [ ] P38.5 Verify, PR, deploy docs, and close phase. Child issue: #248.
+
+Dependency note: this phase follows FreshForge `v0.1.0a5` and Modelwright Phase 36. It provides the
+generic matrix evidence backend that FABLE Pyculator Phase 25 should consume.
+
+Acceptance boundary:
+
+- May summarize matrix-level generated-model validation evidence from compact FreshForge/Modelwright
+  artifacts.
+- Must not run FreshForge matrices, generate models, validate workbooks, or infer domain semantics.
+- Must not copy raw generated source, raw generated values, source workbooks, or full validation
+  reports into compact summaries.
+
+Implementation evidence:
+
+- Added `MatrixEvidencePaths`, `MatrixEvidenceCaseSummary`, and `MatrixEvidenceSummary`.
+- Added matrix evidence extraction and writers that read FreshForge matrix JSON and optional per-case
+  generated-model artifacts or compact validation summaries.
+- Added `modelwright validation matrix-evidence` with matrix run/summary input, artifact root,
+  output directory, required-evidence, and JSON options.
+- Updated validation-evidence docs, CLI reference, public exports, and tests.
+
+Local verification:
+
+- `.venv/bin/python -m ruff check .` passed.
+- `.venv/bin/python -m pytest tests/test_evidence.py tests/test_cli.py tests/test_public_api.py -q`
+  passed with 35 tests.
+- `.venv/bin/python -m pytest` passed with 202 tests and 1 skipped benchmark.
+- `.venv/bin/sphinx-build -q -b html docs _build/html -W` passed.
+- `.venv/bin/python scripts/verify_docs_theme.py _build/html` passed.
+- `scripts/check_release_artifacts.sh` passed.
+- `git diff --check` passed.
