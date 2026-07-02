@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 MODELWRIGHT_PROVIDER_ID = "modelwright"
-MODELWRIGHT_PROVIDER_VERSION = "0.1.0a7"
+MODELWRIGHT_PROVIDER_VERSION = "0.1.0a8"
 
 
 @dataclass(frozen=True)

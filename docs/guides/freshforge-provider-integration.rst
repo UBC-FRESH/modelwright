@@ -25,7 +25,7 @@ and then install FreshForge into the same environment:
 .. code-block:: bash
 
    python -m pip install -e .[dev]
-   python -m pip install "freshforge @ git+https://github.com/UBC-FRESH/freshforge.git@v0.1.0a2"
+   python -m pip install "freshforge @ git+https://github.com/UBC-FRESH/freshforge.git@v0.1.0a3"
 
 Modelwright registers a ``freshforge.providers`` entry point, but it does not
 add a GitHub direct-reference dependency in ``pyproject.toml``. This keeps

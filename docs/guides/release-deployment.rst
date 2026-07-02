@@ -8,18 +8,21 @@ all been checked.
 Current Alpha Target
 --------------------
 
-The current alpha target is ``0.1.0a7`` with Git tag ``v0.1.0a7``.
+The current alpha target is ``0.1.0a8`` with Git tag ``v0.1.0a8``.
 
 The alpha may claim full comparable-output validation for the 2020 FABLE Calculator benchmark:
 281,741 comparable cached workbook outputs, 281,741 matches, and zero mismatches. It may also claim
 the measured Phase 27 generated-runtime and generated-source-size improvements recorded in
 ``planning/phase-27-performance-memory-hardening.md`` and the initial ``modelwright.wrappers``
-facade helpers for building analyst-facing wrappers around generated models. The ``0.1.0a7`` alpha
+facade helpers for building analyst-facing wrappers around generated models. The ``0.1.0a8`` alpha
 may additionally claim optional pandas-backed notebook helpers, a tracked Examples Gallery with
 synthetic and compressed generated 2020 FABLE model examples, real literate `.ipynb` notebooks with
 stored outputs, selected-output generated-model artifact materialization through
 ``modelwright model infer-contract``, and a FreshForge provider that can validate, plan, and execute
-supported generated-model workflow stages when FreshForge is installed separately. It must not claim
+supported generated-model workflow stages when FreshForge is installed separately. It may also claim
+compact machine-readable FreshForge provider stage summaries, improved provider diagnostics,
+namespace-aware FreshForge integration, and generic compact validation-evidence extraction through
+``modelwright.evidence`` and ``modelwright validation evidence``. It must not claim
 full-workbook conversion, automatic workbook output-universe selection, a full spreadsheet UI,
 Excel-backed recalculation equivalence, compact runtime IR production readiness, or stable public API
 compatibility.
@@ -79,7 +82,7 @@ After TestPyPI publication, install the package from TestPyPI in a clean environ
 
 .. code-block:: bash
 
-   python -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ modelwright==0.1.0a7
+   python -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ modelwright==0.1.0a8
    python -c "import modelwright; print(modelwright.__version__)"
    modelwright --help
 
@@ -93,7 +96,7 @@ Expected sequence:
 1. Confirm ``CHANGE_LOG.md`` and release notes describe the actual alpha boundary.
 2. Confirm local and CI release artifact checks pass.
 3. Confirm TestPyPI rehearsal passes or document the exact blocker.
-4. Create the annotated tag, for example ``v0.1.0a7``.
+4. Create the annotated tag, for example ``v0.1.0a8``.
 5. Run the ``Release`` workflow or push the tag, then approve the protected PyPI environment.
 6. Verify the package page, wheel install, import, CLI help, docs deployment, and GitHub release notes.
 
@@ -106,7 +109,7 @@ Use one of these responses:
 
 - yank the broken release on PyPI if installation should be discouraged but historical availability is
   still useful;
-- publish a new alpha such as ``0.1.0a7`` after fixing the issue;
+- publish a new alpha such as ``0.1.0a9`` after fixing the issue;
 - update release notes and roadmap entries with the failure mode and mitigation.
 
 Private Data Rules

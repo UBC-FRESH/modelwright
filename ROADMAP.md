@@ -1365,6 +1365,54 @@ Local verification:
 - Live docs smoke check verified
   `https://ubc-fresh.github.io/modelwright/guides/validation-evidence.html`.
 
+## Phase 37: v0.1.0a8 Generated-Model Evidence Workflow Alpha Release
+
+GitHub parent issue: #235
+
+Active branch: `feature/v0.1.0a8-release`.
+
+Status: active.
+
+Goal: publish `modelwright==0.1.0a8` to GitHub and PyPI as the generated-model evidence workflow
+alpha release.
+
+- [x] P37.1 Bump Modelwright version and release metadata. Child issue: #236.
+  - [x] Bump package and import metadata to `0.1.0a8`.
+  - [x] Update provider metadata version and version tests.
+- [x] P37.2 Update Modelwright release docs and FreshForge guidance. Child issue: #237.
+  - [x] Update release deployment docs for the `0.1.0a8` alpha boundary.
+  - [x] Update FreshForge guidance to `v0.1.0a3`.
+- [x] P37.3 Verify Modelwright release artifacts and smoke tests. Child issue: #238.
+  - [x] Run local quality, tests, docs, docs theme, and release artifact checks.
+  - [x] Smoke-test CLI and evidence commands.
+- [ ] P37.4 Tag, publish PyPI/GitHub release, and close phase. Child issue: #239.
+  - [ ] Open and merge release PR after CI passes.
+  - [ ] Create annotated tag `v0.1.0a8`.
+  - [ ] Publish to PyPI through trusted publishing.
+  - [ ] Create GitHub prerelease and verify clean PyPI install.
+
+Acceptance boundary:
+
+- May claim generated-model FreshForge provider stage summaries, improved provider diagnostics,
+  namespace-aware FreshForge integration, and generic compact validation-evidence extraction.
+- Must not claim FABLE-specific output discovery, arbitrary full-workbook conversion, production
+  readiness, or stable public API compatibility.
+
+Local verification:
+
+- `.venv/bin/python -m ruff check .` passed.
+- `.venv/bin/python -m pytest` passed with 195 tests and 1 skipped benchmark.
+- `.venv/bin/sphinx-build -b html docs _build/html -W` passed.
+- `.venv/bin/python scripts/verify_docs_theme.py _build/html` passed.
+- `scripts/check_release_artifacts.sh` passed; the clean wheel install imported
+  `modelwright 0.1.0a8` and smoke-tested the CLI.
+- `.venv/bin/modelwright --help` passed.
+- `.venv/bin/modelwright model infer-contract --help` passed.
+- `.venv/bin/modelwright validation evidence --help` passed.
+- After installing FreshForge `v0.1.0a3`, `.venv/bin/freshforge providers --json` reported the
+  Modelwright provider version as `0.1.0a8`.
+- `git diff --check` passed.
+
 ## Phase 32: FABLE Pyculator Onboarding And Validation Pilot
 
 GitHub parent issue: #191

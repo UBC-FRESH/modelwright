@@ -4,6 +4,16 @@ This file records completed project work in chronological order.
 
 ## 2026-06-22
 
+- Activated Phase 37 on `feature/v0.1.0a8-release`, created parent issue #235 and child issues #236
+  through #239, and scoped the release around publishing the generated-model evidence workflow alpha
+  after FreshForge `v0.1.0a3`.
+- Prepared the `0.1.0a8` release candidate by bumping package/import metadata, provider metadata
+  version, version tests, release docs, README alpha line, and FreshForge installation guidance.
+- Verified the `0.1.0a8` release candidate locally with Ruff, `195` passing pytest tests and `1`
+  skipped benchmark, warning-clean Sphinx docs, Read the Docs theme verification, release artifact
+  checks, CLI help, `modelwright model infer-contract --help`, `modelwright validation evidence
+  --help`, and FreshForge provider discovery showing Modelwright provider version `0.1.0a8` with
+  FreshForge `v0.1.0a3` installed.
 - Activated Phase 36 on `feature/p36-compact-validation-evidence`, created child issues #231, #232,
   #229, #230, and #233 under parent issue #221, and scoped the phase around generic compact
   validation-evidence extraction for downstream automation without FABLE-specific path conventions
