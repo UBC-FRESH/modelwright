@@ -13,8 +13,11 @@ from typer.main import get_command
 from modelwright.conversion import BenchmarkRole, build_conversion_plan
 from modelwright.evaluation import evaluate_generated_model
 from modelwright.evidence import (
+    extract_matrix_evidence,
     extract_validation_evidence,
+    matrix_evidence_paths,
     validation_evidence_paths,
+    write_matrix_evidence,
     write_validation_evidence,
 )
 from modelwright.execution import execute_generated_model
@@ -396,6 +399,83 @@ def validation_evidence(
         typer.echo(f"Missing artifacts: {len(missing)}")
 
 
+@validation_app.command("matrix-evidence")
+def validation_matrix_evidence(
+    evidence_id: str = typer.Option(
+        "generated-model-matrix",
+        "--evidence-id",
+        help="Stable identifier for this compact matrix evidence package.",
+    ),
+    matrix_run: Path | None = typer.Option(
+        None,
+        "--matrix-run",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="FreshForge matrix run JSON, such as output from freshforge matrix run --json.",
+    ),
+    matrix_summary: Path | None = typer.Option(
+        None,
+        "--matrix-summary",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="FreshForge matrix summary JSON.",
+    ),
+    artifact_root: Path | None = typer.Option(
+        None,
+        "--artifact-root",
+        help="Optional root containing per-case generated-model artifacts or compact summaries.",
+    ),
+    output_dir: Path | None = typer.Option(
+        None,
+        "--output-dir",
+        help="Directory where compact matrix summary.json and summary.md should be written.",
+    ),
+    require_evidence: bool = typer.Option(
+        False,
+        "--require-evidence",
+        help="Fail when a matrix case lacks generated-model evidence.",
+    ),
+    json_output: bool = typer.Option(
+        False,
+        "--json",
+        help="Emit command result as JSON.",
+    ),
+) -> None:
+    """Package compact validation evidence for a FreshForge matrix run."""
+
+    try:
+        payload = _matrix_evidence_payload(
+            evidence_id=evidence_id,
+            matrix_run=matrix_run,
+            matrix_summary=matrix_summary,
+            artifact_root=artifact_root,
+            output_dir=output_dir,
+            require_evidence=require_evidence,
+        )
+    except (FileNotFoundError, ValueError) as error:
+        error_payload: dict[str, JsonValue] = {"ok": False, "error": str(error)}
+        if json_output:
+            _emit_json(error_payload)
+            raise typer.Exit(1) from error
+        raise typer.BadParameter(str(error)) from error
+
+    if json_output:
+        _emit_json(payload)
+        return
+
+    summary = cast(dict[str, JsonValue], payload["summary"])
+    typer.echo("Modelwright matrix validation evidence")
+    typer.echo(f"Evidence status: {summary['evidence_status']}")
+    typer.echo(f"Equivalence status: {summary['equivalence_status']}")
+    typer.echo(f"Cases: {summary['case_count']}")
+    typer.echo(f"Passing cases: {summary['pass_count']}")
+    typer.echo(f"Failing cases: {summary['fail_count']}")
+    typer.echo(f"Summary JSON: {payload['summary_json_path']}")
+    typer.echo(f"Summary Markdown: {payload['summary_markdown_path']}")
+
+
 @conversion_app.command("plan")
 def conversion_plan(
     workbook: Path = typer.Argument(..., exists=True, dir_okay=False, readable=True, help="Source workbook path."),
@@ -620,6 +700,38 @@ def _validation_evidence_payload(
         "summary_markdown_path": written["summary_markdown_path"],
         "missing_artifacts": list(summary.missing_artifacts),
         "comparison": summary.comparison,
+        "summary": summary.to_dict(),
+    }
+
+
+def _matrix_evidence_payload(
+    *,
+    evidence_id: str,
+    matrix_run: Path | None,
+    matrix_summary: Path | None,
+    artifact_root: Path | None,
+    output_dir: Path | None,
+    require_evidence: bool,
+) -> dict[str, JsonValue]:
+    paths = matrix_evidence_paths(
+        evidence_id=evidence_id,
+        matrix_run_path=matrix_run,
+        matrix_summary_path=matrix_summary,
+        artifact_root=artifact_root,
+        output_dir=output_dir,
+    )
+    summary = extract_matrix_evidence(paths, require_evidence=require_evidence)
+    written = write_matrix_evidence(summary, paths)
+    return {
+        "ok": True,
+        "evidence_id": summary.evidence_id,
+        "evidence_status": summary.evidence_status,
+        "equivalence_status": summary.equivalence_status,
+        "summary_json_path": written["summary_json_path"],
+        "summary_markdown_path": written["summary_markdown_path"],
+        "case_count": summary.case_count,
+        "pass_count": summary.pass_count,
+        "fail_count": summary.fail_count,
         "summary": summary.to_dict(),
     }
 

@@ -81,6 +81,13 @@ Validation Commands
      --output-dir tmp/validation-evidence/generated-model \
      --json
 
+   modelwright validation matrix-evidence \
+     --evidence-id generated-model-matrix \
+     --matrix-run tmp/matrix-run.json \
+     --artifact-root tmp/generated-model-matrix \
+     --output-dir tmp/validation-evidence/generated-model-matrix \
+     --json
+
 The evaluation command executes the generated Python model, then builds cached-workbook and/or
 oracle-backed validation reports when those inputs are supplied. Verbose progress is written to stderr so
 stdout remains valid JSON for redirected reports.
@@ -90,6 +97,10 @@ generated-model workflow artifacts. It is extraction-only: it does not rerun gen
 validation. Missing artifacts are reported as ``skipped`` by default; use ``--require-artifacts`` to
 make missing evidence fail. See :doc:`../guides/validation-evidence` for the conservative
 ``evidence_status`` and ``equivalence_status`` rules.
+
+The matrix-evidence command aggregates compact generated-model evidence across an existing
+FreshForge matrix run or matrix summary. It does not run the matrix; it only reads saved matrix JSON
+and optional per-case generated-model artifacts or compact evidence summaries.
 
 Conversion Commands
 -------------------

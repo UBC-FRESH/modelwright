@@ -55,6 +55,43 @@ the command should fail instead:
      --artifact-dir tmp/generated-model \
      --require-artifacts
 
+Matrix Evidence
+---------------
+
+FreshForge matrix runs can produce one generated-model workflow per case. Modelwright can aggregate
+those saved matrix records into a compact matrix-level evidence package:
+
+.. code-block:: bash
+
+   modelwright validation matrix-evidence \
+     --evidence-id generated-model-matrix \
+     --matrix-run tmp/matrix-run.json \
+     --artifact-root tmp/generated-model-matrix \
+     --output-dir tmp/validation-evidence/generated-model-matrix \
+     --json
+
+The matrix command is also extraction-only. It does not run FreshForge, generate models, execute
+generated code, or validate workbooks. It reads a saved FreshForge matrix run or matrix summary and
+then looks for per-case generated-model artifacts under ``--artifact-root``. For each case,
+Modelwright checks ``<artifact-root>/<case-id>`` and then ``<artifact-root>/<namespace>`` when the
+FreshForge namespace is relative.
+
+The output is again compact:
+
+- matrix-level ``summary.json`` and ``summary.md``;
+- one sanitized row per matrix case;
+- evidence/equivalence status per case;
+- comparable, match, and mismatch counts when available.
+
+Use ``--require-evidence`` when every matrix case must have generated-model evidence:
+
+.. code-block:: bash
+
+   modelwright validation matrix-evidence \
+     --matrix-summary tmp/matrix-summary.json \
+     --artifact-root tmp/generated-model-matrix \
+     --require-evidence
+
 Status Rules
 ------------
 
@@ -79,8 +116,11 @@ Python API
 .. code-block:: python
 
    from modelwright import (
+       extract_matrix_evidence,
        extract_validation_evidence,
+       matrix_evidence_paths,
        validation_evidence_paths,
+       write_matrix_evidence,
        write_validation_evidence,
    )
 
@@ -91,6 +131,15 @@ Python API
    )
    summary = extract_validation_evidence(paths)
    write_validation_evidence(summary, paths)
+
+   matrix_paths = matrix_evidence_paths(
+       evidence_id="strategy-matrix",
+       matrix_run_path="tmp/matrix-run.json",
+       artifact_root="tmp/generated-model-matrix",
+       output_dir="tmp/validation-evidence/strategy-matrix",
+   )
+   matrix_summary = extract_matrix_evidence(matrix_paths)
+   write_matrix_evidence(matrix_summary, matrix_paths)
 
 Boundary
 --------

@@ -19,6 +19,12 @@ def test_root_facade_exports_primary_entrypoints() -> None:
     assert "write_validation_evidence" in modelwright.__all__
     assert "ValidationEvidencePaths" in modelwright.__all__
     assert "ValidationEvidenceSummary" in modelwright.__all__
+    assert "matrix_evidence_paths" in modelwright.__all__
+    assert "extract_matrix_evidence" in modelwright.__all__
+    assert "write_matrix_evidence" in modelwright.__all__
+    assert "MatrixEvidencePaths" in modelwright.__all__
+    assert "MatrixEvidenceSummary" in modelwright.__all__
+    assert "MatrixEvidenceCaseSummary" in modelwright.__all__
     assert "infer_generated_module_contract" in modelwright.__all__
     assert "GeneratedContractInferenceResult" in modelwright.__all__
     assert "ModelFacade" in modelwright.__all__

@@ -20,10 +20,16 @@ from modelwright.evaluation import (
     evaluate_generated_model,
 )
 from modelwright.evidence import (
+    MatrixEvidenceCaseSummary,
+    MatrixEvidencePaths,
+    MatrixEvidenceSummary,
     ValidationEvidencePaths,
     ValidationEvidenceSummary,
+    extract_matrix_evidence,
     extract_validation_evidence,
+    matrix_evidence_paths,
     validation_evidence_paths,
+    write_matrix_evidence,
     write_validation_evidence,
 )
 from modelwright.conversion import (
@@ -141,6 +147,9 @@ __all__ = [
     "GenerationDiagnostic",
     "GenerationResult",
     "MISSING_VALUE",
+    "MatrixEvidenceCaseSummary",
+    "MatrixEvidencePaths",
+    "MatrixEvidenceSummary",
     "ModelFacade",
     "NamedRangeRecord",
     "NotebookDependencyError",
@@ -184,9 +193,11 @@ __all__ = [
     "evaluate_generated_model",
     "extract_validation_evidence",
     "extract_workbook",
+    "extract_matrix_evidence",
     "generate_python_module",
     "infer_generated_module_contract",
     "inputs_frame",
+    "matrix_evidence_paths",
     "load_validation_scenario",
     "normalize_cell_reference",
     "normalize_reference",
@@ -199,4 +210,5 @@ __all__ = [
     "translate_formula_cell",
     "validation_evidence_paths",
     "write_validation_evidence",
+    "write_matrix_evidence",
 ]
