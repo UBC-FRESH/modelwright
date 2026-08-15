@@ -50,6 +50,10 @@ This file records completed project work in chronological order.
 - Added regression tests for Excel-faithful arithmetic errors, numeric-string coercion in
   arithmetic and comparisons, `LN`/`VALUE` error strings, `INDEX` over range views, and SUM error
   propagation/text-skipping. Full test run: 217 passed, 1 skipped.
+- Pinned `ruff>=0.8,<0.16` in the `quality` and `dev` extras so CI no longer picks up ruff 0.16's new
+  rules (which flag 139 pre-existing violations repo-wide) and the quality job stays deterministic.
+- Closed out via PR #250 (merged as `ec1c5d0`): feature branch `feature/2024-fable-runtime-validation`,
+  post-merge Test and docs-pages workflows passed, branch deleted.
 
 ## 2026-07-02
 
