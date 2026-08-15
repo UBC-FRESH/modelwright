@@ -1062,6 +1062,32 @@ Phase 38 is active on `feature/p38-matrix-generated-model-evidence`: Modelwright
 compact generated-model evidence across FreshForge matrix runs so downstream packages can summarize
 repeated validation cases without parsing raw artifacts or encoding domain-specific semantics.
 
+## Phase 39: v0.1.0a9 2024 FABLE Runtime-Hardening Alpha Release
+
+GitHub parent issue: (release tracked in this roadmap section)
+
+Release branch: `feature/v0.1.0a9-release`.
+
+Status: complete after PR merge, tag `v0.1.0a9`, PyPI publication, GitHub prerelease, and clean PyPI
+install smoke tests.
+
+Goal: publish `modelwright==0.1.0a9` to GitHub and PyPI as the 2024 FABLE runtime-hardening alpha
+release.
+
+- [x] P39.1 Bump package and import metadata to `0.1.0a9`.
+- [x] P39.2 Update release deployment docs for the `0.1.0a9` alpha boundary.
+- [x] P39.3 Run local quality, tests, docs, docs theme, and release artifact checks.
+- [x] P39.4 Tag, publish PyPI/GitHub release, and close phase.
+
+Acceptance boundary:
+
+- May claim the 2024 FABLE Calculator runtime-hardening evidence recorded in `CHANGE_LOG.md`
+  (2026-08-15): static `INDIRECT(ADDRESS(ROW(), COLUMN()))` resolution, corrupted
+  structured-reference repair, Excel-faithful generated-runtime error semantics, and full 2024
+  workbook conversion + execution of all 10,274 declared outputs with zero runtime errors.
+- Must not claim full-workbook equivalence across arbitrary workbooks, automatic output-universe
+  selection, production readiness, or stable public API compatibility.
+
 ## Phase 33: FreshForge Provider Pilot For Modelwright Workflows
 
 GitHub parent issue: #205

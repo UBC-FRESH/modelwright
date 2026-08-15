@@ -54,6 +54,8 @@ This file records completed project work in chronological order.
   rules (which flag 139 pre-existing violations repo-wide) and the quality job stays deterministic.
 - Closed out via PR #250 (merged as `ec1c5d0`): feature branch `feature/2024-fable-runtime-validation`,
   post-merge Test and docs-pages workflows passed, branch deleted.
+- Published `modelwright==0.1.0a9` (tag `v0.1.0a9`) as the 2024 FABLE runtime-hardening alpha
+  release via PR and the gated release workflow; clean PyPI install verified.
 
 ## 2026-07-02
 

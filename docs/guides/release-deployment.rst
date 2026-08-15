@@ -8,7 +8,7 @@ all been checked.
 Current Alpha Target
 --------------------
 
-The current alpha target is ``0.1.0a8`` with Git tag ``v0.1.0a8``.
+The current alpha target is ``0.1.0a9`` with Git tag ``v0.1.0a9``.
 
 The alpha may claim full comparable-output validation for the 2020 FABLE Calculator benchmark:
 281,741 comparable cached workbook outputs, 281,741 matches, and zero mismatches. It may also claim
@@ -22,7 +22,11 @@ stored outputs, selected-output generated-model artifact materialization through
 supported generated-model workflow stages when FreshForge is installed separately. It may also claim
 compact machine-readable FreshForge provider stage summaries, improved provider diagnostics,
 namespace-aware FreshForge integration, and generic compact validation-evidence extraction through
-``modelwright.evidence`` and ``modelwright validation evidence``. It must not claim
+``modelwright.evidence`` and ``modelwright validation evidence``. The ``0.1.0a9`` alpha may claim
+the 2024 FABLE Calculator runtime hardening recorded in ``CHANGE_LOG.md`` (2026-08-15): static
+``INDIRECT(ADDRESS(ROW(), COLUMN()))`` resolution, corrupted structured-reference repair, and
+Excel-faithful generated-runtime error semantics that let the full 2024 workbook convert and execute
+all 10,274 declared outputs with zero runtime errors. It must not claim
 full-workbook conversion, automatic workbook output-universe selection, a full spreadsheet UI,
 Excel-backed recalculation equivalence, compact runtime IR production readiness, or stable public API
 compatibility.
@@ -82,7 +86,7 @@ After TestPyPI publication, install the package from TestPyPI in a clean environ
 
 .. code-block:: bash
 
-   python -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ modelwright==0.1.0a8
+   python -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ modelwright==0.1.0a9
    python -c "import modelwright; print(modelwright.__version__)"
    modelwright --help
 
@@ -96,7 +100,7 @@ Expected sequence:
 1. Confirm ``CHANGE_LOG.md`` and release notes describe the actual alpha boundary.
 2. Confirm local and CI release artifact checks pass.
 3. Confirm TestPyPI rehearsal passes or document the exact blocker.
-4. Create the annotated tag, for example ``v0.1.0a8``.
+4. Create the annotated tag, for example ``v0.1.0a9``.
 5. Run the ``Release`` workflow or push the tag, then approve the protected PyPI environment.
 6. Verify the package page, wheel install, import, CLI help, docs deployment, and GitHub release notes.
 
