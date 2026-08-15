@@ -47,7 +47,7 @@ def test_provider_metadata_serializes_deterministically() -> None:
 
     assert metadata.to_dict() == {
         "id": "modelwright",
-        "version": "0.1.0a8",
+        "version": "0.1.0a9",
         "node_types": [
             {
                 "id": "workbook_extract",
