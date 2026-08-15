@@ -1434,3 +1434,303 @@ def test_generate_python_module_reuses_range_views_without_changing_results(tmp_
     assert "def values(self):" in result.source_code
     assert "def lazy_values(self):" in result.source_code
     assert module.calculate() == {"Calc!C1": 2, "Calc!C2": 5, "Calc!C3": 1}
+
+
+def test_generate_python_module_returns_excel_error_strings_for_invalid_arithmetic(tmp_path: Path) -> None:
+    contract = GeneratedModuleContract(
+        workbook_id="arithmetic-errors.xlsx",
+        module_name="arithmetic_errors",
+        input_refs=(),
+        output_refs=("Calc!B1", "Calc!B2", "Calc!B3", "Calc!B4", "Calc!B5"),
+        symbols=(
+            GeneratedSymbol(cell_ref="Calc!B1", symbol_name="calc_b1", kind="output", raw_formula="=1/0"),
+            GeneratedSymbol(cell_ref="Calc!B2", symbol_name="calc_b2", kind="output", raw_formula='="abc"+1'),
+            GeneratedSymbol(cell_ref="Calc!B3", symbol_name="calc_b3", kind="output", raw_formula="=7/0"),
+            GeneratedSymbol(cell_ref="Calc!B4", symbol_name="calc_b4", kind="output", raw_formula="=0^0.5"),
+            GeneratedSymbol(cell_ref="Calc!B5", symbol_name="calc_b5", kind="output", raw_formula="=1.5+1"),
+        ),
+    )
+    expressions = {
+        "Calc!B1": formula_expression(
+            "Calc!B1",
+            "=1/0",
+            FormulaExpressionNode.binary("/", FormulaExpressionNode.literal(1), FormulaExpressionNode.literal(0)),
+        ),
+        "Calc!B2": formula_expression(
+            "Calc!B2",
+            '="abc"+1',
+            FormulaExpressionNode.binary("+", FormulaExpressionNode.literal("abc"), FormulaExpressionNode.literal(1)),
+        ),
+        "Calc!B3": formula_expression(
+            "Calc!B3",
+            "=7/0",
+            FormulaExpressionNode.binary("/", FormulaExpressionNode.literal(7), FormulaExpressionNode.literal(0)),
+        ),
+        "Calc!B4": formula_expression(
+            "Calc!B4",
+            "=0^0.5",
+            FormulaExpressionNode.binary("^", FormulaExpressionNode.literal(0), FormulaExpressionNode.literal(0.5)),
+        ),
+        "Calc!B5": formula_expression(
+            "Calc!B5",
+            "=1.5+1",
+            FormulaExpressionNode.binary("+", FormulaExpressionNode.literal(1.5), FormulaExpressionNode.literal(1)),
+        ),
+    }
+    output_path = tmp_path / "generated_arithmetic_errors.py"
+
+    result = generate_python_module(
+        contract=contract,
+        expressions=expressions,
+        constants={},
+        output_path=output_path,
+    )
+    module = load_module(output_path)
+
+    assert result.generated is True
+    assert module.calculate() == {
+        "Calc!B1": "#DIV/0!",
+        "Calc!B2": "#VALUE!",
+        "Calc!B3": "#DIV/0!",
+        "Calc!B4": 0,
+        "Calc!B5": 2.5,
+    }
+
+
+def test_generate_python_module_coerces_numeric_strings_in_arithmetic_and_comparisons(tmp_path: Path) -> None:
+    contract = GeneratedModuleContract(
+        workbook_id="numeric-string-coercion.xlsx",
+        module_name="numeric_string_coercion",
+        input_refs=("Data!A1", "Data!A2"),
+        output_refs=("Calc!B1", "Calc!B2"),
+        symbols=(
+            GeneratedSymbol(cell_ref="Data!A1", symbol_name="data_a1", kind="input"),
+            GeneratedSymbol(cell_ref="Data!A2", symbol_name="data_a2", kind="input"),
+            GeneratedSymbol(cell_ref="Calc!B1", symbol_name="calc_b1", kind="output", raw_formula="=Data!A1<=2015"),
+            GeneratedSymbol(cell_ref="Calc!B2", symbol_name="calc_b2", kind="output", raw_formula="=Data!A2*2"),
+        ),
+    )
+    expressions = {
+        "Calc!B1": formula_expression(
+            "Calc!B1",
+            "=Data!A1<=2015",
+            FormulaExpressionNode.comparison(
+                "<=",
+                FormulaExpressionNode.reference_to(normalize_reference("Data!A1")),
+                FormulaExpressionNode.literal(2015),
+            ),
+        ),
+        "Calc!B2": formula_expression(
+            "Calc!B2",
+            "=Data!A2*2",
+            FormulaExpressionNode.binary(
+                "*",
+                FormulaExpressionNode.reference_to(normalize_reference("Data!A2")),
+                FormulaExpressionNode.literal(2),
+            ),
+        ),
+    }
+    output_path = tmp_path / "generated_numeric_string_coercion.py"
+
+    result = generate_python_module(
+        contract=contract,
+        expressions=expressions,
+        constants={},
+        output_path=output_path,
+    )
+    module = load_module(output_path)
+
+    assert result.generated is True
+    assert "_sf_compare(" in result.source_code
+    assert module.calculate(inputs={"Data!A1": "2015", "Data!A2": "2.5"}) == {
+        "Calc!B1": True,
+        "Calc!B2": 5.0,
+    }
+
+
+def test_generate_python_module_ln_and_value_return_error_strings(tmp_path: Path) -> None:
+    contract = GeneratedModuleContract(
+        workbook_id="math-error-strings.xlsx",
+        module_name="math_error_strings",
+        input_refs=("Data!A1", "Data!A2"),
+        output_refs=("Calc!B1", "Calc!B2", "Calc!B3"),
+        symbols=(
+            GeneratedSymbol(cell_ref="Data!A1", symbol_name="data_a1", kind="input"),
+            GeneratedSymbol(cell_ref="Data!A2", symbol_name="data_a2", kind="input"),
+            GeneratedSymbol(cell_ref="Calc!B1", symbol_name="calc_b1", kind="output", raw_formula="=LN(Data!A1)"),
+            GeneratedSymbol(cell_ref="Calc!B2", symbol_name="calc_b2", kind="output", raw_formula="=LN(Data!A2)"),
+            GeneratedSymbol(cell_ref="Calc!B3", symbol_name="calc_b3", kind="output", raw_formula='=VALUE("12,5")'),
+        ),
+    )
+    expressions = {
+        "Calc!B1": formula_expression(
+            "Calc!B1",
+            "=LN(Data!A1)",
+            FormulaExpressionNode.function_call(
+                "LN",
+                (FormulaExpressionNode.reference_to(normalize_reference("Data!A1")),),
+            ),
+        ),
+        "Calc!B2": formula_expression(
+            "Calc!B2",
+            "=LN(Data!A2)",
+            FormulaExpressionNode.function_call(
+                "LN",
+                (FormulaExpressionNode.reference_to(normalize_reference("Data!A2")),),
+            ),
+        ),
+        "Calc!B3": formula_expression(
+            "Calc!B3",
+            '=VALUE("12,5")',
+            FormulaExpressionNode.function_call("VALUE", (FormulaExpressionNode.literal("12,5"),)),
+        ),
+    }
+    output_path = tmp_path / "generated_math_error_strings.py"
+
+    result = generate_python_module(
+        contract=contract,
+        expressions=expressions,
+        constants={},
+        output_path=output_path,
+    )
+    module = load_module(output_path)
+
+    assert result.generated is True
+    assert module.calculate(inputs={"Data!A1": 0, "Data!A2": "4"}) == {
+        "Calc!B1": "#NUM!",
+        "Calc!B2": 1.3862943611198906,
+        "Calc!B3": 12.5,
+    }
+
+
+def test_generate_python_module_index_resolves_range_views(tmp_path: Path) -> None:
+    contract = GeneratedModuleContract(
+        workbook_id="index-ranges.xlsx",
+        module_name="index_ranges",
+        output_refs=("Calc!C1", "Calc!C2", "Calc!C3", "Calc!C4"),
+        symbols=(
+            GeneratedSymbol(cell_ref="Data!A1", symbol_name="data_a1", kind="input"),
+            GeneratedSymbol(cell_ref="Data!A2", symbol_name="data_a2", kind="input"),
+            GeneratedSymbol(cell_ref="Data!A3", symbol_name="data_a3", kind="input"),
+            GeneratedSymbol(cell_ref="Data!A4", symbol_name="data_a4", kind="input"),
+            GeneratedSymbol(cell_ref="Data!B1", symbol_name="data_b1", kind="input"),
+            GeneratedSymbol(cell_ref="Data!B2", symbol_name="data_b2", kind="input"),
+            GeneratedSymbol(cell_ref="Calc!C1", symbol_name="calc_c1", kind="output", raw_formula="=INDEX(Data!A1:A4,3)"),
+            GeneratedSymbol(cell_ref="Calc!C2", symbol_name="calc_c2", kind="output", raw_formula="=INDEX(Data!A1:B2,2,1)"),
+            GeneratedSymbol(cell_ref="Calc!C3", symbol_name="calc_c3", kind="output", raw_formula="=INDEX(Data!A1:A4,9)"),
+            GeneratedSymbol(cell_ref="Calc!C4", symbol_name="calc_c4", kind="output", raw_formula="=INDEX(Data!A1:A4,2)"),
+        ),
+    )
+    single_column = normalize_reference("Data!A1:A4")
+    two_column = normalize_reference("Data!A1:B2")
+    expressions = {
+        "Calc!C1": formula_expression(
+            "Calc!C1",
+            "=INDEX(Data!A1:A4,3)",
+            FormulaExpressionNode.function_call(
+                "INDEX",
+                (FormulaExpressionNode.reference_to(single_column), FormulaExpressionNode.literal(3)),
+            ),
+        ),
+        "Calc!C2": formula_expression(
+            "Calc!C2",
+            "=INDEX(Data!A1:B2,2,1)",
+            FormulaExpressionNode.function_call(
+                "INDEX",
+                (
+                    FormulaExpressionNode.reference_to(two_column),
+                    FormulaExpressionNode.literal(2),
+                    FormulaExpressionNode.literal(1),
+                ),
+            ),
+        ),
+        "Calc!C3": formula_expression(
+            "Calc!C3",
+            "=INDEX(Data!A1:A4,9)",
+            FormulaExpressionNode.function_call(
+                "INDEX",
+                (FormulaExpressionNode.reference_to(single_column), FormulaExpressionNode.literal(9)),
+            ),
+        ),
+        "Calc!C4": formula_expression(
+            "Calc!C4",
+            "=INDEX(Data!A1:A4,2)",
+            FormulaExpressionNode.function_call(
+                "INDEX",
+                (FormulaExpressionNode.reference_to(single_column), FormulaExpressionNode.literal(2)),
+            ),
+        ),
+    }
+    output_path = tmp_path / "generated_index_ranges.py"
+
+    result = generate_python_module(
+        contract=contract,
+        expressions=expressions,
+        constants={"Data!A1": 10, "Data!A2": 20, "Data!A3": 30, "Data!A4": 40, "Data!B1": 1, "Data!B2": 2},
+        output_path=output_path,
+    )
+    module = load_module(output_path)
+
+    assert result.generated is True
+    assert module.calculate() == {
+        "Calc!C1": 30,
+        "Calc!C2": 20,
+        "Calc!C3": "#REF!",
+        "Calc!C4": 20,
+    }
+
+
+def test_generate_python_module_sum_propagates_errors_and_ignores_text(tmp_path: Path) -> None:
+    contract = GeneratedModuleContract(
+        workbook_id="sum-errors.xlsx",
+        module_name="sum_errors",
+        input_refs=("Data!A1", "Data!A2", "Data!A3", "Data!B1", "Data!B2"),
+        output_refs=("Calc!C1", "Calc!C2", "Calc!C3"),
+        symbols=(
+            GeneratedSymbol(cell_ref="Data!A1", symbol_name="data_a1", kind="input"),
+            GeneratedSymbol(cell_ref="Data!A2", symbol_name="data_a2", kind="input"),
+            GeneratedSymbol(cell_ref="Data!A3", symbol_name="data_a3", kind="input"),
+            GeneratedSymbol(cell_ref="Data!B1", symbol_name="data_b1", kind="input"),
+            GeneratedSymbol(cell_ref="Data!B2", symbol_name="data_b2", kind="input"),
+            GeneratedSymbol(cell_ref="Calc!C1", symbol_name="calc_c1", kind="output", raw_formula="=SUM(Data!B1:B2)"),
+            GeneratedSymbol(cell_ref="Calc!C2", symbol_name="calc_c2", kind="output", raw_formula="=SUM(Data!A1:A3)"),
+            GeneratedSymbol(cell_ref="Calc!C3", symbol_name="calc_c3", kind="output", raw_formula="=SUM(Data!A1:B2)"),
+        ),
+    )
+    range_a = normalize_reference("Data!A1:A3")
+    range_b = normalize_reference("Data!B1:B2")
+    range_ab = normalize_reference("Data!A1:B2")
+    expressions = {
+        "Calc!C1": formula_expression(
+            "Calc!C1",
+            "=SUM(Data!B1:B2)",
+            FormulaExpressionNode.function_call("SUM", (FormulaExpressionNode.reference_to(range_b),)),
+        ),
+        "Calc!C2": formula_expression(
+            "Calc!C2",
+            "=SUM(Data!A1:A3)",
+            FormulaExpressionNode.function_call("SUM", (FormulaExpressionNode.reference_to(range_a),)),
+        ),
+        "Calc!C3": formula_expression(
+            "Calc!C3",
+            "=SUM(Data!A1:B2)",
+            FormulaExpressionNode.function_call("SUM", (FormulaExpressionNode.reference_to(range_ab),)),
+        ),
+    }
+    output_path = tmp_path / "generated_sum_errors.py"
+
+    result = generate_python_module(
+        contract=contract,
+        expressions=expressions,
+        constants={"Data!A1": 1, "Data!A2": 2, "Data!A3": "#N/A", "Data!B1": 3, "Data!B2": "x"},
+        output_path=output_path,
+    )
+    module = load_module(output_path)
+
+    assert result.generated is True
+    assert "_sf_sum(" in result.source_code
+    assert module.calculate() == {
+        "Calc!C1": 3,
+        "Calc!C2": "#N/A",
+        "Calc!C3": 6,
+    }

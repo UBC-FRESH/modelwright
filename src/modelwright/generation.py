@@ -575,6 +575,98 @@ def _render_module(
         "    return 0 if value is None else value",
         "",
         "",
+        "def _sf_is_error(value):",
+        "    return isinstance(value, str) and value.startswith('#')",
+        "",
+        "",
+        "def _sf_arith(operator, left, right):",
+        "    left_value = _sf_value(left)",
+        "    right_value = _sf_value(right)",
+        "    for value in (left_value, right_value):",
+        "        if _sf_is_error(value):",
+        "            return value",
+        "    left_number = _sf_coerce_number(left_value)",
+        "    right_number = _sf_coerce_number(right_value)",
+        "    if left_number is None or right_number is None:",
+        "        return '#VALUE!'",
+        "    if operator == '+':",
+        "        return left_number + right_number",
+        "    if operator == '-':",
+        "        return left_number - right_number",
+        "    if operator == '*':",
+        "        return left_number * right_number",
+        "    if operator == '/':",
+        "        if right_number == 0:",
+        "            return '#DIV/0!'",
+        "        return left_number / right_number",
+        "    if operator == '^':",
+        "        if left_number == 0 and right_number < 0:",
+        "            return '#DIV/0!'",
+        "        if left_number < 0 and right_number != int(right_number):",
+        "            return '#NUM!'",
+        "        return left_number ** right_number",
+        "    raise ValueError(f'unsupported arithmetic operator: {operator}')",
+        "",
+        "",
+        "def _sf_coerce_number(value):",
+        "    value = _sf_value(value)",
+        "    if isinstance(value, bool):",
+        "        return int(value)",
+        "    if value is None or value == '':",
+        "        return 0",
+        "    if isinstance(value, (int, float)):",
+        "        return value",
+        "    if isinstance(value, str):",
+        "        try:",
+        "            return float(value)",
+        "        except ValueError:",
+        "            return None",
+        "    return None",
+        "",
+        "",
+        "def _sf_compare_operand(value):",
+        "    value = _sf_value(value)",
+        "    if isinstance(value, bool):",
+        "        return int(value), 0",
+        "    if value is None or value == '':",
+        "        return 0, 0",
+        "    if isinstance(value, (int, float)):",
+        "        return value, 0",
+        "    if isinstance(value, str):",
+        "        try:",
+        "            return float(value), 0",
+        "        except ValueError:",
+        "            return value, 1",
+        "    return str(value), 1",
+        "",
+        "",
+        "def _sf_compare(operator, left, right):",
+        "    left_value = _sf_value(left)",
+        "    right_value = _sf_value(right)",
+        "    for value in (left_value, right_value):",
+        "        if _sf_is_error(value):",
+        "            return value",
+        "    left_operand, left_kind = _sf_compare_operand(left_value)",
+        "    right_operand, right_kind = _sf_compare_operand(right_value)",
+        "    if left_kind != right_kind:",
+        "        result = -1 if left_kind < right_kind else 1",
+        "    elif left_kind == 0:",
+        "        result = (left_operand > right_operand) - (left_operand < right_operand)",
+        "    else:",
+        "        left_text = str(left_operand).upper()",
+        "        right_text = str(right_operand).upper()",
+        "        result = (left_text > right_text) - (left_text < right_text)",
+        "    if operator == '<':",
+        "        return result < 0",
+        "    if operator == '<=':",
+        "        return result <= 0",
+        "    if operator == '>':",
+        "        return result > 0",
+        "    if operator == '>=':",
+        "        return result >= 0",
+        "    raise ValueError(f'unsupported comparison operator: {operator}')",
+        "",
+        "",
         "def _sf_direct_reference(value):",
         "    value = _sf_value(value)",
         "    return 0 if value is None else value",
@@ -585,6 +677,53 @@ def _render_module(
         "    if value is None or isinstance(value, str):",
         "        return 0",
         "    return value",
+        "",
+        "",
+        "def _sf_excel_value(value):",
+        "    value = _sf_value(value)",
+        "    if value is None:",
+        "        return 0",
+        "    if isinstance(value, bool):",
+        "        return int(value)",
+        "    if isinstance(value, (int, float)):",
+        "        return value",
+        "    try:",
+        "        return float(str(value).replace(',', '.'))",
+        "    except (TypeError, ValueError):",
+        "        return '#VALUE!'",
+        "",
+        "",
+        "def _sf_excel_numbervalue(value, *separators):",
+        "    value = _sf_value(value)",
+        "    if value is None or value == '':",
+        "        return 0",
+        "    if isinstance(value, (int, float)):",
+        "        return value",
+        "    text = str(value)",
+        "    if len(separators) >= 2 and separators[1]:",
+        "        text = text.replace(str(separators[1]), '')",
+        "    decimal = str(separators[0]) if separators and separators[0] else '.'",
+        "    if decimal != '.':",
+        "        text = text.replace(decimal, '.')",
+        "    try:",
+        "        return float(text)",
+        "    except (TypeError, ValueError):",
+        "        return '#VALUE!'",
+        "",
+        "",
+        "def _sf_ln(value):",
+        "    value = _sf_value(value)",
+        "    if isinstance(value, str):",
+        "        try:",
+        "            value = float(value)",
+        "        except ValueError:",
+        "            return '#VALUE!'",
+        "    if value is None or value == '':",
+        "        value = 0",
+        "    if not isinstance(value, (int, float)) or value <= 0:",
+        "        return '#NUM!'",
+        "    import math",
+        "    return math.log(value)",
         "",
         "",
         "@lru_cache(maxsize=4096)",
@@ -602,8 +741,32 @@ def _render_module(
         "",
         "",
         "def _sf_average(values):",
-        "    values = list(values)",
-        "    return sum(values) / len(values)",
+        "    total = 0",
+        "    count = 0",
+        "    for value in values:",
+        "        value = _sf_value(value)",
+        "        if _sf_is_error(value):",
+        "            return value",
+        "        if isinstance(value, bool):",
+        "            total += int(value)",
+        "            count += 1",
+        "        elif isinstance(value, (int, float)):",
+        "            total += value",
+        "            count += 1",
+        "    return total / count if count else '#DIV/0!'",
+        "",
+        "",
+        "def _sf_sum(*operands):",
+        "    total = 0",
+        "    for value in _sf_flatten(operands):",
+        "        value = _sf_value(value)",
+        "        if _sf_is_error(value):",
+        "            return value",
+        "        if isinstance(value, bool):",
+        "            total += int(value)",
+        "        elif isinstance(value, (int, float)):",
+        "            total += value",
+        "    return total",
         "",
         "",
         "def _sf_iferror(value_fn, fallback):",
@@ -660,14 +823,8 @@ def _render_module(
         "        return _sf_criteria_equal(value, expected)",
         "    if operator == '<>':",
         "        return not _sf_criteria_equal(value, expected)",
-        "    if operator == '>':",
-        "        return value > expected",
-        "    if operator == '>=':",
-        "        return value >= expected",
-        "    if operator == '<':",
-        "        return value < expected",
-        "    if operator == '<=':",
-        "        return value <= expected",
+        "    if operator in ('>', '>=', '<', '<='):",
+        "        return _sf_compare(operator, value, expected)",
         "    raise ValueError(f'unsupported criteria operator: {operator}')",
         "",
         "",
@@ -697,6 +854,9 @@ def _render_module(
         "    criteria_values = tuple(_sf_flatten((criteria_range,)))",
         "    sum_values = criteria_values if sum_range is None else tuple(_sf_flatten_lazy((sum_range,)))",
         "    matcher = _sf_criteria_matcher(criteria)",
+        "    for sum_value in sum_values:",
+        "        if not callable(sum_value) and _sf_is_error(sum_value):",
+        "            return sum_value",
         "    total = 0",
         "    for criteria_value, sum_value in zip(criteria_values, sum_values):",
         "        if matcher(criteria_value):",
@@ -711,6 +871,9 @@ def _render_module(
         "",
         "def _sf_sumifs(sum_range, *criteria_pairs):",
         "    sum_values = tuple(_sf_flatten_lazy((sum_range,)))",
+        "    for sum_value in sum_values:",
+        "        if not callable(sum_value) and _sf_is_error(sum_value):",
+        "            return sum_value",
         "    criteria_ranges = [tuple(_sf_flatten((criteria_range,))) for criteria_range, _criteria in criteria_pairs]",
         "    criteria_matchers = tuple(_sf_criteria_matcher(criteria) for _range, criteria in criteria_pairs)",
         "    total = 0",
@@ -730,6 +893,65 @@ def _render_module(
         "        for index in range(len(criteria_ranges[0]))",
         "        if all(matcher(criteria_range[index]) for criteria_range, matcher in zip(criteria_ranges, criteria_matchers))",
         "    )",
+        "",
+        "",
+        "def _sf_averageif(criteria_range, criteria, average_range=None):",
+        "    criteria_values = tuple(_sf_flatten((criteria_range,)))",
+        "    average_values = criteria_values if average_range is None else tuple(_sf_flatten_lazy((average_range,)))",
+        "    for average_value in average_values:",
+        "        if not callable(average_value) and _sf_is_error(average_value):",
+        "            return average_value",
+        "    matcher = _sf_criteria_matcher(criteria)",
+        "    total = 0",
+        "    count = 0",
+        "    for criteria_value, average_value in zip(criteria_values, average_values):",
+        "        if not matcher(criteria_value):",
+        "            continue",
+        "        value = _sf_value(average_value)",
+        "        if value is None or isinstance(value, str):",
+        "            continue",
+        "        total += value",
+        "        count += 1",
+        "    return total / count",
+        "",
+        "",
+        "def _sf_averageifs(average_range, *criteria_pairs):",
+        "    average_values = tuple(_sf_flatten_lazy((average_range,)))",
+        "    for average_value in average_values:",
+        "        if not callable(average_value) and _sf_is_error(average_value):",
+        "            return average_value",
+        "    criteria_ranges = [tuple(_sf_flatten((criteria_range,))) for criteria_range, _criteria in criteria_pairs]",
+        "    criteria_matchers = tuple(_sf_criteria_matcher(criteria) for _range, criteria in criteria_pairs)",
+        "    total = 0",
+        "    count = 0",
+        "    for index, average_value in enumerate(average_values):",
+        "        if not all(matcher(criteria_range[index]) for criteria_range, matcher in zip(criteria_ranges, criteria_matchers)):",
+        "            continue",
+        "        value = _sf_value(average_value)",
+        "        if value is None or isinstance(value, str):",
+        "            continue",
+        "        total += value",
+        "        count += 1",
+        "    return total / count",
+        "",
+        "",
+        "def _sf_minifs(min_range, *criteria_pairs):",
+        "    min_values = tuple(_sf_flatten_lazy((min_range,)))",
+        "    for min_value in min_values:",
+        "        if not callable(min_value) and _sf_is_error(min_value):",
+        "            return min_value",
+        "    criteria_ranges = [tuple(_sf_flatten((criteria_range,))) for criteria_range, _criteria in criteria_pairs]",
+        "    criteria_matchers = tuple(_sf_criteria_matcher(criteria) for _range, criteria in criteria_pairs)",
+        "    minimum = None",
+        "    for index, min_value in enumerate(min_values):",
+        "        if not all(matcher(criteria_range[index]) for criteria_range, matcher in zip(criteria_ranges, criteria_matchers)):",
+        "            continue",
+        "        value = _sf_value(min_value)",
+        "        if value is None or isinstance(value, str):",
+        "            continue",
+        "        if minimum is None or value < minimum:",
+        "            minimum = value",
+        "    return 0 if minimum is None else minimum",
         "",
         "",
         "def _sf_range_lookup_enabled(range_lookup):",
@@ -765,6 +987,84 @@ def _render_module(
         "    if candidate is None:",
         "        return '#N/A'",
         "    return candidate[column_index]",
+        "",
+        "",
+        "def _sf_match(lookup_value, lookup_array, match_type=1):",
+        "    values = tuple(_sf_flatten((lookup_array,)))",
+        "    match_type = _sf_value(match_type)",
+        "    if isinstance(match_type, str):",
+        "        try:",
+        "            match_type = int(float(match_type))",
+        "        except (TypeError, ValueError):",
+        "            raise ValueError('#VALUE!') from None",
+        "    if match_type == 0:",
+        "        for index, value in enumerate(values):",
+        "            if _sf_lookup_equal(value, lookup_value):",
+        "                return index + 1",
+        "        return '#N/A'",
+        "    if match_type == 1:",
+        "        candidate = None",
+        "        for index, value in enumerate(values):",
+        "            try:",
+        "                matched = value <= lookup_value",
+        "            except TypeError:",
+        "                continue",
+        "            if matched:",
+        "                candidate = index + 1",
+        "            else:",
+        "                break",
+        "        return '#N/A' if candidate is None else candidate",
+        "    if match_type == -1:",
+        "        candidate = None",
+        "        for index, value in enumerate(values):",
+        "            try:",
+        "                matched = value >= lookup_value",
+        "            except TypeError:",
+        "                continue",
+        "            if matched:",
+        "                candidate = index + 1",
+        "                break",
+        "        return '#N/A' if candidate is None else candidate",
+        "    raise ValueError('#VALUE!')",
+        "",
+        "",
+        "def _sf_index(array, row_num, col_num=None):",
+        "    array = _sf_value(array)",
+        "    if isinstance(array, _SfRangeView):",
+        "        if array.max_col == array.min_col:",
+        "            rows = tuple(array.values())",
+        "        else:",
+        "            width = array.max_col - array.min_col + 1",
+        "            values = array.values()",
+        "            rows = tuple(tuple(values[index:index + width]) for index in range(0, len(values), width))",
+        "    elif isinstance(array, (list, tuple)) and any(isinstance(item, (list, tuple)) for item in array):",
+        "        rows = tuple(tuple(row) for row in array)",
+        "    elif isinstance(array, (list, tuple)):",
+        "        rows = tuple(array)",
+        "    else:",
+        "        rows = (array,)",
+        "    try:",
+        "        row_index = int(_sf_value(row_num)) - 1",
+        "    except (TypeError, ValueError):",
+        "        return '#VALUE!'",
+        "    if row_index < 0 or row_index >= len(rows):",
+        "        return '#REF!'",
+        "    row = rows[row_index]",
+        "    if col_num is None:",
+        "        return row",
+        "    try:",
+        "        col_value = _sf_value(col_num)",
+        "    except (TypeError, ValueError):",
+        "        return '#VALUE!'",
+        "    if col_value == 0:",
+        "        return row",
+        "    try:",
+        "        col_index = int(col_value) - 1",
+        "    except (TypeError, ValueError):",
+        "        return '#VALUE!'",
+        "    if not isinstance(row, (list, tuple)) or col_index < 0 or col_index >= len(row):",
+        "        return '#REF!'",
+        "    return row[col_index]",
         "",
         "",
         f"def {contract.entrypoint}(inputs=None):",
@@ -934,16 +1234,17 @@ def _render_expression(node: FormulaExpressionNode | None) -> str:
     if node.kind == "binary":
         left, right = node.operands
         if node.operator == "^":
-            return f"(_sf_number({_render_expression(left)}) ** _sf_number({_render_expression(right)}))"
+            return f"_sf_arith('^', {_render_expression(left)}, {_render_expression(right)})"
         if node.operator == "&":
             return f"(str({_render_expression(left)}) + str({_render_expression(right)}))"
-        return f"(_sf_number({_render_expression(left)}) {node.operator} _sf_number({_render_expression(right)}))"
+        return f"_sf_arith({node.operator!r}, {_render_expression(left)}, {_render_expression(right)})"
     if node.kind == "comparison":
         left, right = node.operands
+        if node.operator in {">", ">=", "<", "<="}:
+            return f"_sf_compare({node.operator!r}, {_render_expression(left)}, {_render_expression(right)})"
         if node.operator in {"=", "<>"}:
             return f"_sf_compare_criteria({_render_expression(left)}, {node.operator!r}, {_render_expression(right)})"
-        operator = _python_comparison_operator(node.operator)
-        return f"({_render_expression(left)} {operator} {_render_expression(right)})"
+        raise ValueError(f"unsupported comparison operator: {node.operator}")
     if node.kind == "function_call":
         return _render_function_call(node)
 
@@ -976,7 +1277,7 @@ def _render_function_call(node: FormulaExpressionNode) -> str:
     if node.function_name == "OR":
         return f"any(_sf_flatten({_render_argument_tuple(node.operands)}))"
     if node.function_name == "SUM":
-        return f"sum(_sf_flatten({_render_argument_tuple(node.operands)}))"
+        return f"_sf_sum({_render_argument_tuple(node.operands)})"
     if node.function_name == "MIN":
         return f"min(_sf_flatten({_render_argument_tuple(node.operands)}))"
     if node.function_name == "MAX":
@@ -993,6 +1294,10 @@ def _render_function_call(node: FormulaExpressionNode) -> str:
         if len(node.operands) != 2:
             raise ValueError("COUNTIF requires two operands")
         return f"_sf_countif({_render_function_arguments(node.operands)})"
+    if node.function_name == "AVERAGEIF":
+        if len(node.operands) not in {2, 3}:
+            raise ValueError("AVERAGEIF requires two or three operands")
+        return f"_sf_averageif({_render_function_arguments(node.operands)})"
     if node.function_name == "SUMIFS":
         if len(node.operands) < 3 or len(node.operands) % 2 != 1:
             raise ValueError("SUMIFS requires a sum range followed by criteria range/criteria pairs")
@@ -1001,6 +1306,34 @@ def _render_function_call(node: FormulaExpressionNode) -> str:
         if len(node.operands) < 2 or len(node.operands) % 2 != 0:
             raise ValueError("COUNTIFS requires criteria range/criteria pairs")
         return f"_sf_countifs({_render_criteria_function_arguments(node.operands)})"
+    if node.function_name == "AVERAGEIFS":
+        if len(node.operands) < 3 or len(node.operands) % 2 != 1:
+            raise ValueError("AVERAGEIFS requires an average range followed by criteria range/criteria pairs")
+        return f"_sf_averageifs({_render_criteria_function_arguments(node.operands)})"
+    if node.function_name == "MINIFS":
+        if len(node.operands) < 3 or len(node.operands) % 2 != 1:
+            raise ValueError("MINIFS requires a min range followed by criteria range/criteria pairs")
+        return f"_sf_minifs({_render_criteria_function_arguments(node.operands)})"
+    if node.function_name == "MATCH":
+        if len(node.operands) not in {2, 3}:
+            raise ValueError("MATCH requires two or three operands")
+        return f"_sf_match({_render_function_arguments(node.operands)})"
+    if node.function_name == "INDEX":
+        if len(node.operands) not in {2, 3}:
+            raise ValueError("INDEX requires two or three operands")
+        return f"_sf_index({_render_function_arguments(node.operands)})"
+    if node.function_name == "VALUE":
+        if len(node.operands) != 1:
+            raise ValueError("VALUE requires one operand")
+        return f"_sf_excel_value({_render_expression(node.operands[0])})"
+    if node.function_name == "NUMBERVALUE":
+        if len(node.operands) not in {1, 2, 3}:
+            raise ValueError("NUMBERVALUE requires one to three operands")
+        return f"_sf_excel_numbervalue({_render_function_arguments(node.operands)})"
+    if node.function_name == "LN":
+        if len(node.operands) != 1:
+            raise ValueError("LN requires one operand")
+        return f"_sf_ln({_render_expression(node.operands[0])})"
     if node.function_name == "VLOOKUP":
         if len(node.operands) not in {3, 4}:
             raise ValueError("VLOOKUP requires three or four operands")
@@ -1062,16 +1395,6 @@ def _render_table_array(node: FormulaExpressionNode) -> str:
 
     min_col, min_row, max_col, max_row = range_boundaries(f"{reference.start_cell}:{reference.end_cell}")
     return f"_table({reference.sheet!r}, {min_col}, {min_row}, {max_col}, {max_row})"
-
-
-def _python_comparison_operator(operator: str | None) -> str:
-    if operator == "=":
-        return "=="
-    if operator == "<>":
-        return "!="
-    if operator is None:
-        raise ValueError("missing comparison operator")
-    return operator
 
 
 def _expand_range_dependency(reference) -> tuple[str, ...]:

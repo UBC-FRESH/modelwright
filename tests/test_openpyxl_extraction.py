@@ -231,3 +231,53 @@ def test_extract_workbook_reads_sparse_populated_cells_without_dense_scan(tmp_pa
     workbook = extract_workbook(workbook_path)
 
     assert [cell.cell_ref for cell in workbook.cells] == ["Inputs!A1", "Inputs!CV5000"]
+
+
+def test_extract_sheet_cells_reads_array_formula_text() -> None:
+    from openpyxl.worksheet.formula import ArrayFormula
+
+    formula_workbook = Workbook()
+    formula_sheet = formula_workbook.active
+    formula_sheet.title = "Data"
+    formula_sheet["A1"] = ArrayFormula("A1:A1", "=SUM(A2:A3)")
+
+    cached_workbook = Workbook()
+    cached_sheet = cached_workbook.active
+    cached_sheet.title = "Data"
+    cached_sheet["A1"] = 42
+
+    records = _extract_sheet_cells(
+        formula_sheet,
+        cached_sheet,
+        populated_cells=("A1",),
+    )
+    cells = {cell.cell_ref: cell for cell in records}
+
+    assert cells["Data!A1"].kind == "formula"
+    assert cells["Data!A1"].raw_value == "=SUM(A2:A3)"
+    assert cells["Data!A1"].formula is not None
+    assert cells["Data!A1"].formula.raw_formula == "=SUM(A2:A3)"
+    assert cells["Data!A1"].cached_value == 42
+
+
+def test_extract_sheet_cells_adds_static_indirect_reference() -> None:
+    formula_workbook = Workbook()
+    formula_sheet = formula_workbook.active
+    formula_sheet.title = "Data"
+    formula_sheet["B10"] = "=INDIRECT(ADDRESS(ROW()-1,COLUMN()))"
+    formula_sheet["A2"] = "=SUM(A1:A2)"
+
+    cached_workbook = Workbook()
+    cached_sheet = cached_workbook.active
+    cached_sheet.title = "Data"
+    cached_sheet["B10"] = 7
+
+    records = _extract_sheet_cells(
+        formula_sheet,
+        cached_sheet,
+        populated_cells=("B10",),
+    )
+    cells = {cell.cell_ref: cell for cell in records}
+
+    assert cells["Data!B10"].formula is not None
+    assert "Data!B9" in cells["Data!B10"].formula.raw_references
