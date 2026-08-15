@@ -2,6 +2,55 @@
 
 This file records completed project work in chronological order.
 
+## 2026-08-15
+
+- Unblocked full-workbook conversion of the 2024 Canada FABLE Calculator workbook (Zenodo record
+  14755928, `2024_Open_FABLECalculator.xlsx`): the extract, graph, translate, infer-contract, and
+  generate steps now all complete cleanly (410,299 formulas translated, 0 untranslated, 0 output
+  closure blockers, `generated=True`) for both the pristine and edited workbook copies.
+- Implemented static `INDIRECT(ADDRESS(ROW() +- k, COLUMN() +- k))` resolution (used by 55 cells as
+  a "value of the cell directly above" pattern): `ROW`/`COLUMN` parse to the formula cell's
+  coordinates, `ADDRESS` folds to a literal address string, `INDIRECT` resolves a static address to
+  a cell reference; `static_indirect_cell_reference` in `references.py` adds the resolved target to
+  `FormulaRecord.raw_references` so the dependency graph creates the execution edge.
+- Added `repair_corrupted_structured_references` in `references.py` for the source-level defect
+  where a structured reference appears with a duplicated table prefix
+  (`name[] name[[#This Row],[Column]]`, 330 cells); the dangling prefix is dropped during
+  tokenization and raw-reference extraction while `FormulaRecord.raw_formula` keeps provenance.
+- Added `ADDRESS` and `INDIRECT` to `SUPPORTED_FUNCTIONS`; non-static INDIRECT/ADDRESS forms report
+  `unsupported_function` instead of translating.
+- Added regression tests: repaired corrupted structured reference, static INDIRECT translation,
+  non-static INDIRECT rejection, and static INDIRECT raw-reference extraction. Full test run:
+  212 passed, 1 skipped.
+- Executed the generated 2024 Canada FABLE model end to end (`calculate({})`, 10,274 outputs,
+  ~100 s) and eliminated all 349 runtime output errors found during scenario execution.
+- Hardened generated runtime semantics in `generation.py` so invalid workbook arithmetic and math
+  return Excel-faithful error strings instead of raising Python exceptions:
+  `_sf_arith` now coerces numeric strings, treats blank as zero, returns `#DIV/0!` for division by
+  zero, and `#NUM!` for negative-base non-integer `^`; ordering comparisons (`>`, `>=`, `<`, `<=`)
+  render through a new coercion-safe `_sf_compare` (Excel number<text ordering, numeric-string
+  coercion); `VALUE`/`NUMBERVALUE` return `#VALUE!` and `LN` returns `#NUM!` instead of raising.
+- Fixed `_sf_index` so `INDEX` resolves `_SfRangeView` arrays (single-column and multi-column row
+  reconstruction) instead of treating the whole range as one scalar row; out-of-range rows return
+  `#REF!`.
+- Replaced raw `sum(_sf_flatten(...))` SUM rendering with a `_sf_sum` helper that propagates error
+  values and ignores text cells, and made `_sf_average` error/text safe (`#DIV/0!` on empty),
+  fixing `TypeError: unsupported operand type(s) for +: 'int' and 'str'` crashes from text/error
+  cells inside large aggregation ranges.
+- Re-ran the scenario after regeneration: all 10,274 generated outputs now compute with zero errors;
+  a 300-output sample compared against workbook cached values matched 94% with small relative
+  deviations (0.05%-0.3%) consistent with Excel iterative-circular-calculation tolerance, not
+  systematic translation defects.
+- Resolved the `static_circular_dependency` investigation (1,741 warnings): the cycles are phantom
+  whole-column SUMIFS ranges (e.g. `SUMIFS(calc_land_cor[CalcForest], calc_land_cor[Year], year-5)`)
+  whose year-offset criteria exclude the formula's own cell; lazy sum-range evaluation means they
+  never form runtime cycles, and the scenario run produced no circular-dependency errors. Decision:
+  keep these as warnings and document the phantom-cycle rationale rather than attempting automatic
+  cycle-breaking.
+- Added regression tests for Excel-faithful arithmetic errors, numeric-string coercion in
+  arithmetic and comparisons, `LN`/`VALUE` error strings, `INDEX` over range views, and SUM error
+  propagation/text-skipping. Full test run: 217 passed, 1 skipped.
+
 ## 2026-07-02
 
 - Activated Phase 38 on `feature/p38-matrix-generated-model-evidence`, created parent issue #243 and

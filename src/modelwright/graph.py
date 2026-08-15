@@ -545,7 +545,7 @@ def _bracketed_parts(reference: str) -> tuple[str, ...]:
         if character == "]":
             depth -= 1
             if depth == 0:
-                part = "".join(current)
+                part = "".join(current).strip()
                 current = []
                 if part.startswith("[") and part.endswith("]"):
                     parts.extend(_bracketed_parts(part))
@@ -560,7 +560,7 @@ def _bracketed_parts(reference: str) -> tuple[str, ...]:
 
 
 def _clean_structured_selector(selector: str) -> str:
-    return selector.removeprefix("@").replace("''", "'")
+    return selector.strip().removeprefix("@").replace("''", "'")
 
 
 def _table_containing_target(target: WorkbookReference, tables: dict[str, TableRecord]) -> TableRecord | None:

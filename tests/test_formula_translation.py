@@ -337,7 +337,7 @@ def test_translate_unary_minus_exponent_and_concat(tmp_path: Path) -> None:
     assert concat.root.operator == "&"
 
 
-def test_translate_ref_error_reports_sharp_diagnostic(tmp_path: Path) -> None:
+def test_translate_ref_error_emits_sharp_literal(tmp_path: Path) -> None:
     workbook_path = tmp_path / "ref-error.xlsx"
     source = Workbook()
     sheet = source.active
@@ -350,9 +350,9 @@ def test_translate_ref_error_reports_sharp_diagnostic(tmp_path: Path) -> None:
 
     expression = translate_formula_cell(formula_cell, graph)
 
-    assert expression.translated is False
-    assert expression.diagnostics[0].code == "unsupported_error_reference"
-    assert expression.diagnostics[0].raw_value == "#REF!"
+    assert expression.translated is True
+    assert expression.root.kind == "literal"
+    assert expression.root.value == "#REF!"
 
 
 def test_translate_static_offset_to_concrete_reference(tmp_path: Path) -> None:
@@ -415,3 +415,156 @@ def test_translate_xlfn_ifna_as_ifna(tmp_path: Path) -> None:
     assert expression.root is not None
     assert expression.root.kind == "function_call"
     assert expression.root.function_name == "IFNA"
+
+
+def test_translate_index_match_lookup(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "index-match.xlsx"
+    source = Workbook()
+    sheet = source.active
+    sheet.title = "Data"
+    sheet.append(["Code", "Label", "Result"])
+    sheet.append(["A", "Alpha", '=INDEX(InputTable[Label],MATCH(InputTable[[#This Row],[Code]],InputTable[Code],0),0)'])
+    sheet.append(["B", "Beta", None])
+    sheet.add_table(Table(displayName="InputTable", ref="A1:C3"))
+    source.save(workbook_path)
+    workbook = extract_workbook(workbook_path)
+    graph = build_dependency_graph(workbook)
+    formula_cell = next(cell for cell in workbook.cells if cell.cell_ref == "Data!C2")
+
+    expression = translate_formula_cell(formula_cell, graph, reference_index=build_formula_reference_index(graph))
+
+    assert expression.translated is True
+    assert expression.root is not None
+    assert expression.root.kind == "function_call"
+    assert expression.root.function_name == "INDEX"
+    assert expression.root.operands[0].kind == "reference"
+    assert expression.root.operands[0].reference.kind == "range"
+    assert expression.root.operands[0].reference.normalized == "Data!A2:B3" or expression.root.operands[0].reference.normalized == "Data!B2:B3"
+    assert expression.root.operands[1].kind == "function_call"
+    assert expression.root.operands[1].function_name == "MATCH"
+
+
+def test_translate_conditional_aggregate_functions(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "conditional-aggregates.xlsx"
+    source = Workbook()
+    sheet = source.active
+    sheet.title = "Data"
+    sheet.append(["Group", "Value"])
+    sheet.append(["a", 1])
+    sheet.append(["b", 2])
+    sheet.append(["a", 3])
+    sheet["E1"] = '=AVERAGEIFS(InputTable[Value],InputTable[Group],"a")'
+    sheet["E2"] = '=_xlfn.MINIFS(InputTable[Value],InputTable[Group],"b")'
+    sheet["E3"] = '=AVERAGEIF(InputTable[Value],">0")'
+    sheet.add_table(Table(displayName="InputTable", ref="A1:B4"))
+    source.save(workbook_path)
+    workbook = extract_workbook(workbook_path)
+    graph = build_dependency_graph(workbook)
+    reference_index = build_formula_reference_index(graph)
+
+    for cell_ref, function_name in (("Data!E1", "AVERAGEIFS"), ("Data!E2", "MINIFS"), ("Data!E3", "AVERAGEIF")):
+        formula_cell = next(cell for cell in workbook.cells if cell.cell_ref == cell_ref)
+        expression = translate_formula_cell(formula_cell, graph, reference_index=reference_index)
+        assert expression.translated is True
+        assert expression.root.function_name == function_name
+
+
+def test_translate_numeric_functions(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "numeric-functions.xlsx"
+    source = Workbook()
+    sheet = source.active
+    sheet.title = "Calc"
+    sheet["A1"] = 4
+    sheet["B1"] = "=VALUE(\"42\")"
+    sheet["B2"] = "=_xlfn.NUMBERVALUE(\"1.5\")"
+    sheet["B3"] = "=LN(A1)"
+    sheet["B4"] = "=VALUE(A1)"
+    source.save(workbook_path)
+    workbook = extract_workbook(workbook_path)
+    graph = build_dependency_graph(workbook)
+    reference_index = build_formula_reference_index(graph)
+
+    expected = {"Calc!B1": "VALUE", "Calc!B2": "NUMBERVALUE", "Calc!B3": "LN", "Calc!B4": "VALUE"}
+    for cell_ref, function_name in expected.items():
+        formula_cell = next(cell for cell in workbook.cells if cell.cell_ref == cell_ref)
+        expression = translate_formula_cell(formula_cell, graph, reference_index=reference_index)
+        assert expression.translated is True
+        assert expression.root.function_name == function_name
+
+
+def test_translate_repaired_corrupted_structured_reference(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "corrupted-structured.xlsx"
+    source = Workbook()
+    sheet = source.active
+    sheet.title = "Data"
+    sheet.append(["Country", "Product"])
+    sheet.append(["CA", "Wheat"])
+    sheet.append(["US", "Maize"])
+    formula = (
+        '=INDEX(calc_cropcosts[] calc_cropcosts[[#This Row],[Product]],'
+        'MATCH(1,calc_cropcosts[[#This Row],[Country]],0))'
+    )
+    sheet["D2"] = formula
+    sheet.add_table(Table(displayName="calc_cropcosts", ref="A1:C3"))
+    source.save(workbook_path)
+    workbook = extract_workbook(workbook_path)
+    graph = build_dependency_graph(workbook)
+    formula_cell = next(cell for cell in workbook.cells if cell.cell_ref == "Data!D2")
+
+    expression = translate_formula_cell(formula_cell, graph, reference_index=build_formula_reference_index(graph))
+
+    assert expression.translated is True
+    assert expression.root is not None
+    assert expression.root.kind == "function_call"
+    assert expression.root.function_name == "INDEX"
+    assert expression.root.operands[0].kind == "reference"
+    assert expression.root.operands[0].reference.kind == "cell"
+    assert expression.root.operands[0].reference.normalized == "Data!B2"
+
+
+def test_translate_static_indirect_address(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "static-indirect.xlsx"
+    source = Workbook()
+    sheet = source.active
+    sheet.title = "Data"
+    sheet["A2"] = 42
+    sheet["B2"] = "=INDIRECT(ADDRESS(ROW()-1,COLUMN()))"
+    sheet["B3"] = "=INDIRECT(ADDRESS(ROW(),COLUMN()-1))"
+    source.save(workbook_path)
+    workbook = extract_workbook(workbook_path)
+    graph = build_dependency_graph(workbook)
+    reference_index = build_formula_reference_index(graph)
+
+    b2 = next(cell for cell in workbook.cells if cell.cell_ref == "Data!B2")
+    expression = translate_formula_cell(b2, graph, reference_index=reference_index)
+    assert expression.translated is True
+    assert expression.root is not None
+    assert expression.root.kind == "reference"
+    assert expression.root.reference is not None
+    assert expression.root.reference.normalized == "Data!B1"
+
+    b3 = next(cell for cell in workbook.cells if cell.cell_ref == "Data!B3")
+    expression = translate_formula_cell(b3, graph, reference_index=reference_index)
+    assert expression.translated is True
+    assert expression.root is not None
+    assert expression.root.kind == "reference"
+    assert expression.root.reference is not None
+    assert expression.root.reference.normalized == "Data!A3"
+
+
+def test_translate_static_indirect_address_with_unsupported_pattern(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "nonstatic-indirect.xlsx"
+    source = Workbook()
+    sheet = source.active
+    sheet.title = "Data"
+    sheet["A1"] = "X"
+    sheet["B2"] = '=INDIRECT("A"&1)'
+    source.save(workbook_path)
+    workbook = extract_workbook(workbook_path)
+    graph = build_dependency_graph(workbook)
+    formula_cell = next(cell for cell in workbook.cells if cell.cell_ref == "Data!B2")
+
+    expression = translate_formula_cell(formula_cell, graph, reference_index=build_formula_reference_index(graph))
+
+    assert expression.translated is False
+    assert expression.diagnostics[0].code == "unsupported_function"

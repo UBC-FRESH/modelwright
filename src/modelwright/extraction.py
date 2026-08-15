@@ -15,6 +15,9 @@ from typing import Any, Literal
 from openpyxl import load_workbook
 from openpyxl.formula.tokenizer import Tokenizer
 from openpyxl.utils.cell import get_column_letter, range_boundaries
+from openpyxl.worksheet.formula import ArrayFormula
+
+from modelwright.references import repair_corrupted_structured_references, static_indirect_cell_reference
 
 
 JsonValue = str | int | float | bool | None | list[Any] | dict[str, Any]
@@ -474,12 +477,13 @@ def _extract_sheet_cells(
 
         cell_ref = _cell_ref(worksheet.title, coordinate)
         if cell.data_type == "f":
-            formula = _extract_formula(cell_ref, str(cell.value), cached_value)
+            formula_value = _formula_cell_value(raw_value)
+            formula = _extract_formula(cell_ref, formula_value, cached_value)
             records.append(
                 CellRecord(
                     cell_ref=cell_ref,
                     kind="formula",
-                    raw_value=_json_value(raw_value),
+                    raw_value=_json_value(formula_value),
                     data_type=cell.data_type,
                     cached_value=_json_value(cached_value),
                     formula=formula,
@@ -524,8 +528,9 @@ def _progress(progress: Callable[[str], None] | None, message: str) -> None:
         progress(message)
 
 def _extract_formula(cell_ref: str, raw_formula: str, cached_value: JsonValue) -> FormulaRecord:
+    tokenized_formula = repair_corrupted_structured_references(raw_formula)
     try:
-        tokenizer = Tokenizer(raw_formula)
+        tokenizer = Tokenizer(tokenized_formula)
     except Exception as error:
         return FormulaRecord(
             raw_formula=raw_formula,
@@ -544,6 +549,9 @@ def _extract_formula(cell_ref: str, raw_formula: str, cached_value: JsonValue) -
     raw_references = tuple(
         token.value for token in tokenizer.items if token.type == "OPERAND" and token.subtype == "RANGE"
     )
+    static_indirect_reference = static_indirect_cell_reference(cell_ref, raw_formula)
+    if static_indirect_reference is not None and static_indirect_reference not in raw_references:
+        raw_references = raw_references + (static_indirect_reference,)
     functions = tuple(
         token.value[:-1].upper() for token in tokenizer.items if token.type == "FUNC" and token.subtype == "OPEN"
     )
@@ -636,6 +644,20 @@ def _json_value(value: Any) -> JsonValue:
     return str(value)
 
 
+def _formula_cell_value(value: Any) -> str:
+    """Return the formula text for a formula cell value.
+
+    OpenPyXL stores array formula cells (and similar formula objects) as wrapper
+    objects that expose the formula text through their ``text`` attribute instead
+    of as plain strings.
+    """
+    if isinstance(value, str):
+        return value
+    if isinstance(value, ArrayFormula):
+        return value.text if value.text else str(value)
+    return str(value)
+
+
 def _is_external_reference(reference: str) -> bool:
     return "[" in reference and "]" in reference and ("." in reference.split("]", 1)[0] or "!" in reference)
 
@@ -657,7 +679,7 @@ def _bracketed_parts(reference: str) -> tuple[str, ...]:
         if character == "]":
             depth -= 1
             if depth == 0:
-                part = "".join(current)
+                part = "".join(current).strip()
                 current = []
                 if part.startswith("[") and part.endswith("]"):
                     parts.extend(_bracketed_parts(part))
@@ -672,4 +694,4 @@ def _bracketed_parts(reference: str) -> tuple[str, ...]:
 
 
 def _clean_structured_selector(selector: str) -> str:
-    return selector.removeprefix("@").replace("''", "'")
+    return selector.strip().removeprefix("@").replace("''", "'")

@@ -15,7 +15,9 @@ from openpyxl.utils.cell import get_column_letter, range_boundaries
 from modelwright.extraction import CellRecord
 from modelwright.graph import DependencyEdge, DependencyGraph
 from modelwright.references import WorkbookReference
+from modelwright.references import cell_reference_coordinates
 from modelwright.references import normalize_reference
+from modelwright.references import repair_corrupted_structured_references
 
 
 JsonValue = str | int | float | bool | None | list[Any] | dict[str, Any]
@@ -26,21 +28,31 @@ SUPPORTED_FUNCTIONS = frozenset(
     {
         "AND",
         "AVERAGE",
+        "AVERAGEIF",
+        "AVERAGEIFS",
         "CONCATENATE",
         "COUNTIF",
         "COUNTIFS",
         "IF",
         "IFERROR",
         "IFNA",
+        "INDEX",
+        "LN",
+        "MATCH",
         "MAX",
         "MIN",
+        "MINIFS",
+        "NUMBERVALUE",
         "OR",
         "OFFSET",
         "ROUND",
         "SUM",
         "SUMIF",
         "SUMIFS",
+        "VALUE",
         "VLOOKUP",
+        "ADDRESS",
+        "INDIRECT",
     }
 )
 SUPPORTED_OPERATORS = frozenset({"+", "-", "*", "/", "^", "&", ">", ">=", "<", "<=", "=", "<>", "(", ")", ","})
@@ -343,6 +355,8 @@ class _FormulaParser:
             return FormulaExpressionNode.literal(token.value)
         if token.kind == "logical":
             return FormulaExpressionNode.literal(token.value == "TRUE")
+        if token.kind == "error":
+            return FormulaExpressionNode.literal(token.value)
         if token.kind == "reference":
             return FormulaExpressionNode.reference_to(self._resolved_reference(token.value))
         if token.kind == "identifier":
@@ -357,6 +371,24 @@ class _FormulaParser:
         self._expect("(")
         raw_function_name = function_name.upper()
         function_name = _normalized_function_name(raw_function_name)
+        if function_name == "ROW":
+            if (token := self._peek()) is not None and token.value == ")":
+                self._advance()
+                return FormulaExpressionNode.literal(cell_reference_coordinates(self.cell.cell_ref)[0])
+            raise FormulaTranslationError(
+                "unsupported_function",
+                "ROW with arguments is not supported",
+                raw_function_name,
+            )
+        if function_name == "COLUMN":
+            if (token := self._peek()) is not None and token.value == ")":
+                self._advance()
+                return FormulaExpressionNode.literal(cell_reference_coordinates(self.cell.cell_ref)[1])
+            raise FormulaTranslationError(
+                "unsupported_function",
+                "COLUMN with arguments is not supported",
+                raw_function_name,
+            )
         if function_name not in SUPPORTED_FUNCTIONS:
             raise FormulaTranslationError(
                 "unsupported_function",
@@ -378,6 +410,10 @@ class _FormulaParser:
             self._expect(")")
             if function_name == "OFFSET":
                 return _static_offset_reference(arguments)
+            if function_name == "ADDRESS":
+                return _static_address_reference(arguments)
+            if function_name == "INDIRECT":
+                return _static_indirect_reference(self, arguments)
             return FormulaExpressionNode.function_call(function_name, tuple(arguments))
 
     def _resolved_reference(self, raw_reference: str) -> WorkbookReference:
@@ -437,7 +473,8 @@ class _FormulaParser:
 
 def _formula_tokens(raw_formula: str) -> tuple[_FormulaToken, ...]:
     tokens: list[_FormulaToken] = []
-    for token in Tokenizer(raw_formula).items:
+    repaired_formula = repair_corrupted_structured_references(raw_formula)
+    for token in Tokenizer(repaired_formula).items:
         if token.type == "WHITE-SPACE":
             continue
         if token.type == "FUNC" and token.subtype == "OPEN":
@@ -463,11 +500,8 @@ def _formula_tokens(raw_formula: str) -> tuple[_FormulaToken, ...]:
             tokens.append(_FormulaToken("logical", token.value.upper()))
             continue
         if token.type == "OPERAND" and token.subtype == "ERROR":
-            raise FormulaTranslationError(
-                "unsupported_error_reference",
-                "formula contains an unsupported error reference",
-                token.value,
-            )
+            tokens.append(_FormulaToken("error", token.value))
+            continue
         if token.type == "OPERAND" and token.subtype == "RANGE":
             tokens.append(_FormulaToken("reference", token.value))
             continue
@@ -528,6 +562,77 @@ def _literal_integer(node: FormulaExpressionNode) -> int | None:
         value = _literal_integer(operand)
         return None if value is None else -value
     return None
+
+
+def _static_address_reference(arguments: list[FormulaExpressionNode]) -> FormulaExpressionNode:
+    if len(arguments) not in {2, 3, 4}:
+        raise FormulaTranslationError(
+            "unsupported_function",
+            "ADDRESS requires two to four arguments",
+            "ADDRESS",
+        )
+    row = _static_number(arguments[0])
+    column = _static_number(arguments[1])
+    if row < 1 or column < 1 or int(row) != row or int(column) != column:
+        raise FormulaTranslationError(
+            "unsupported_function",
+            "ADDRESS row and column must be static positive integers",
+            "ADDRESS",
+        )
+    address = f"{get_column_letter(int(column))}{int(row)}"
+    return FormulaExpressionNode.literal(address)
+
+
+def _static_indirect_reference(parser: "_FormulaParser", arguments: list[FormulaExpressionNode]) -> FormulaExpressionNode:
+    if len(arguments) != 1:
+        raise FormulaTranslationError(
+            "unsupported_function",
+            "INDIRECT requires exactly one argument",
+            "INDIRECT",
+        )
+    address = _static_address_text(arguments[0])
+    if address is None:
+        raise FormulaTranslationError(
+            "unsupported_function",
+            "INDIRECT argument must be a static cell address",
+            "INDIRECT",
+        )
+    return FormulaExpressionNode.reference_to(parser._resolved_reference(address))
+
+
+def _static_address_text(node: FormulaExpressionNode) -> str | None:
+    if node.kind == "literal" and isinstance(node.value, str):
+        return node.value
+    return None
+
+
+def _static_number(node: FormulaExpressionNode) -> int | float:
+    if node.kind == "literal":
+        value = node.value
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            return value
+    if node.kind == "unary":
+        (operand,) = node.operands
+        if node.operator == "-":
+            return -_static_number(operand)
+        if node.operator == "+":
+            return _static_number(operand)
+    if node.kind == "binary":
+        left = _static_number(node.operands[0])
+        right = _static_number(node.operands[1])
+        if node.operator == "+":
+            return left + right
+        if node.operator == "-":
+            return left - right
+        if node.operator == "*":
+            return left * right
+        if node.operator == "/":
+            return left / right
+    raise FormulaTranslationError(
+        "unsupported_function",
+        "function argument is not statically computable",
+        "",
+    )
 
 
 def _shift_cell_reference(

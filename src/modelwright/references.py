@@ -6,7 +6,7 @@ import re
 from dataclasses import dataclass
 from typing import Any, Literal
 
-from openpyxl.utils.cell import range_boundaries
+from openpyxl.utils.cell import get_column_letter, range_boundaries
 
 
 JsonValue = str | int | float | bool | None | list[Any] | dict[str, Any]
@@ -207,3 +207,60 @@ def _column_name(index: int) -> str:
         index, remainder = divmod(index - 1, 26)
         name = chr(65 + remainder) + name
     return name
+
+
+_CORRUPTED_STRUCTURED_RE = re.compile(r"([^\s\[\]]+)\[\]\s+\1\[", re.IGNORECASE)
+
+
+def repair_corrupted_structured_references(raw_formula: str) -> str:
+    """Repair duplicated structured-reference table prefixes.
+
+    Some workbooks carry a malformed prefix where a table name is written twice,
+    once as a dangling ``name[]`` token and again as the real structured
+    reference (``name[] name[[#This Row],[Column]]``). This is a source defect
+    in the workbook; the repair drops the dangling prefix so the remaining
+    structured reference parses normally.
+    """
+    return _CORRUPTED_STRUCTURED_RE.sub(r"\1[", raw_formula)
+
+
+_STATIC_INDIRECT_ADDRESS_RE = re.compile(
+    r"INDIRECT\s*\(\s*ADDRESS\s*\(\s*"
+    r"ROW\s*\(\s*\)\s*([+\-]\s*\d+)?\s*,\s*"
+    r"COLUMN\s*\(\s*\)\s*([+\-]\s*\d+)?\s*"
+    r"\)\s*\)",
+    re.IGNORECASE,
+)
+
+
+def static_indirect_cell_reference(cell_ref: str, raw_formula: str) -> str | None:
+    """Resolve a statically-computable ``INDIRECT(ADDRESS(ROW(), COLUMN()))``.
+
+    Returns the target cell reference (e.g. ``Sheet!B4``) for the fixed pattern
+    ``INDIRECT(ADDRESS(ROW() +- k, COLUMN() +- k))`` that some workbooks use to
+    reference the cell directly above the formula, or ``None`` when the formula
+    does not match the pattern.
+    """
+    match = _STATIC_INDIRECT_ADDRESS_RE.search(raw_formula)
+    if match is None:
+        return None
+    sheet_name, coordinate = cell_ref.rsplit("!", 1)
+    min_col, min_row, _max_col, _max_row = range_boundaries(coordinate)
+    row = min_row + _integer_offset(match.group(1))
+    column = min_col + _integer_offset(match.group(2))
+    if row < 1 or column < 1:
+        return None
+    return f"{sheet_name}!{get_column_letter(column)}{row}"
+
+
+def cell_reference_coordinates(cell_ref: str) -> tuple[int, int]:
+    """Return ``(row, column)`` (1-based) for a cell reference string."""
+    coordinate = cell_ref.rsplit("!", 1)[-1]
+    min_col, min_row, _max_col, _max_row = range_boundaries(coordinate)
+    return min_row, min_col
+
+
+def _integer_offset(group: str | None) -> int:
+    if not group:
+        return 0
+    return int(group.replace(" ", ""))
