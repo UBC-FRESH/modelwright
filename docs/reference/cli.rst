@@ -44,6 +44,16 @@ Model Commands
      --out tmp/generated_model.py \
      > tmp/generation-result.json
 
+   # Optional external input-data mode: per-sheet CSVs plus a manifest.
+   modelwright model generate \
+     --contract tmp/contract.json \
+     --expressions tmp/expressions.json \
+     --constants tmp/constants.json \
+     --out tmp/generated-model/generated_model.py \
+     --external-data \
+     --data-dir tmp/generated-model/model_data \
+     > tmp/generation-result.json
+
    modelwright model execute \
      --contract tmp/contract.json \
      --model tmp/generated_model.py \
@@ -101,6 +111,22 @@ make missing evidence fail. See :doc:`../guides/validation-evidence` for the con
 The matrix-evidence command aggregates compact generated-model evidence across an existing
 FreshForge matrix run or matrix summary. It does not run the matrix; it only reads saved matrix JSON
 and optional per-case generated-model artifacts or compact evidence summaries.
+
+Uncertainty Commands
+--------------------
+
+.. code-block:: bash
+
+   modelwright uncertainty run \
+     --model tmp/generated-model/generated_model.py \
+     --spec tmp/uncertainty/spec.json \
+     --contract tmp/generated-model/contract.json \
+     --out tmp/uncertainty/result.json
+
+The ``uncertainty run`` command evaluates a JSON input-uncertainty specification (inverse-CDF draws
+over declared input cell refs) and writes expected-value and output-distribution summaries. See
+:doc:`../guides/input-uncertainty` for the specification format and result fields. The runner is
+serial and intended as a reference implementation, not a production Monte Carlo executor.
 
 Conversion Commands
 -------------------

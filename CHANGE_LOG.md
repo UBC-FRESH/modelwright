@@ -2,6 +2,34 @@
 
 This file records completed project work in chronological order.
 
+## 2026-11-23
+
+- Added opt-in external input-data mode for generated models: `generate_python_module(...,
+  external_data=True)` renders `calculate(inputs=None, data_dir=None)` with a manifest/CSV loader,
+  and `build_external_model_data` / `write_external_model_data` emit versioned `model_data/` files
+  (per-sheet long-format CSVs plus a manifest with counts and SHA-256 checksums). Added `model
+  generate --external-data` and `--data-dir`; default generation output is unchanged.
+- Added `modelwright.uncertainty` for independent input-variate uncertainty: `InputDistribution`
+  (normal, truncated normal, uniform, lognormal, triangular, constant), `UncertaintySpec`,
+  inverse-CDF sampling with random or Latin-hypercube designs, seeded draws, `evaluate_draws`,
+  `summarize_draws`, `run_uncertainty`, and `unknown_input_refs`. Summaries include expected value,
+  median, standard deviation, Monte Carlo standard error, coefficient of variation, percentiles,
+  histogram counts, and error/non-numeric counts. Added `modelwright uncertainty run`.
+- Added the `input-uncertainty` guide, external-data documentation, CLI/API reference updates, and
+  17 tests. Local verification: 234 passed, 1 skipped; ruff clean; warning-clean Sphinx docs and
+  theme verification.
+- 2024 FABLE external-data experiment: regenerated the full model in external mode in 463.2 s
+  (`generated=True`, 0 output-closure untranslated, 105,125 inputs across 46 sheets; 3.7 MiB data
+  bundle with 46 CSVs + manifest). All 10,274 outputs matched the embedded model exactly (0
+  mismatches); calculate time was 124.5 s embedded vs 128.8 s external. Editing one CSV input
+  (`1_data_demand!BU26`, 916.6565 → 1000) and rerunning changed exactly one output (`FOOD!V15`,
+  0.155% relative) in 123.2 s without the 463.2 s regeneration step.
+- 2024 uncertainty probe: four seeded draws on `1_data_demand!BU26` and `1_data_demand!BU27`
+  (normal, 2% standard deviation) produced a `FOOD!V15` mean of 1871.57 (median 1871.44, standard
+  deviation 0.55, Monte Carlo standard error 0.28, 90% interval 1871.10–1872.22) with 0 errors in
+  475.9 s; `GHG!AE18` correctly stayed constant at 14.2202, reporting zero variance for an output
+  not driven by those inputs.
+
 ## 2026-08-15
 
 - Unblocked full-workbook conversion of the 2024 Canada FABLE Calculator workbook (Zenodo record

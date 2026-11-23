@@ -40,6 +40,12 @@ Generated Model Execution
 .. automodule:: modelwright.execution
    :members:
 
+Input Uncertainty
+-----------------
+
+.. automodule:: modelwright.uncertainty
+   :members:
+
 Evaluation Orchestration
 ------------------------
 

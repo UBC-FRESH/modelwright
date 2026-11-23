@@ -18,6 +18,7 @@ assemble validation reports. It is not yet a general workbook converter.
    guides/workflow-boundaries
    guides/generated-model-artifacts
    guides/validation-evidence
+   guides/input-uncertainty
    guides/freshforge-provider-integration
    guides/private-workbooks
    guides/validation

@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import importlib.util
 import json
-from collections.abc import Sequence
+import sys
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any, cast
 
@@ -24,9 +26,10 @@ from modelwright.execution import execute_generated_model
 from modelwright.extraction import WorkbookRecord, extract_workbook
 from modelwright.formulas import FormulaExpression, build_formula_reference_index, translate_formula_cell
 from modelwright.generation import GeneratedModuleContract, generate_python_module
-from modelwright.generation import infer_generated_module_contract
+from modelwright.generation import EXTERNAL_DATA_DIR_NAME, infer_generated_module_contract
 from modelwright.graph import build_dependency_graph
 from modelwright.oracles import OracleResult
+from modelwright.uncertainty import UncertaintySpec, run_uncertainty, unknown_input_refs
 from modelwright.validation import build_validation_report, load_validation_scenario
 
 
@@ -57,11 +60,17 @@ conversion_app = typer.Typer(
     no_args_is_help=True,
     help="Assemble conversion planning reports.",
 )
+uncertainty_app = typer.Typer(
+    add_completion=False,
+    no_args_is_help=True,
+    help="Run expected-value and distribution modelling over uncertain generated-model inputs.",
+)
 
 app.add_typer(workbook_app, name="workbook")
 app.add_typer(model_app, name="model")
 app.add_typer(validation_app, name="validation")
 app.add_typer(conversion_app, name="conversion")
+app.add_typer(uncertainty_app, name="uncertainty")
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -121,10 +130,31 @@ def model_generate(
         "--out",
         help="Optional path for generated Python source.",
     ),
+    external_data: bool = typer.Option(
+        False,
+        "--external-data",
+        help="Generate a loader-based module and write input constants to external data files.",
+    ),
+    data_dir: Path | None = typer.Option(
+        None,
+        "--data-dir",
+        help="External input-data directory; defaults to <out.parent>/model_data.",
+    ),
 ) -> None:
     """Generate Python from explicit JSON contracts."""
 
-    _emit_json(_generate_payload(contract=contract, expressions=expressions, constants=constants, output=output))
+    if external_data and output is None and data_dir is None:
+        raise typer.BadParameter("--external-data requires --out or --data-dir")
+    _emit_json(
+        _generate_payload(
+            contract=contract,
+            expressions=expressions,
+            constants=constants,
+            output=output,
+            external_data=external_data,
+            data_dir=data_dir,
+        )
+    )
 
 
 @model_app.command("infer-contract")
@@ -529,19 +559,31 @@ def _generate_payload(
     expressions: Path,
     constants: Path | None,
     output: Path | None,
+    external_data: bool = False,
+    data_dir: Path | None = None,
 ) -> dict[str, JsonValue]:
     module_contract = GeneratedModuleContract.from_dict(_load_object(contract))
     formula_expressions = {
         cell_ref: FormulaExpression.from_dict(expression)
         for cell_ref, expression in _load_object(expressions).items()
     }
+    constants_payload = _load_object(constants) if constants else {}
     result = generate_python_module(
         contract=module_contract,
         expressions=formula_expressions,
-        constants=_load_object(constants) if constants else {},
+        constants=constants_payload,
         output_path=output,
+        external_data=external_data,
+        external_data_dir=data_dir,
     )
-    return result.to_dict()
+    payload = result.to_dict()
+    if external_data:
+        resolved = data_dir if data_dir is not None else (
+            output.parent / EXTERNAL_DATA_DIR_NAME if output is not None else None
+        )
+        if resolved is not None:
+            payload["data_dir"] = str(resolved)
+    return payload
 
 
 def _infer_contract_payload(
@@ -762,6 +804,99 @@ def _conversion_plan_payload(
         include_source_path=include_source_path,
     )
     return plan.to_dict()
+
+
+@uncertainty_app.command("run")
+def uncertainty_run(
+    model: Path = typer.Option(
+        ...,
+        "--model",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Generated Python model path.",
+    ),
+    spec: Path = typer.Option(
+        ...,
+        "--spec",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Input-uncertainty specification JSON path.",
+    ),
+    output: Path | None = typer.Option(
+        None,
+        "--out",
+        help="Optional path for the uncertainty result JSON.",
+    ),
+    contract: Path | None = typer.Option(
+        None,
+        "--contract",
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        help="Optional generated-module contract JSON used to validate input cell refs.",
+    ),
+    include_samples: bool = typer.Option(
+        False,
+        "--include-samples",
+        help="Include per-draw output values in the result JSON.",
+    ),
+    data_dir: Path | None = typer.Option(
+        None,
+        "--data-dir",
+        help="External input-data directory for a loader-based generated model.",
+    ),
+    stop_on_error: bool = typer.Option(
+        False,
+        "--stop-on-error",
+        help="Abort on the first draw failure instead of recording it.",
+    ),
+) -> None:
+    """Run expected-value and distribution modelling over uncertain inputs."""
+
+    uncertainty_spec = UncertaintySpec.load(spec)
+    if contract is not None:
+        contract_payload = _load_object(contract)
+        input_refs = contract_payload.get("input_refs", ())
+        if not isinstance(input_refs, list) or not all(isinstance(item, str) for item in input_refs):
+            raise typer.BadParameter("contract JSON must contain a string 'input_refs' array")
+        unknown = unknown_input_refs(uncertainty_spec, input_refs)
+        if unknown:
+            raise typer.BadParameter(
+                "uncertainty spec references cell refs that are not declared inputs: " + ", ".join(unknown)
+            )
+
+    calculate = _load_generated_calculate(model)
+    calculate_kwargs = {"data_dir": data_dir} if data_dir is not None else None
+    result = run_uncertainty(
+        calculate,
+        uncertainty_spec,
+        calculate_kwargs=calculate_kwargs,
+        include_samples=include_samples,
+        stop_on_error=stop_on_error,
+    )
+    rendered = json.dumps(result, indent=2, sort_keys=True) + "\n"
+    if output is not None:
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(rendered, encoding="utf-8")
+        typer.echo(str(output))
+    else:
+        typer.echo(rendered, nl=False)
+
+
+def _load_generated_calculate(path: Path) -> Callable[..., Mapping[str, Any]]:
+    module_name = path.stem
+    module_spec = importlib.util.spec_from_file_location(module_name, path)
+    if module_spec is None or module_spec.loader is None:
+        raise typer.BadParameter(f"could not load generated model: {path}")
+    module = importlib.util.module_from_spec(module_spec)
+    sys.modules[module_name] = module
+    module_spec.loader.exec_module(module)
+    calculate = getattr(module, "calculate", None)
+    if not callable(calculate):
+        raise typer.BadParameter(f"generated model has no calculate() entrypoint: {path}")
+    return calculate
 
 
 def _emit_json(payload: dict[str, JsonValue]) -> None:
