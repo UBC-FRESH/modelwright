@@ -29,6 +29,8 @@ This file records completed project work in chronological order.
   deviation 0.55, Monte Carlo standard error 0.28, 90% interval 1871.10–1872.22) with 0 errors in
   475.9 s; `GHG!AE18` correctly stayed constant at 14.2202, reporting zero variance for an output
   not driven by those inputs.
+- Phase 40 merged through PR #257 (squash `289c36f`); post-merge `Test` run #45124424444 and
+  `docs-pages` run #45124424151 passed; parent issue #252 and child issues #253–#256 are closed.
 
 ## 2026-08-15
 

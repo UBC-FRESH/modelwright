@@ -1644,7 +1644,9 @@ GitHub parent issue: #252.
 
 Active branch: `feature/p40-input-data-uncertainty`.
 
-Status: implemented locally; PR pending.
+Status: complete after PR #257 merge; post-merge Test and Docs Pages workflows passed.
+
+Merged PR: #257 (squash merge `289c36f`).
 
 Goal: make the generated-model input boundary explicit and editable without changing default
 generation, and add expected-value/distribution modelling for independent uncertain input variates
@@ -1702,3 +1704,6 @@ Local verification:
 - `.venv/bin/sphinx-build -q -b html docs _build/html -W` passed.
 - `.venv/bin/python scripts/verify_docs_theme.py _build/html` passed.
 - `git diff --check` passed.
+- Post-merge `Test` workflow run #45124424444 passed.
+- Post-merge `docs-pages` workflow run #45124424151 passed and deployed.
+- Parent issue #252 and child issues #253–#256 are closed.
