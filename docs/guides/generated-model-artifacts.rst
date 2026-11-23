@@ -125,6 +125,51 @@ information, and conservative evidence/equivalence statuses. It does not copy ra
 raw output values, workbook contents, or full validation reports. See
 :doc:`validation-evidence` for the exact status rules.
 
+External Input-Data Mode
+------------------------
+
+By default, the generated module embeds its input constants as a ``_constants`` mapping. For
+workflows where analysts need to edit assumptions without touching generated Python, pass
+``--external-data`` to write a versioned input-data directory and generate a loader-based module:
+
+.. code-block:: bash
+
+   modelwright model generate \
+     --contract tmp/contract.json \
+     --expressions tmp/expressions.json \
+     --constants tmp/constants.json \
+     --out tmp/generated-model/generated_model.py \
+     --external-data \
+     > tmp/generation-result.json
+
+The default data directory is ``tmp/generated-model/model_data``; override it with ``--data-dir``. It
+contains:
+
+.. code-block:: text
+
+   model_data/manifest.json
+   model_data/000_Inputs.csv
+   model_data/001_Calc.csv
+
+``manifest.json`` records the format version, workbook id, module name, input count, and per-file
+cell counts and SHA-256 checksums. Each sheet CSV is long-format and stable-sorted by cell coordinate:
+
+.. code-block:: text
+
+   cell_ref,kind,value
+   Inputs!B2,number,100
+   Inputs!B3,number,0.08
+   Inputs!B4,number,0.65
+
+``kind`` is one of ``number``, ``text``, ``boolean``, or ``blank``. Values are parsed accordingly, so
+editing a CSV changes the model's default inputs without regenerating Python. The generated entrypoint
+becomes ``calculate(inputs=None, data_dir=None)``: it loads defaults from ``model_data`` next to the
+module (or from ``data_dir``), and explicit ``inputs`` still override file values. Default generation
+without ``--external-data`` is unchanged.
+
+Only scalar input constants are supported in external data files. When the data directory is missing,
+the loader raises a clear ``FileNotFoundError`` instead of silently falling back.
+
 FABLE Workbook Versions
 -----------------------
 

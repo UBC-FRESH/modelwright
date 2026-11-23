@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import csv
+import hashlib
+import io
+import json
 import re
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
@@ -22,6 +26,9 @@ DEFAULT_INLINE_FORMULA_LAMBDA_LIMIT = 50_000
 DiagnosticSeverity = Literal["info", "warning", "error"]
 FormulaStorage = Literal["lambdas", "expression_source"]
 GeneratedSymbolKind = Literal["input", "intermediate", "output"]
+EXTERNAL_DATA_FORMAT = "modelwright-input-data"
+EXTERNAL_DATA_VERSION = 1
+EXTERNAL_DATA_DIR_NAME = "model_data"
 
 
 @dataclass(frozen=True)
@@ -395,6 +402,110 @@ def infer_generated_module_contract(
     )
 
 
+def _cell_coordinate_sort_key(cell_ref: str) -> tuple[int, int, str]:
+    sheet, _, coordinate = cell_ref.rpartition("!")
+    match = re.fullmatch(r"([A-Za-z]+)([0-9]+)", coordinate)
+    if match is None:
+        return (0, 0, cell_ref)
+    letters, row = match.groups()
+    column = 0
+    for character in letters.upper():
+        column = column * 26 + (ord(character) - 64)
+    return (column, int(row), sheet)
+
+
+def _constant_kind(value: JsonValue) -> str:
+    if value is None:
+        return "blank"
+    if isinstance(value, bool):
+        return "boolean"
+    if isinstance(value, (int, float)):
+        return "number"
+    return "text"
+
+
+def _sheet_file_stem(index: int, sheet: str) -> str:
+    cleaned = re.sub(r"[^0-9A-Za-z._-]+", "_", sheet).strip("._-")
+    if not cleaned:
+        cleaned = "sheet"
+    return f"{index:03d}_{cleaned}"
+
+
+def build_external_model_data(
+    contract: GeneratedModuleContract,
+    constants: Mapping[str, JsonValue],
+) -> dict[str, str]:
+    """Build manifest and per-sheet CSV contents for external input data."""
+
+    by_sheet: dict[str, list[tuple[str, JsonValue]]] = {}
+    for cell_ref, value in constants.items():
+        sheet, separator, _ = cell_ref.rpartition("!")
+        if not separator:
+            raise ValueError(f"input cell ref has no sheet: {cell_ref!r}")
+        by_sheet.setdefault(sheet, []).append((cell_ref, value))
+
+    files: dict[str, str] = {}
+    sheet_records: list[dict[str, Any]] = []
+    for index, sheet in enumerate(sorted(by_sheet)):
+        cells = sorted(by_sheet[sheet], key=lambda item: _cell_coordinate_sort_key(item[0]))
+        buffer = io.StringIO()
+        writer = csv.writer(buffer, lineterminator="\n")
+        writer.writerow(("cell_ref", "kind", "value"))
+        for cell_ref, value in cells:
+            if isinstance(value, (list, dict)):
+                raise ValueError(f"external input data supports scalar values only: {cell_ref!r}")
+            kind = _constant_kind(value)
+            if kind == "blank":
+                rendered = ""
+            elif kind == "boolean":
+                rendered = "true" if value else "false"
+            elif kind == "number":
+                rendered = json.dumps(value)
+            else:
+                rendered = str(value)
+            writer.writerow((cell_ref, kind, rendered))
+        content = buffer.getvalue()
+        filename = _sheet_file_stem(index, sheet) + ".csv"
+        files[filename] = content
+        sheet_records.append(
+            {
+                "sheet": sheet,
+                "file": filename,
+                "cell_count": len(cells),
+                "sha256": hashlib.sha256(content.encode("utf-8")).hexdigest(),
+            }
+        )
+
+    manifest = {
+        "format": EXTERNAL_DATA_FORMAT,
+        "version": EXTERNAL_DATA_VERSION,
+        "workbook_id": contract.workbook_id,
+        "module_name": contract.module_name,
+        "input_ref_count": len(constants),
+        "sheets": sheet_records,
+    }
+    files["manifest.json"] = json.dumps(manifest, indent=2, sort_keys=True) + "\n"
+    return files
+
+
+def write_external_model_data(
+    contract: GeneratedModuleContract,
+    constants: Mapping[str, JsonValue],
+    data_dir: str | Path,
+) -> tuple[Path, tuple[Path, ...]]:
+    """Write external input-data files and return the directory and written paths."""
+
+    directory = Path(data_dir)
+    directory.mkdir(parents=True, exist_ok=True)
+    files = build_external_model_data(contract, constants)
+    written: list[Path] = []
+    for filename in sorted(files):
+        path = directory / filename
+        path.write_text(files[filename], encoding="utf-8")
+        written.append(path)
+    return directory, tuple(written)
+
+
 def generate_python_module(
     *,
     contract: GeneratedModuleContract,
@@ -403,6 +514,8 @@ def generate_python_module(
     output_path: str | Path | None = None,
     progress: Callable[[str], None] | None = None,
     runtime_progress_interval: int | None = None,
+    external_data: bool = False,
+    external_data_dir: str | Path | None = None,
 ) -> GenerationResult:
     """Generate standalone Python source from translated formula expressions."""
 
@@ -420,6 +533,7 @@ def generate_python_module(
         constants=constants,
         progress=progress,
         runtime_progress_interval=runtime_progress_interval,
+        external_data=external_data,
     )
     if output_path is not None:
         path = Path(output_path)
@@ -427,6 +541,14 @@ def generate_python_module(
         _progress(progress, f"python generation write start path={path}")
         path.write_text(source_code, encoding="utf-8")
         _progress(progress, f"python generation write done bytes={path.stat().st_size}")
+    if external_data and (output_path is not None or external_data_dir is not None):
+        data_dir = (
+            Path(external_data_dir)
+            if external_data_dir is not None
+            else Path(output_path).parent / EXTERNAL_DATA_DIR_NAME  # type: ignore[arg-type]
+        )
+        directory, written = write_external_model_data(contract, constants, data_dir)
+        _progress(progress, f"python generation external data write done path={directory} files={len(written)}")
 
     _progress(progress, f"python generation done source_chars={len(source_code)} diagnostics={len(diagnostics)}")
     return GenerationResult(contract=contract, source_code=source_code, diagnostics=tuple(diagnostics))
@@ -481,6 +603,42 @@ def _generation_diagnostics(
     return diagnostics
 
 
+def _render_external_data_loader() -> list[str]:
+    return [
+        "def _load_model_data(data_dir=None):",
+        f"    base = Path(data_dir) if data_dir is not None else Path(__file__).resolve().parent / {EXTERNAL_DATA_DIR_NAME!r}",
+        "    manifest_path = base / 'manifest.json'",
+        "    if not manifest_path.is_file():",
+        "        raise FileNotFoundError(",
+        "            'external model data not found: %s. Pass data_dir=... or regenerate with external data mode.' % manifest_path",
+        "        )",
+        "    manifest = json.loads(manifest_path.read_text(encoding='utf-8'))",
+        f"    if manifest.get('format') != {EXTERNAL_DATA_FORMAT!r}:",
+        "        raise ValueError(f\"unsupported model data format: {manifest.get('format')!r}\")",
+        f"    if manifest.get('version') != {EXTERNAL_DATA_VERSION!r}:",
+        "        raise ValueError(f\"unsupported model data version: {manifest.get('version')!r}\")",
+        "    constants = {}",
+        "    for sheet in manifest.get('sheets', ()):",
+        "        path = base / sheet['file']",
+        "        with path.open(newline='', encoding='utf-8') as handle:",
+        "            for row in csv.DictReader(handle):",
+        "                kind = row['kind']",
+        "                raw = row['value']",
+        "                if kind == 'number':",
+        "                    value = json.loads(raw)",
+        "                elif kind == 'boolean':",
+        "                    value = raw == 'true'",
+        "                elif kind == 'blank':",
+        "                    value = None",
+        "                else:",
+        "                    value = raw",
+        "                constants[row['cell_ref']] = value",
+        "    return constants, manifest",
+        "",
+        "",
+    ]
+
+
 def _render_module(
     *,
     contract: GeneratedModuleContract,
@@ -488,6 +646,7 @@ def _render_module(
     constants: Mapping[str, JsonValue],
     progress: Callable[[str], None] | None = None,
     runtime_progress_interval: int | None = None,
+    external_data: bool = False,
 ) -> str:
     lines = [
         '"""Generated Modelwright model.',
@@ -1067,25 +1226,39 @@ def _render_module(
         "    return row[col_index]",
         "",
         "",
-        f"def {contract.entrypoint}(inputs=None):",
-        "    inputs = {} if inputs is None else dict(inputs)",
-        "    _cache = {}",
-        "    _range_cache = {}",
-        "    _stack = []",
-        "    _evaluated_count = 0",
-        "    _constants = {",
     ]
 
     input_symbols = tuple(symbol for symbol in contract.symbols if symbol.kind == "input")
     formula_symbols = tuple(symbol for symbol in contract.symbols if symbol.kind != "input")
 
-    for symbol in input_symbols:
-        default_value = constants.get(symbol.cell_ref)
-        lines.append(f"        {symbol.cell_ref!r}: {default_value!r},")
+    if external_data:
+        lines[6:6] = ["import csv", "import json", "from pathlib import Path"]
+        lines.extend(_render_external_data_loader())
+        entrypoint_signature = f"def {contract.entrypoint}(inputs=None, data_dir=None):"
+    else:
+        entrypoint_signature = f"def {contract.entrypoint}(inputs=None):"
 
     lines.extend(
         [
-            "    }",
+            entrypoint_signature,
+            "    inputs = {} if inputs is None else dict(inputs)",
+            "    _cache = {}",
+            "    _range_cache = {}",
+            "    _stack = []",
+            "    _evaluated_count = 0",
+        ]
+    )
+    if external_data:
+        lines.append("    _constants, _data_manifest = _load_model_data(data_dir)")
+    else:
+        lines.append("    _constants = {")
+        for symbol in input_symbols:
+            default_value = constants.get(symbol.cell_ref)
+            lines.append(f"        {symbol.cell_ref!r}: {default_value!r},")
+        lines.append("    }")
+
+    lines.extend(
+        [
             "",
             "    def _get(cell_ref):",
             "        nonlocal _evaluated_count",

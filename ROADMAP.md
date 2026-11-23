@@ -1637,3 +1637,68 @@ Local verification:
 - `.venv/bin/python scripts/verify_docs_theme.py _build/html` passed.
 - `scripts/check_release_artifacts.sh` passed.
 - `git diff --check` passed.
+
+## Phase 40: External Input-Data Mode And Input-Uncertainty Distribution Modelling
+
+GitHub parent issue: #252.
+
+Active branch: `feature/p40-input-data-uncertainty`.
+
+Status: implemented locally; PR pending.
+
+Goal: make the generated-model input boundary explicit and editable without changing default
+generation, and add expected-value/distribution modelling for independent uncertain input variates
+driven through the generated model.
+
+- [x] P40.1 Add opt-in external input-data generation mode and runtime loader. Child issue: #253.
+- [x] P40.2 Add input-uncertainty distribution spec, inverse-CDF sampling, and expected-value
+  distribution summaries. Child issue: #254.
+- [x] P40.3 Add CLI commands and documentation for external input data and input uncertainty.
+  Child issue: #255.
+- [x] P40.4 Verify local quality, tests, docs, and the 2024 FABLE external-data experiment; record
+  evidence. Child issue: #256.
+
+Dependency note: P40.1 is a materialization experiment over the existing contract `input_refs` and
+`constants.json` boundary; P40.2 consumes the same boundary through `calculate(inputs=...)`.
+
+Acceptance boundary:
+
+- May emit and load versioned external input-data files for generated models, and summarize
+  independent input-uncertainty draws (expected value, standard deviation, percentiles, histogram,
+  coefficient of variation) for generated-model outputs.
+- Must not claim correlation/copula modelling, Sobol or variance-based global sensitivity,
+  arbitrary-workbook equivalence, or production-scale Monte Carlo throughput.
+- Default generation output and behavior must remain unchanged; external data mode is opt-in.
+
+Implementation evidence:
+
+- Added `build_external_model_data` and `write_external_model_data` in `generation.py`, plus
+  `generate_python_module(..., external_data=True, external_data_dir=...)`. External mode renders a
+  `_load_model_data` loader and `calculate(inputs=None, data_dir=None)`; embedded mode is unchanged.
+- Added `modelwright.uncertainty` with `InputDistribution`, `UncertaintySpec`, `iter_input_draws`,
+  `evaluate_draws`, `summarize_draws`, `run_uncertainty`, and `unknown_input_refs`.
+- Added `model generate --external-data/--data-dir` and `modelwright uncertainty run` with
+  `--model`, `--spec`, `--contract`, `--data-dir`, `--include-samples`, and `--stop-on-error`.
+- Added `docs/guides/input-uncertainty.rst`, external-data documentation, CLI/API reference updates,
+  and 19 tests across `tests/test_external_model_data.py` and `tests/test_uncertainty.py`.
+- 2024 FABLE external-data experiment: regenerated the full model in external mode in 463.2 s
+  (`generated=True`, 0 output-closure untranslated, 105,125 inputs across 46 sheets); the data bundle
+  is 3.7 MiB (46 CSVs + manifest). All 10,274 outputs matched the embedded model exactly (0
+  mismatches, max absolute/relative difference 0.0); calculate time was 124.5 s embedded vs 128.8 s
+  external.
+- Edit-workflow demonstration: changing one CSV input (`1_data_demand!BU26`, 916.6565 → 1000) and
+  rerunning changed exactly one output (`FOOD!V15`, 1871.32198 → 1868.41989, 0.155% relative) in
+  123.2 s, without the 463.2 s regeneration step.
+- 2024 uncertainty probe: four seeded draws on `1_data_demand!BU26` and `1_data_demand!BU27`
+  (normal, 2% standard deviation) produced a `FOOD!V15` mean of 1871.57 (median 1871.44, standard
+  deviation 0.55, Monte Carlo standard error 0.28, 90% interval 1871.10–1872.22) with 0 errors in
+  475.9 s; `GHG!AE18` stayed constant at 14.2202, correctly reporting zero variance for an output not
+  driven by those inputs.
+
+Local verification:
+
+- `.venv/bin/python -m ruff check .` passed.
+- `.venv/bin/python -m pytest` passed with 236 tests and 1 skipped benchmark.
+- `.venv/bin/sphinx-build -q -b html docs _build/html -W` passed.
+- `.venv/bin/python scripts/verify_docs_theme.py _build/html` passed.
+- `git diff --check` passed.

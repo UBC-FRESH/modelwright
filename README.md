@@ -21,6 +21,8 @@ The durable API is organized by module responsibility:
 - `modelwright.formulas`: formula expression records, translation helpers, and reference-index helpers.
 - `modelwright.generation`: generated-module records and `generate_python_module`.
 - `modelwright.validation`: validation scenarios, scalar comparisons, and report records.
+- `modelwright.uncertainty`: input-uncertainty distributions, inverse-CDF sampling, and
+  expected-value/output-distribution summaries for generated models.
 - `modelwright.oracles`, `modelwright.formulas_oracle`, and `modelwright.oracle_validation`: oracle request/result records, optional `formulas` oracle execution, and oracle-backed report assembly.
 
 The package root `modelwright` exposes a curated convenience facade for those records and functions. Module-level imports remain preferred for implementation work because this project is still pre-release.
@@ -40,6 +42,7 @@ modelwright workbook extract path/to/workbook.xlsx > tmp/extraction.json
 modelwright workbook graph path/to/workbook.xlsx > tmp/dependency-graph.json
 modelwright conversion plan path/to/workbook.xlsx > tmp/conversion-plan.json
 modelwright model generate --contract tmp/contract.json --expressions tmp/expressions.json --constants tmp/constants.json --out tmp/generated_model.py > tmp/generation-result.json
+modelwright uncertainty run --model tmp/generated_model.py --spec tmp/uncertainty-spec.json > tmp/uncertainty-result.json
 modelwright validation report --scenario tests/fixtures/synthetic_model/baseline_scenario.json --generated-values tmp/generated-values.json --oracle-values tmp/oracle-values.json > tmp/validation-report.json
 ```
 
