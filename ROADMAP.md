@@ -1640,7 +1640,7 @@ Local verification:
 
 ## Phase 40: External Input-Data Mode And Input-Uncertainty Distribution Modelling
 
-GitHub parent issue: pending (GitHub CLI authentication unavailable in this session; open when restored).
+GitHub parent issue: #252.
 
 Active branch: `feature/p40-input-data-uncertainty`.
 
@@ -1650,12 +1650,13 @@ Goal: make the generated-model input boundary explicit and editable without chan
 generation, and add expected-value/distribution modelling for independent uncertain input variates
 driven through the generated model.
 
-- [x] P40.1 Add opt-in external input-data generation mode and runtime loader.
+- [x] P40.1 Add opt-in external input-data generation mode and runtime loader. Child issue: #253.
 - [x] P40.2 Add input-uncertainty distribution spec, inverse-CDF sampling, and expected-value
-  distribution summaries.
+  distribution summaries. Child issue: #254.
 - [x] P40.3 Add CLI commands and documentation for external input data and input uncertainty.
+  Child issue: #255.
 - [x] P40.4 Verify local quality, tests, docs, and the 2024 FABLE external-data experiment; record
-  evidence.
+  evidence. Child issue: #256.
 
 Dependency note: P40.1 is a materialization experiment over the existing contract `input_refs` and
 `constants.json` boundary; P40.2 consumes the same boundary through `calculate(inputs=...)`.
